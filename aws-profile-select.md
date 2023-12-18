@@ -48,7 +48,7 @@ Adding an alias to both config files is advised. Even if you only use one of the
 Using a new terminal window or tab (required for the new alias settings to take effect), simply run the script using the alias created above (aws-switch.zsh):
 
 ```
-aws-superstar@hackstation-[~]: aws-switch.zsh
+aws-superstar@hackstation-[~]: aws-switch
 
 ------------- AWS Profile Select-O-Matic -------------
 No profile set yet
