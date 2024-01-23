@@ -14,6 +14,27 @@ sdk=1
 
 AWS_PROFILE="technative-userauth"
 
+# # Voer AWS CLI-commando uit om de identiteit op te halen
+# aws_sts_output=$(aws sts get-caller-identity --profile $AWS_PROFILE 2>&1)
+
+aws_mfa_session_file=".aws-profile-switch.mfa.session"
+aws_mfa_session_file=${aws_mfa_session_file/#\~/$HOME}
+
+# Check for valid aws-mfa session
+#while [[ -z ${mfa_session_valid} ]]; do
+#  while [[ ! -f ${aws_mfa_session_file} ]]; do
+#    aws-mfa --profile ${mfa_profile} --device ${mfa_device_arn} | sed -n -e 's/^.*expire at //p' | tee ${aws_mfa_session_file}
+#  done
+#  check_datetime=$(<${aws_mfa_session_file})
+#  current_datetime=$(date "+%Y-%m-%d %H:%M")
+#
+#  if [[ ${check_datetime} == ${current_datetime} ]]; then
+#    mfa_session_valid=true
+#  else
+#    aws-mfa --profile ${mfa_profile} --device ${mfa_device_arn} | sed -n -e 's/^.*expire at //p' | tee ${aws_mfa_session_file}
+#  fi
+#done
+
 # Controleer de uitvoer van het AWS CLI-commando
 if [ $? -eq 0 ]; then
   echo "Valid AWS-session found:"
