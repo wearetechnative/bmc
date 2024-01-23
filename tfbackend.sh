@@ -6,8 +6,6 @@ IFS=$'\n'
 backends=($backends)
 IFS=$IFSBAK
 backends_len=${#backends[*]}
-echo $backends
-echo $backends_len
 
 sdk=1
 
@@ -31,11 +29,18 @@ function usage {
   # exit 1
 }
 
+function set_tfbackend_prompt {
+  TF_BACKENDPROMPTBAK=
+  TF_BACKEND=$(terraform show | grep -A2 "module.terraformbackend.module.state_lock.aws_dynamodb_table.this"|tail -1|awk -F ":" '{print $5}')
+}
+
 function set_tfbackend {
   backend_file=$1
   if [[ -z ${backend_file} ]]; then echo "!!! Error backend-file"; exit 1;fi
   terraform  init -backend-config="${backend_file}" -reconfigure
-  TF_BACKEND=$(terraform show | grep -A2 "module.terraformbackend.module.state_lock.aws_dynamodb_table.this"|tail -1|awk -F ":" '{print $5}')
+  echo ${TF_BACKEND} > .terraform.tfbackend.state
+  # TF_ENV=$(echo $TF_BACKEND |awk -F '.' '{print $1}')
+  # export TF_ENV
 }
 
 function set_prompt {
@@ -96,7 +101,7 @@ function read_selection {
       new_prompt="${cmd_prompt}-(${backends[choice]}): "
       if [[ $shell_type == "zsh" ]]; then
         if [[ ${rprompt_config} == "true" ]]; then
-		export RPROMPT=${profiles[choice]}-${TF_BACKEND}
+		export RPROMPT=${profiles[choice]}-${backends[choice]}
         else
           export PROMPT="$new_prompt"
         fi
@@ -113,6 +118,7 @@ function read_selection {
     fi
   done
 }
+
 
 if [ $# -gt 0 ]; then
   while [ ! $# -eq 0 ]; do
