@@ -25,11 +25,55 @@ You will need to have your AWS CLI configured with profiles before this tool doe
 
 For configuring different AWS profiles using a single IAM account and MFA, see the documentation here: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html
 
+The MFA_ARN needs to be configured with the -longterm configuration.
+
+<details>
+<summary>Example config file</summary>
+
+```bash
+[company-userauth]
+region = eu-central-1
+source_profile=company-userauth
+
+[profile company-playground]
+region = eu-central-1
+role_arn = arn:aws:iam::123456789012:role/landing_zone_devops_administrator
+source_profile = company-userauth
+
+[profile company-playground-mgt]
+region = eu-central-1
+role_arn = arn:aws:iam::12345678912:role/landing_zone_devops_administrator
+source_profile = company-userauth
+```
+</details>
+
+
+<details>
+<summary>Example credential file</summary>
+
+```bash
+[company-userauth-long-term]
+aws_access_key_id = <AWS-CREDENTIALS-KEY-ID>
+aws_secret_access_key = <AWS-CREDENTIALS-SECRET-ACCESS-KEY>
+aws_mfa_device = arn:aws:iam::123456789012:mfa/<MFA-DEVICE-ALIAS>
+
+[company-userauth]
+aws_access_key_id = ASIAXSZQFYVIG374RTHB
+aws_secret_access_key = 9Kdfk8SUICbA+5izT/oKZx9LODSQ7DmYLXiu/Z3U
+assumed_role = False
+aws_security_token = 
+aws_session_token =
+expiration = 
+
+```
+</details>
+
+
 ---
 
 ### To install/upgrade:
 
-_Note_: the procedures below will be replaced by a homebrew tap in the near future. Until then, installation and upgrade is a manual process.
+_Note_: the procedures might be a little different, depending on your personal configuration
 
 1. Download, optionally inspect, and copy the script to an appropriate folder
 2. Add aliases:
@@ -39,7 +83,9 @@ _Note_: the procedures below will be replaced by a homebrew tap in the near futu
     ```
 
     For oh-my-zsh users:
+    ```
     echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.oh-my-zsh/custom/aliases.zsh
+    ```
 
 Adding an alias to both config files is advised. Even if you only use one of the above shells, this will ensure that aws-switch.zsh works the same in either, should the need arise.
 
@@ -78,12 +124,21 @@ aws-superstar@hackstation[~]: (company-main): echo $AWS_PROFILE
 company-main
 ```
 
-##### Aditional usage:
-```
-Usage: aws-switch.zsh [-n|--no-sdk] [-h|--help]
+##### aws-mfa
+To use `aws-mfa`, you need to:
 
-If you do not want the AWS_SDK_LOAD_CONFIG environment variable to be set to `1` (true), append -n or --no-sdk to the command
+- install the tool manually.
+- set variable `aws_mfa`
+
+**General installation**:
+
+See [https://github.com/broamski/aws-mfa](https://github.com/broamski/aws-mfa)
+
+**Homebrew installation**:
+
+```
+ brew install aws-iam-authenticator
 ```
 
-###### © Copyright 2022 Jesse Price, all rights reserved
+###### Wouter van der Toorren. Forked from: Jesse Price
 
