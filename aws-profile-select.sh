@@ -1,9 +1,7 @@
+## Copyright 2022 Jesse Price
 ## User configurable setings
 # User RPROMPT function, zsh only
-#
-# Version: 2024012301
-#
-
+# set -x
 rprompt_config="true"
 aws_sso="false"
 aws_mfa="true"
@@ -88,6 +86,7 @@ function mfa {
 
   if [[ -z ${source_profile} ]]; then
     source_profile_longterm="${AWS_PROFILE}-long-term"
+    source_profile=${AWS_PROFILE}
   else
     source_profile_longterm="${source_profile}-long-term"
   fi
@@ -98,6 +97,7 @@ function mfa {
 
   if [[ ${expiration_date} -lt ${date_now} ]]; then
     if [[ ! -z ${mfa_arn} ]]; then
+      echo aws-mfa --profile ${source_profile} --force --device ${mfa_arn}
       aws-mfa --profile ${source_profile} --force --device ${mfa_arn}
     else
       echo "!! MFA_arn not found. Can't renew session"
@@ -200,4 +200,3 @@ else
   # Kick off the main function:
   main
 fi
-
