@@ -1,48 +1,16 @@
-## Copyright 2022 Jesse Price
-
 ## User configurable setings
-
 # User RPROMPT function, zsh only
+#
+# Version: 2024012301
+#
+
 rprompt_config="true"
-aws_sso="true"
+aws_sso="false"
 aws_mfa="true"
-mfa_profile="technative-userauth"
-mfa_device_arn="arn:aws:iam::521402697040:mfa/wouter@technative.nl"
 
 # Enable setting of AWS_SDK_LOAD_CONFIG by default
 sdk=1
-
-AWS_PROFILE="technative-userauth"
-
-# # Voer AWS CLI-commando uit om de identiteit op te halen
-# aws_sts_output=$(aws sts get-caller-identity --profile $AWS_PROFILE 2>&1)
-
-aws_mfa_session_file=".aws-profile-switch.mfa.session"
-aws_mfa_session_file=${aws_mfa_session_file/#\~/$HOME}
-
-# Check for valid aws-mfa session
-#while [[ -z ${mfa_session_valid} ]]; do
-#  while [[ ! -f ${aws_mfa_session_file} ]]; do
-#    aws-mfa --profile ${mfa_profile} --device ${mfa_device_arn} | sed -n -e 's/^.*expire at //p' | tee ${aws_mfa_session_file}
-#  done
-#  check_datetime=$(<${aws_mfa_session_file})
-#  current_datetime=$(date "+%Y-%m-%d %H:%M")
-#
-#  if [[ ${check_datetime} == ${current_datetime} ]]; then
-#    mfa_session_valid=true
-#  else
-#    aws-mfa --profile ${mfa_profile} --device ${mfa_device_arn} | sed -n -e 's/^.*expire at //p' | tee ${aws_mfa_session_file}
-#  fi
-#done
-
-# Controleer de uitvoer van het AWS CLI-commando
-if [ $? -eq 0 ]; then
-  echo "Valid AWS-session found:"
-  echo "$aws_sts_output"
-else
-  echo "No valid AWS-session found."
-  aws-mfa --profile ${mfa_profile} -userauth --device ${mfa_device_arn}
-fi
+unset mfaduration
 
 if [ -n "$ZSH_VERSION" ]; then
   # zsh-handling
@@ -71,12 +39,13 @@ profiles=$(grep '^\[' <~/.aws/config | sed -E 's/\[profile (.*)/\1/g' | sed 's/\
 
 IFSBAK=$IFS
 IFS=$'\n'
-profiles=($profiles)
+profiles=(${profiles})
 IFS=$IFSBAK
 
 profiles_len=${#profiles[*]}
 
 function main {
+  parse_arguments
   printf "Current value of AWS_SDK_LOAD_CONFIG: ${AWS_SDK_LOAD_CONFIG}\n"
   echo
   echo ------------- AWS Profile Select-O-Matic -------------
@@ -108,6 +77,34 @@ function set_prompt {
     echo "$i: ${profiles[$i]}"
   done
   read_selection
+}
+
+function mfa {
+  # Check for valid aws-mfa session
+  unset expiration_date
+
+  # search long-term
+  source_profile=$(sed -n -e "/\[.*${AWS_PROFILE}\]/,/^$/ s/^[[:space:]]*source_profile[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/config)
+
+  if [[ -z ${source_profile} ]]; then
+    source_profile_longterm="${AWS_PROFILE}-long-term"
+  else
+    source_profile_longterm="${source_profile}-long-term"
+  fi
+
+  expiration_date=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(sed -n -e "/\[${source_profile}\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)" "+%s" 2>/dev/null)
+  date_now=$(date +%s)
+  mfa_arn=$(sed -n -e "/\[${source_profile_longterm}\]/,/^$/ s/^[[:space:]]*aws_mfa_device[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)
+
+  if [[ ${expiration_date} -lt ${date_now} ]]; then
+    if [[ ! -z ${mfa_arn} ]]; then
+      aws-mfa --profile ${source_profile} --force --device ${mfa_arn}
+    else
+      echo "!! MFA_arn not found. Can't renew session"
+    fi
+  else
+    echo "MFA Valid"
+  fi
 }
 
 function selection_menu {
@@ -158,8 +155,8 @@ function read_selection {
       new_prompt="${cmd_prompt}aps:(${profiles[choice]}): "
       if [[ $shell_type == "zsh" ]]; then
         if [[ ${rprompt_config} == "true" ]]; then
-		    # export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
-        export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
+          # export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
+          export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
         else
           export PROMPT="$new_prompt"
         fi
@@ -167,6 +164,10 @@ function read_selection {
         export PS1="$new_prompt"
       fi
       in_range=true
+
+      if [[ ${aws_mfa} == "true" ]]; then
+        mfa
+      fi
     else
       clear
       echo Invalid selection. Select a valid profile number or press ctrl+c to exit
@@ -188,10 +189,15 @@ if [ $# -gt 0 ]; then
       # Kick off the main function:
       main
       ;;
+    *)
+      echo "Invalid script parameters"
+      main
+      ;;
     esac
-    shift
+    main
   done
 else
   # Kick off the main function:
   main
 fi
+
