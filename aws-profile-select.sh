@@ -103,7 +103,7 @@ function mfa {
       echo "!! MFA_arn not found. Can't renew session"
     fi
   else
-    echo "MFA Valid"
+    echo "MFA Validi, until: $(date -j -f "%s" ${expiration_date} "%Y-%m-%d %H:%M:%S")"
   fi
 }
 
