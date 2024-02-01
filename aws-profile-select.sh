@@ -43,7 +43,7 @@ IFS=$IFSBAK
 profiles_len=${#profiles[*]}
 
 function main {
-  parse_arguments
+  # parse_arguments
   printf "Current value of AWS_SDK_LOAD_CONFIG: ${AWS_SDK_LOAD_CONFIG}\n"
   echo
   echo ------------- AWS Profile Select-O-Matic -------------
@@ -58,6 +58,30 @@ function main {
 
   # Show the menu
   selection_menu
+}
+
+read_aws_config() {
+	oldCol=$COLUMNS
+	COLUMNS=6
+	 config_file="$HOME/.aws/config"
+
+    if [ -f "$config_file" ]; then
+        while IFS= read -r line; do
+            if [[ $line == \[* ]]; then
+                current_profile=$(echo "$line" | sed 's/\[\(.*\)\]/\1/')
+            elif [[ $line == role_arn* ]]; then
+                role_arn=$(echo "$line" | awk -F'=' '{print $2}' | tr -d '[:space:]')
+                account_number=$(echo "$role_arn" | cut -d':' -f5)
+
+                if [[ "$account_number" =~ ^[0-9]+$ ]]; then
+                    printf "%s : %s\n" "$account_number" "$current_profile"
+                fi
+            fi
+        done < "$config_file"
+    else
+        echo "AWS config file not found: $config_file"
+    fi
+    COLUMNS=$oldCol
 }
 
 function usage {
@@ -120,6 +144,7 @@ function read_selection {
   echo
   printf 'Selection: '
   read choice
+  COLUMN=6
   case $choice in
   '' | *[!0-9\-]*)
     clear
@@ -181,6 +206,10 @@ function read_selection {
 if [ $# -gt 0 ]; then
   while [ ! $# -eq 0 ]; do
     case "$1" in
+    -l)
+	    read_aws_config
+	    break
+	  ;;
     --help | -h)
       usage
       ;;
