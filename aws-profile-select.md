@@ -25,11 +25,6 @@ You will need to have your AWS CLI configured with profiles before this tool doe
 
 For configuring different AWS profiles using a single IAM account and MFA, see the documentation here: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html
 
-##### AWS_MFA
-
-To use AWS_MFA, you need to install aws-mfa python script; check this site: [https://github.com/broamski/aws-mfa](https://github.com/broamski/aws-mfa) 
-The MFA_ARN needs to be configured with the -longterm configuration. Check the example 'Example credential file' below, notice the line in block 'company-userauth-long-term' that starts with 'role_arn = '  
-
 <details>
 <summary>Example config file</summary>
 
