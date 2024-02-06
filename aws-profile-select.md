@@ -14,8 +14,8 @@ It's also a handy way to see the currently selected profile, as it is given in a
 
 aws-switch.zsh has been tested to be compatible with the following shell versions:
 
--   Bash: v4 and newer
--   ZSH: tested with v5.8 (with [Oh My Zsh!](https://github.com/ohmyzsh/ohmyzsh/wiki) installed, but should work equally well without it)
+- Bash: v4 and newer
+- ZSH: tested with v5.8 (with [Oh My Zsh!](https://github.com/ohmyzsh/ohmyzsh/wiki) installed, but should work equally well without it)
 
 It may work with shells sharing compatibility with the above, but it's certainly not guaranteed.
 
@@ -25,7 +25,10 @@ You will need to have your AWS CLI configured with profiles before this tool doe
 
 For configuring different AWS profiles using a single IAM account and MFA, see the documentation here: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html
 
-The MFA_ARN needs to be configured with the -longterm configuration.
+##### AWS_MFA
+
+To use AWS_MFA, you need to install aws-mfa python script; check this site: [https://github.com/broamski/aws-mfa](https://github.com/broamski/aws-mfa) 
+The MFA_ARN needs to be configured with the -longterm configuration. Check the example 'Example credential file' below, notice the line in block 'company-userauth-long-term' that starts with 'role_arn = '  
 
 <details>
 <summary>Example config file</summary>
@@ -45,8 +48,8 @@ region = eu-central-1
 role_arn = arn:aws:iam::12345678912:role/landing_zone_devops_administrator
 source_profile = company-userauth
 ```
-</details>
 
+</details>
 
 <details>
 <summary>Example credential file</summary>
@@ -61,13 +64,13 @@ aws_mfa_device = arn:aws:iam::123456789012:mfa/<MFA-DEVICE-ALIAS>
 aws_access_key_id = ASIAXSZQFYVIG374RTHB
 aws_secret_access_key = 9Kdfk8SUICbA+5izT/oKZx9LODSQ7DmYLXiu/Z3U
 assumed_role = False
-aws_security_token = 
+aws_security_token =
 aws_session_token =
-expiration = 
+expiration =
 
 ```
-</details>
 
+</details>
 
 ---
 
@@ -77,15 +80,17 @@ _Note_: the procedures might be a little different, depending on your personal c
 
 1. Download, optionally inspect, and copy the script to an appropriate folder
 2. Add aliases:
-    ```
-    echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.bash_profile
-    echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.zshrc
-    ```
 
-    For oh-my-zsh users:
-    ```
-    echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.oh-my-zsh/custom/aliases.zsh
-    ```
+   ```
+   echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.bash_profile
+   echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.zshrc
+   ```
+
+   For oh-my-zsh users:
+
+   ```
+   echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.oh-my-zsh/custom/aliases.zsh
+   ```
 
 Adding an alias to both config files is advised. Even if you only use one of the above shells, this will ensure that aws-switch.zsh works the same in either, should the need arise.
 
@@ -125,6 +130,7 @@ company-main
 ```
 
 ##### aws-mfa
+
 To use `aws-mfa`, you need to:
 
 - install the tool manually.
@@ -141,4 +147,3 @@ See [https://github.com/broamski/aws-mfa](https://github.com/broamski/aws-mfa)
 ```
 
 ###### Wouter van der Toorren. Forked from: Jesse Price
-
