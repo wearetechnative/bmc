@@ -1,19 +1,19 @@
-## Copyright 2022 Jesse Price
-## User configurable setings
-# User RPROMPT function, zsh only
-# set -x
+#!/bin/bash
+# Version: 2024020601
+
 rprompt_config="true"
 aws_sso="false"
 aws_mfa="true"
 
 # Enable setting of AWS_SDK_LOAD_CONFIG by default
 sdk=1
+exit_script="false"
 unset mfaduration
 
 if [ -n "$ZSH_VERSION" ]; then
   # zsh-handling
   shell_type=zsh
-  echo "!! check zsh_version"
+  # echo "!! check zsh_version"
   setopt ksh_arrays
   setopt SH_WORD_SPLIT
   if [ -z "$PROMPTBAK" ]; then
@@ -45,9 +45,7 @@ profiles_len=${#profiles[*]}
 function main {
   # parse_arguments
   printf "Current value of AWS_SDK_LOAD_CONFIG: ${AWS_SDK_LOAD_CONFIG}\n"
-  echo
   echo ------------- AWS Profile Select-O-Matic -------------
-  echo
   if [ -z "$AWS_PROFILE" ]; then
     printf "No profile set yet\n\n"
   else
@@ -57,32 +55,41 @@ function main {
   echo
 
   # Show the menu
-  selection_menu
+  # echo "!! READ SELECTION"
+  read_selection
+  # echo "!! CHECK DSK"
+  check_sdk
+  # echo "!! SET PROMPT"
+  set_prompt
+
+  if [[ ${aws_mfa} == "true" ]]; then mfa; fi
+  # if [[ ${aws_sso} == "true" ]]; then sso; fi
+
 }
 
-read_aws_config() {
-	oldCol=$COLUMNS
-	COLUMNS=6
-	 config_file="$HOME/.aws/config"
+# read_aws_config() {
+#   oldCol=$COLUMNS
+#   COLUMNS=6
+#   config_file="$HOME/.aws/config"
 
-    if [ -f "$config_file" ]; then
-        while IFS= read -r line; do
-            if [[ $line == \[* ]]; then
-                current_profile=$(echo "$line" | sed 's/\[\(.*\)\]/\1/')
-            elif [[ $line == role_arn* ]]; then
-                role_arn=$(echo "$line" | awk -F'=' '{print $2}' | tr -d '[:space:]')
-                account_number=$(echo "$role_arn" | cut -d':' -f5)
+#   if [ -f "$config_file" ]; then
+#     while IFS= read -r line; do
+#       if [[ $line == \[* ]]; then
+#         current_profile=$(echo "$line" | sed 's/\[\(.*\)\]/\1/')
+#       elif [[ $line == role_arn* ]]; then
+#         role_arn=$(echo "$line" | awk -F'=' '{print $2}' | tr -d '[:space:]')
+#         account_number=$(echo "$role_arn" | cut -d':' -f5)
 
-                if [[ "$account_number" =~ ^[0-9]+$ ]]; then
-                    printf "%s : %s\n" "$account_number" "$current_profile"
-                fi
-            fi
-        done < "$config_file"
-    else
-        echo "AWS config file not found: $config_file"
-    fi
-    COLUMNS=$oldCol
-}
+#         if [[ "$account_number" =~ ^[0-9]+$ ]]; then
+#           printf "%s : %s\n" "$account_number" "$current_profile"
+#         fi
+#       fi
+#     done <"$config_file"
+#   else
+#     echo "AWS config file not found: $config_file"
+#   fi
+#   COLUMNS=$oldCol
+# }
 
 function usage {
   echo "Usage: aps [-n|--no-sdk] [-h|--help]"
@@ -91,22 +98,15 @@ function usage {
   # exit 1
 }
 
-# Takes 1 argument: the variable name which stores the prompt (PS1/PROMPT)
-function set_prompt {
-  # echo ${profiles[*]}
-  echo "-: Unset Profile"
-  for ((i = 0; i < $profiles_len; i++)); do
-    echo "$i: ${profiles[$i]}"
-  done
-  read_selection
-}
-
 function mfa {
+  if [[ ${exit_script} == "true" ]]; then return; fi
   # Check for valid aws-mfa session
   unset expiration_date
 
   # search long-term
+  # echo "!!! MFA: AWS_PROFILE: ${AWS_PROFILE}"
   source_profile=$(sed -n -e "/\[.*${AWS_PROFILE}\]/,/^$/ s/^[[:space:]]*source_profile[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/config)
+  # echo "!!! MFA: source_profile: ${source_profile}"
 
   if [[ -z ${source_profile} ]]; then
     source_profile_longterm="${AWS_PROFILE}-long-term"
@@ -131,34 +131,26 @@ function mfa {
   fi
 }
 
-function selection_menu {
-  # echo ${profiles[*]}
-  echo "-: Unset Profile"
-  for ((i = 0; i < $profiles_len; i++)); do
-    echo "$i: ${profiles[$i]}"
-  done
-  read_selection
-}
+# function selection_menu {
+#   # echo ${profiles[*]}
+#   # echo "-: Unset Profile"
+#   # for ((i = 0; i < $profiles_len; i++)); do
+#   #   echo "$i: ${profiles[$i]}"
+#   # done
+#   # read_selection
+# }
 
 function read_selection {
-  echo
-  printf 'Selection: '
-  read choice
-  COLUMN=6
-  case $choice in
-  '' | *[!0-9\-]*)
-    clear
-    echo Invalid selection. Make a valid selection from the list above or press ctrl+c to exit
-    echo '-> Error: Not a number, and not "-"'
-    echo
-    selection_menu
-    ;;
-  esac
-  in_range=false
-  while [ $in_range != true ]; do
-    if [[ $choice == '-' ]]; then
-      echo "Deactivating all profiles"
-      unset AWS_PROFILE
+  PS3="Select a profile number: "
+  echo "-: Unset profile"
+  select item in "${profiles[@]}"; do
+    if [[ -n ${item} ]]; then
+      echo "AWS_PROFILE set to $item"
+      export AWS_PROFILE=${item}
+      break
+    fi
+    if [[ ${REPLY} == "-" ]]; then
+      echo "Unsetting profile"
       if [[ $shell_type == "zsh" ]]; then
         export PROMPT="$PROMPTBAK"
         if [[ ${rprompt_config} == "true" ]]; then
@@ -167,38 +159,48 @@ function read_selection {
       else
         export PS1="$PS1BAK"
       fi
-      in_range=true
-    elif (($choice >= 0)) && (($choice <= ${profiles_len})); then
-      # Set AWS_SDK_LOAD_CONFIG to true to make this useful for tools such as Terraform and Serverless framework
-      if (($sdk == 1)); then
-        export AWS_SDK_LOAD_CONFIG=1
-      else
-        export AWS_SDK_LOAD_CONFIG=0
-      fi
-      echo "Activating profile ${choice}: ${profiles[choice]}"
-      export AWS_PROFILE="${profiles[choice]}"
-      new_prompt="${cmd_prompt}aps:(${profiles[choice]}): "
-      if [[ $shell_type == "zsh" ]]; then
-        if [[ ${rprompt_config} == "true" ]]; then
-          # export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
-          export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
-        else
-          export PROMPT="$new_prompt"
-        fi
-      else
-        export PS1="$new_prompt"
-      fi
-      in_range=true
-
-      if [[ ${aws_mfa} == "true" ]]; then
-        mfa
-      fi
+      exit_script=true
+      break
     else
-      clear
       echo Invalid selection. Select a valid profile number or press ctrl+c to exit
-      echo "-> Error:  Number must be one of 0-"$((${#profiles[@]} - 1))""
-      echo
-      selection_menu
+    fi
+  done
+}
+
+function check_sdk {
+  # Set AWS_SDK_LOAD_CONFIG to true to make this useful for tools such as Terraform and Serverless framework
+  if (($sdk == 1)); then
+    export AWS_SDK_LOAD_CONFIG=1
+  else
+    export AWS_SDK_LOAD_CONFIG=0
+  fi
+}
+
+function set_prompt {
+  new_prompt="${cmd_prompt}aps:(${AWS_PROFILE}): "
+
+  # set prompt for ZSH or BASH
+  if [[ $shell_type == "zsh" ]]; then
+    # ZSH
+    if [[ ${rprompt_config} == "true" ]]; then
+      # export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
+      export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
+    else
+      export PROMPT="$new_prompt"
+    fi
+  else
+    #BASH
+    export PS1="$new_prompt"
+  fi
+}
+
+function list_config_profiles {
+  config_profiles=$(grep -E '\[profile .+\]' ~/.aws/config | sed 's/\[profile \(.*\)\]/\1/')
+  for config_profile in ${config_profiles}; do
+    role_arn=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep role_arn | awk -F' = ' '{print $2}')
+    account_number=$(echo ${role_arn} | awk -F'::' '{print $2}' | awk -F':' '{print $1}')
+    if [[ ! -z ${role_arn} ]]; then
+      echo "${account_number} : ${config_profile}"
     fi
   done
 }
@@ -207,9 +209,9 @@ if [ $# -gt 0 ]; then
   while [ ! $# -eq 0 ]; do
     case "$1" in
     -l)
-	    read_aws_config
-	    break
-	  ;;
+      list_config_profiles
+      break
+      ;;
     --help | -h)
       usage
       ;;
