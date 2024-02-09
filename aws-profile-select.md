@@ -73,7 +73,7 @@ expiration =
 
 _Note_: the procedures might be a little different, depending on your personal configuration
 
-1. Download or copy the script to "/usr/local/bin", add it to your PATH, and make it executable:
+1. Download or copy the script to "/usr/local/bin", add it to your PATH, and make it executable with `chmod +x /usr/local/bin/aws-profile-select.sh`:
 2. Add aliases:
 
    For Ubuntu users (if alias not work use ~/.profile instead of ~/.bashrc):
