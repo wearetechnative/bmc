@@ -73,11 +73,12 @@ expiration =
 
 _Note_: the procedures might be a little different, depending on your personal configuration
 
-1. Download, optionally inspect, and copy the script to an appropriate folder
+1. Download or copy the script to "/usr/local/bin", add it to your PATH, and make it executable with `chmod +x /usr/local/bin/aws-profile-select.sh`:
 2. Add aliases:
 
+   For Ubuntu users (if alias not work use ~/.profile instead of ~/.bashrc):
    ```
-   echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.bash_profile
+   echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.bashrc
    echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.zshrc
    ```
 
@@ -87,11 +88,17 @@ _Note_: the procedures might be a little different, depending on your personal c
    echo -e "\nalias aws-switch='source /usr/local/bin/aws-profile-select.sh'" >> ~/.oh-my-zsh/custom/aliases.zsh
    ```
 
+   Reload the shell
+   ```
+   source ~/.bashrc
+   source ~/.zshrc
+   ```
+
 Adding an alias to both config files is advised. Even if you only use one of the above shells, this will ensure that aws-switch.zsh works the same in either, should the need arise.
 
 ### To use:
 
-Using a new terminal window or tab (required for the new alias settings to take effect), simply run the script using the alias created above (aws-switch.zsh):
+Using a new terminal window or tab (required for the new alias settings to take effect if you haven't reloaded the shell), simply run the script using the alias created above `aws-switch`:
 
 ```
 aws-superstar@hackstation-[~]: aws-switch
