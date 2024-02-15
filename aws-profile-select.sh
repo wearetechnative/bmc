@@ -196,11 +196,35 @@ function set_prompt {
 
 function list_config_profiles {
   config_profiles=$(grep -E '\[profile .+\]' ~/.aws/config | sed 's/\[profile \(.*\)\]/\1/')
+  max_account_length=0
+  max_profile_length=0
+  max_region_length=0
+
+  # Bepaal de maximale lengte van elk veld
   for config_profile in ${config_profiles}; do
     role_arn=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep role_arn | awk -F' = ' '{print $2}')
     account_number=$(echo ${role_arn} | awk -F'::' '{print $2}' | awk -F':' '{print $1}')
+    region=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep region | awk -F' = ' '{print $2}')
     if [[ ! -z ${role_arn} ]]; then
-      echo "${account_number} : ${config_profile}"
+      if [ ${#account_number} -gt $max_account_length ]; then
+        max_account_length=${#account_number}
+      fi
+      if [ ${#config_profile} -gt $max_profile_length ]; then
+        max_profile_length=${#config_profile}
+      fi
+      if [ ${#region} -gt $max_region_length ]; then
+        max_region_length=${#region}
+      fi
+    fi
+  done
+
+  # Uitlijning en weergave van gegevens
+  for config_profile in ${config_profiles}; do
+    role_arn=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep role_arn | awk -F' = ' '{print $2}')
+    account_number=$(echo ${role_arn} | awk -F'::' '{print $2}' | awk -F':' '{print $1}')
+    region=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep region | awk -F' = ' '{print $2}')
+    if [[ ! -z ${role_arn} ]]; then
+      printf "%-${max_account_length}s : %-${max_profile_length}s : %-${max_region_length}s\n" "${account_number}" "${config_profile}" "${region}"
     fi
   done
 }
