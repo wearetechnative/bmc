@@ -1,5 +1,26 @@
 #!/bin/bash
-backends="$(ls *.tfbackend)"
+
+# Get the current directory
+current_directory=$(pwd)
+
+# Check if the string "$(pwd)" contains 'stack'
+if [[ "$current_directory" == *"stack"* ]]; then
+  # Extract the parent directory of 'stack'
+  base_directory=$(dirname "${current_directory%stack*}stack")
+  #echo "Parent directory of 'stack': $parent_directory"
+else
+  echo "'stack' not found in the current directory path"
+  base_directory=${current_directory}
+fi
+
+backends=$(find ${base_directory} -type f -name "*.tfbackend" | sort)
+backends_name=()
+
+for item in ${backends}; do
+  backends_name+=("$(basename $item)")
+done
+
+echo ${#backends_name[*]}
 
 IFSBAK=$IFS
 IFS=$'\n'
@@ -31,14 +52,17 @@ function usage {
 
 function set_tfbackend_prompt {
   TF_BACKENDPROMPTBAK=
-  TF_BACKEND=$(terraform show | grep -A2 "module.terraformbackend.module.state_lock.aws_dynamodb_table.this"|tail -1|awk -F ":" '{print $5}')
+  TF_BACKEND=$(terraform show | grep -A2 "module.terraformbackend.module.state_lock.aws_dynamodb_table.this" | tail -1 | awk -F ":" '{print $5}')
 }
 
 function set_tfbackend {
   backend_file=$1
-  if [[ -z ${backend_file} ]]; then echo "!!! Error backend-file"; exit 1;fi
-  terraform  init -backend-config="${backend_file}" -reconfigure
-  echo ${TF_BACKEND} > .terraform.tfbackend.state
+  if [[ -z ${backend_file} ]]; then
+    echo "!!! Error backend-file"
+    exit 1
+  fi
+  terraform init -backend-config="${backend_file}" -reconfigure
+  echo ${TF_BACKEND} >.terraform.tfbackend.state
   # TF_ENV=$(echo $TF_BACKEND |awk -F '.' '{print $1}')
   # export TF_ENV
 }
@@ -55,7 +79,7 @@ function selection_menu {
   # echo ${profiles[*]}
   echo "-: Unset backend"
   for ((i = 0; i < $backends_len; i++)); do
-    echo "$i: ${backends[$i]}"
+    echo "$i: ${backends_name[$i]}"
   done
   read_selection
 }
@@ -101,7 +125,7 @@ function read_selection {
       new_prompt="${cmd_prompt}-(${backends[choice]}): "
       if [[ $shell_type == "zsh" ]]; then
         if [[ ${rprompt_config} == "true" ]]; then
-		export RPROMPT=${profiles[choice]}-${backends[choice]}
+          export RPROMPT=${profiles[choice]}-${backends_name[choice]}
         else
           export PROMPT="$new_prompt"
         fi
@@ -118,7 +142,6 @@ function read_selection {
     fi
   done
 }
-
 
 if [ $# -gt 0 ]; then
   while [ ! $# -eq 0 ]; do
