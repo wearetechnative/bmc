@@ -184,7 +184,7 @@ function set_prompt {
     # ZSH
     if [[ ${rprompt_config} == "true" ]]; then
       # export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
-      export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
+      export RPROMPT=${AWS_PROFILE}-$(basename ${TF_BACKEND})
     else
       export PROMPT="$new_prompt"
     fi
