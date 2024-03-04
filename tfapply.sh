@@ -1,61 +1,62 @@
 #!/bin/bash
-current_directory=$(pwd)
+# Version: 2024030401 - WvdT
+# To-Do:
+#
+unset TF_VAR TF_VARS
 
-# Check if the string "$(pwd)" contains 'stack'
-if [[ "$current_directory" == *"stack"* ]]; then
-    # Extract the parent directory of 'stack'
-    base_directory=$(dirname "${current_directory%stack*}stack")
-    #echo "Parent directory of 'stack': $parent_directory"
-else
-    echo "'stack' not found in the current directory path"
-    base_directory=${current_directory}
+# Extract the base directory containing '*.tfvars' files
+base_directory=$(pwd)
+if [[ "$base_directory" == *"stack"* ]]; then
+    base_directory=$(dirname "${base_directory%stack*}stack")
 fi
 
-TF_ENV=$(echo $TF_BACKEND | awk -F '.' '{print $1}' 2>&1)
-TF_VARS=$(find ${base_directory} -type f -name "*.tfvars")
+# Set TF_ENV variable
+# Find all '*.tfvars' files in the base directory
+TF_VARS=($(find "${base_directory}" -type f -name "*.tfvars" | sort))
+TF_VARS_BASE=($(find "${base_directory}" -type f -name "*.tfvars" -exec basename {} \; | sort))
+TF_VARS_LEN=${#TF_VARS[*]}
 
+function multiple_vars() {
 
-
-if [[ -f ${TF_ENV}.tfvars ]]; then
-    terraform apply -var-file=${TF_ENV}.tfvars $@
-elif [[ ! -z ${TF_VARS} ]]; then
-
-    TF_VARS=(${TF_VARS})
-    TF_VARS_len=${#TF_VARS[*]}
-
-
-    echo "--- Choose vars-file"
-    echo "-: Quit"
-    for ((i = 0; i < $TF_VARS_len; i++)); do
-        echo "$i: ${TF_VARS[$i]}"
-    done
-    echo
-    printf 'Selection: '
-    read choice
-    COLUMN=6
-    case $choice in
-    '' | *[!0-9\-]*)
-        clear
-        echo Invalid selection. Make a valid selection from the list above or press ctrl+c to exit
-        echo '-> Error: Not a number, and not "-"'
-        echo
-        break
-        ;;
-    esac
-    in_range=false
-    while [ $in_range != true ]; do
-        if [[ $choice == '-' ]]; then
-            break
-        elif (($choice >= 0)) && (($choice <= (${TF_VARS_len}-1))); then
-
-            echo ${TF_VARS[choice]}
-            in_range=true
-            terraform apply -var-file=${TF_VARS[choice]} $@
-            break
-        else
-            echo "!! Not a valid option"
+    PS3="Select a var-file number: "
+    # echo "-: Unset"
+    select item in "${TF_VARS_BASE[@]}"; do
+        if [[ -n ${item} ]]; then
+            # echo "Using var-file: $item"
+            ((REPLY--))
+            TF_VAR=${TF_VARS[${REPLY}]} #${item}
             break
         fi
     done
+}
 
+if [[ ${TF_VARS_LEN} -eq 1 ]]; then
+    echo "just one backend"
+    TF_VAR=${TF_VARS}
+fi
+
+if [[ ! -z ${TF_BACKEND} ]]; then
+    # echo "backend found"
+    TF_ENV=$(basename $(echo $TF_BACKEND | awk -F '.' '{print $1}' 2>&1))
+
+    for var in "${TF_VARS[@]}"; do
+        if [[ $var == *"${TF_ENV}"* ]]; then
+            TF_VAR="$var"
+        fi
+    done
+    if [[ -z ${TF_VAR} ]]; then
+        multiple_vars
+    fi
+fi
+
+if [[ ${TF_VARS_LEN} -ge 2 && -z ${TF_VAR} ]]; then
+    echo "multiple backends, not matching"
+    multiple_vars
+fi
+
+echo "Using TF variable-file: ${TF_VAR}"
+if [[ ! -z ${TF_VAR} ]]; then
+    terraform apply -var-file=${TF_VAR} $@
+else
+    terraform apply $@
 fi
