@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Version: 2024020601
 
 rprompt_config="true"
 aws_sso="false"
-aws_mfa="true"
+aws_mfa="false"
 
 # Enable setting of AWS_SDK_LOAD_CONFIG by default
 sdk=1
