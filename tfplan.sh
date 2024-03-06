@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Version: 2024030401 - WvdT
 # To-Do:
 #
