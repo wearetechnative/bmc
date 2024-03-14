@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#Version: 202403141
 
 function check_prerequisites(){
   if [[ -z ${AWS_PROFILE} ]]; then
