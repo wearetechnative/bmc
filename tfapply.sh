@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Version: 2024030401 - WvdT
 # To-Do:
 #
@@ -31,12 +31,13 @@ function multiple_vars() {
 }
 
 if [[ ${TF_VARS_LEN} -eq 1 ]]; then
-    echo "just one backend"
+    echo "just one var-file"
     TF_VAR=${TF_VARS}
 fi
 
+TF_BACKEND=$(cat .terraform/tfbackend.state 2>/dev/null)
+
 if [[ ! -z ${TF_BACKEND} ]]; then
-    # echo "backend found"
     TF_ENV=$(basename $(echo $TF_BACKEND) | awk -F '.' '{print $1}' 2>&1)
 
     for var in "${TF_VARS[@]}"; do
