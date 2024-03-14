@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 find_blocks_with_role_arn_and_region() {
     local config_file="$1"
