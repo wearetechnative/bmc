@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Version: 2024020601
+# Version: 202403141
 
 rprompt_config="true"
 aws_sso="false"
@@ -151,6 +151,7 @@ function read_selection {
     fi
     if [[ ${REPLY} == "-" ]]; then
       echo "Unsetting profile"
+      unset AWS_PROFILE
       if [[ $shell_type == "zsh" ]]; then
         export PROMPT="$PROMPTBAK"
         if [[ ${rprompt_config} == "true" ]]; then
@@ -184,7 +185,7 @@ function set_prompt {
     # ZSH
     if [[ ${rprompt_config} == "true" ]]; then
       # export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
-      export RPROMPT=${AWS_PROFILE}-$(basename ${TF_BACKEND})
+      #WTO export RPROMPT=${AWS_PROFILE}-$(basename ${TF_BACKEND})
     else
       export PROMPT="$new_prompt"
     fi
