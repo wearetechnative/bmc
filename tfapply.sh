@@ -37,7 +37,7 @@ fi
 
 if [[ ! -z ${TF_BACKEND} ]]; then
     # echo "backend found"
-    TF_ENV=$(basename $(echo $TF_BACKEND | awk -F '.' '{print $1}' 2>&1))
+    TF_ENV=$(basename $(echo $TF_BACKEND) | awk -F '.' '{print $1}' 2>&1)
 
     for var in "${TF_VARS[@]}"; do
         if [[ $var == *"${TF_ENV}"* ]]; then
