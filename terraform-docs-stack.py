@@ -7,23 +7,23 @@ FILENAME = "README.md"
 STACK_DIRECTORY = "stack"
 
 # Define the tags
-BEGIN_TAG = "<!-- BEGIN_TERRAFORM_STACKS -->"
-END_TAG = "<!-- END_TERRAFORM_STACKS -->"
+BEGIN_TAG = "<!-- BEGIN_TERRAFORM_DOMAINS -->"
+END_TAG = "<!-- END_TERRAFORM_DOMAINS -->"
 
 # Find all directories one level deep in the stack directory
-map_array = [stack_dir for stack_dir in os.listdir(STACK_DIRECTORY) if os.path.isdir(os.path.join(STACK_DIRECTORY, stack_dir))]
+map_array = [domain_dir for domain_dir in os.listdir(STACK_DIRECTORY) if os.path.isdir(os.path.join(STACK_DIRECTORY, domain_dir))]
 
 # Array to store results
 results = []
 
 # Loop over the directories and execute the command
-for stack_dir in map_array:
+for domain_dir in map_array:
     # Add a header for the stack directory
-    header = f"## Stack: {stack_dir}\n"
+    header = f"## Domain: {domain_dir}\n"
     results.append(header)
 
     # Execute the command in the directory
-    result = subprocess.run(["terraform-docs", "markdown", os.path.join(STACK_DIRECTORY, stack_dir)], capture_output=True, text=True)
+    result = subprocess.run(["terraform-docs", "markdown", os.path.join(STACK_DIRECTORY, domain_dir)], capture_output=True, text=True)
     results.append(result.stdout)
 
 # Check if README.md exists, if not, create it
