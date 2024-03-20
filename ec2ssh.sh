@@ -4,14 +4,13 @@
 aws_output=$(aws ec2 describe-instances)
 
 # Extract de gewenste velden uit de JSON-output met behulp van jq
-instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | "\(.InstanceId) - \(.PrivateIpAddress) - \(.PublicIpAddress) - \(.Tags[] | select(.Key=="Name") | .Value)"')
-
+instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | select(.State.Code != 48) | "\(.InstanceId) - \(.PrivateIpAddress) - \(.PublicIpAddress) - \(.Tags[] | select(.Key=="Name") | .Value)"' | sed 's/\ -\ /\t/g')
 # Print de gewenste velden
 user=$(gum choose "root" "ubuntu" "other")
 
 if [[ $user == "other" ]]; then
   user=$(gum input)
 fi
-instance=$(echo "$instances" | gum filter)
+instance=$(echo "$instances" | gum filter --indicator.foreground="2")
 instance_name=$(echo $instance | cut -f 1 -d " ")
 ssh $user@$instance_name
