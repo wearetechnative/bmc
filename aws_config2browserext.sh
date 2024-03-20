@@ -12,6 +12,7 @@ find_blocks_with_role_arn_and_region() {
                 echo "$profile_header"
                 echo "role_arn = $role_arn"
                 echo "region = $region"
+                echo "color = ffffff"
                 echo
             fi
             profile_header="$line"
@@ -35,6 +36,7 @@ find_blocks_with_role_arn_and_region() {
         echo "$profile_header"
         echo "role_arn = $role_arn"
         echo "region = $region"
+        echo "color = ffffff"
     fi
 }
 
