@@ -60,7 +60,6 @@ function main {
   # echo "!! CHECK DSK"
   check_sdk
   # echo "!! SET PROMPT"
-  set_prompt
 
   if [[ ${aws_mfa} == "true" ]]; then mfa; fi
   # if [[ ${aws_sso} == "true" ]]; then sso; fi
@@ -174,24 +173,6 @@ function check_sdk {
     export AWS_SDK_LOAD_CONFIG=1
   else
     export AWS_SDK_LOAD_CONFIG=0
-  fi
-}
-
-function set_prompt {
-  new_prompt="${cmd_prompt}aps:(${AWS_PROFILE}): "
-
-  # set prompt for ZSH or BASH
-  if [[ $shell_type == "zsh" ]]; then
-    # ZSH
-    if [[ ${rprompt_config} == "true" ]]; then
-      # export RPROMPT=${AWS_PROFILE}-${TF_BACKEND}
-      #WTO export RPROMPT=${AWS_PROFILE}-$(basename ${TF_BACKEND})
-    else
-      export PROMPT="$new_prompt"
-    fi
-  else
-    #BASH
-    export PS1="$new_prompt"
   fi
 }
 
