@@ -5,6 +5,10 @@ rprompt_config="true"
 aws_sso="false"
 aws_mfa="false"
 
+mkdir -p ~/.config/aws-profile-select/
+
+if [[ -f ~/.config/aws-profile-select/env ]]; then source ~/.config/aws-profile-select/env; fi
+
 # Enable setting of AWS_SDK_LOAD_CONFIG by default
 sdk=1
 exit_script="false"
@@ -126,7 +130,7 @@ function mfa {
       echo "!! MFA_arn not found. Can't renew session"
     fi
   else
-    echo "MFA Validi, until: $(date -j -f "%s" ${expiration_date} "%Y-%m-%d %H:%M:%S")"
+    echo "MFA Valid, until: $(date -j -f "%s" ${expiration_date} "%Y-%m-%d %H:%M:%S")"
   fi
 }
 
