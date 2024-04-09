@@ -1,4 +1,26 @@
 #!/usr/bin/env bash
+#
+while getopts 'i:' opt; do
+  case "$opt" in
+    i)
+      sshKey="$OPTARG"
+      if [[ -f ${sshKey} ]]; then
+       echo "Using ssh-key: '${OPTARG}' "
+       sshKey="-i ${OPTARG}"
+       else
+         echo "ssh-key not found: '${OPTARG}'. Not using it"
+	 unset sshKey
+      fi
+      ;;
+
+    ?)
+      echo -e "Invalid command option.\nUsage: $(basename $0) [-i path_to/ssh_key]"
+      exit 1
+      ;;
+  esac
+done
+shift "$(($OPTIND -1))"
+
 
 # Check AWS credentials via AWS_PROFILE and AWS_DEFAULT_REGION
 if [[ ! -z ${AWS_PROFILE} || ! -z ${AWS_DEFAULT_REGION} ]]; then
@@ -29,7 +51,7 @@ if [[ ! -z ${AWS_PROFILE} || ! -z ${AWS_DEFAULT_REGION} ]]; then
   fi
   instance=$(echo "$instances" | gum filter)
   instance_name=$(echo $instance | cut -f 1 -d " ")
-  ssh $user@$instance_name
+  ssh $sshKey $user@$instance_name
 else
   echo "!! No AWS_PROFILE or AWS_DEFAULT_REGION set"
 fi
