@@ -7,7 +7,7 @@ aws_mfa="false"
 
 mkdir -p ~/.config/aws-profile-select/
 
-if [[ -f ~/.config/aws-profile-select/env ]]; then source ~/.config/aws-profile-select/env; fi
+if [[ -f ~/.config/aws-profile-select/env ]]; then source ~/.config/aws-profile-select/env; echo "MFA enabled";  fi
 
 # Enable setting of AWS_SDK_LOAD_CONFIG by default
 sdk=1
@@ -101,6 +101,18 @@ function usage {
   # exit 1
 }
 
+function checkOS {
+if [ -e /etc/lsb-release ]; then
+   echo "linux"
+elif [ -e /System/Library/CoreServices/SystemVersion.plist ]; then
+    echo "macos" 
+else
+    echo "other"
+fi
+ return $osType
+
+}
+
 function mfa {
   if [[ ${exit_script} == "true" ]]; then return; fi
   # Check for valid aws-mfa session
@@ -108,6 +120,8 @@ function mfa {
 
   # search long-term
   # echo "!!! MFA: AWS_PROFILE: ${AWS_PROFILE}"
+   
+  # Detecting source_profile to obtain mfa-device
   source_profile=$(sed -n -e "/\[.*${AWS_PROFILE}\]/,/^$/ s/^[[:space:]]*source_profile[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/config)
   # echo "!!! MFA: source_profile: ${source_profile}"
 
@@ -118,9 +132,30 @@ function mfa {
     source_profile_longterm="${source_profile}-long-term"
   fi
 
-  expiration_date=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(sed -n -e "/\[${source_profile}\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)" "+%s" 2>/dev/null)
+
+  expiration=$(sed -n -e "/\[$source_profile\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" "$HOME/.aws/credentials")
+
+  osType=$(checkOS)
+  if [[ ${osType} == "macos" ]]; then
+	  echo "ostype: macos" 
+	  expiration_date=$(date -j -f  "%Y-%m-%d %H:%M:%S" "${expiration}" "+%s" 2>/dev/null)
+	  dateCmd="date -j -f ";
+	 elif [[ ${osType} == "linux" ]]; then
+	  echo "ostype: linux" 
+          expiration_date=$(date -d "$expiration" +%s 2>/dev/null)
+	else
+		echo "!! ostype not linux or macos" 
+		exit 1
+fi
+
+echo expiration_date: ${expiration_date}
+
+#  expiration_date=$(${dateCmd}  "%Y-%m-%d %H:%M:%S" "$(sed -n -e "/\[${source_profile}\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)" "+%s" 2>/dev/null)
   date_now=$(date +%s)
   mfa_arn=$(sed -n -e "/\[${source_profile_longterm}\]/,/^$/ s/^[[:space:]]*aws_mfa_device[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)
+
+  echo date expiration  ${expiration_date}
+  echo date now: ${date_now}
 
   if [[ ${expiration_date} -lt ${date_now} ]]; then
     if [[ ! -z ${mfa_arn} ]]; then
@@ -130,7 +165,7 @@ function mfa {
       echo "!! MFA_arn not found. Can't renew session"
     fi
   else
-    echo "MFA Valid, until: $(date -j -f "%s" ${expiration_date} "%Y-%m-%d %H:%M:%S")"
+    echo "MFA Valid, until: ${expiration}"
   fi
 }
 
