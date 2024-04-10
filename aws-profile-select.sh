@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Version: 202404101
+# Version: 202404102
 
 rprompt_config="true"
 aws_sso="false"
@@ -29,7 +29,7 @@ if [ -n "$ZSH_VERSION" ]; then
   else
     cmd_prompt="$PROMPTBAK"
   fi
-else
+else∑
   # bash-handling
   # Backup prompt as a separate variable if not already backed up
   if [ -z "$PS1BAK" ]; then
@@ -185,38 +185,42 @@ function check_sdk {
 }
 
 function list_config_profiles {
-  config_profiles=$(grep -E '\[profile .+\]' ~/.aws/config | sed 's/\[profile \(.*\)\]/\1/')
+
+  config_profiles=($(grep -E '\[profile .+\]' ~/.aws/config | sed 's/\[profile \(.*\)\]/\1/'))
+
   max_account_length=0
   max_profile_length=0
   max_region_length=0
 
   # Bepaal de maximale lengte van elk veld
-  for config_profile in ${config_profiles}; do
-    role_arn=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep role_arn | awk -F' = ' '{print $2}')
-    account_number=$(echo ${role_arn} | awk -F'::' '{print $2}' | awk -F':' '{print $1}')
-    region=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep region | awk -F' = ' '{print $2}')
-    if [[ ! -z ${role_arn} ]]; then
-      if [ ${#account_number} -gt $max_account_length ]; then
-        max_account_length=${#account_number}
-      fi
-      if [ ${#config_profile} -gt $max_profile_length ]; then
-        max_profile_length=${#config_profile}
-      fi
-      if [ ${#region} -gt $max_region_length ]; then
-        max_region_length=${#region}
-      fi
+  for config_profile in "${config_profiles[@]}"; do
+    osType="macos"
+    if [[ ${osType} == "macos" ]]; then
+      profile_data=($(
+        profile_name="${config_profile}"
+        sed -n -e "/^\[profile $profile_name\]/, /^\[/ {/^\[/d; p;}" ~/.aws/config | awk 'NF'
+      ))
+    else
+      profile_data=($(
+        profile_name="${config_profile}"
+        sed -n -e "/^\[profile $profile_name\]/, /^\[/ {/^\[/d; p;}" ~/.aws/config | awk 'NF'
+      ))
     fi
-  done
 
-  # Uitlijning en weergave van gegevens
-  for config_profile in ${config_profiles}; do
-    role_arn=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep role_arn | awk -F' = ' '{print $2}')
-    account_number=$(echo ${role_arn} | awk -F'::' '{print $2}' | awk -F':' '{print $1}')
-    region=$(grep -A3 "\[profile ${config_profile}\]" ~/.aws/config | grep region | awk -F' = ' '{print $2}')
-    if [[ ! -z ${role_arn} ]]; then
-      printf "%-${max_account_length}s : %-${max_profile_length}s : %-${max_region_length}s\n" "${account_number}" "${config_profile}" "${region}"
-    fi
-  done
+    for field in "${profile_data[@]}"; do
+      key=$(echo "$field" | cut -d '=' -f 1)
+      value=$(echo "$field" | cut -d '=' -f 2-)
+
+      if [ "$key" = "role_arn" ]; then
+        account_number=$(echo "$value" | awk -F ':' '{print $5}')
+        role_arn="$value"
+      elif [ "$key" = "region" ]; then
+        region="$value"
+      fi
+    done
+
+    printf "%-20s | %-15s | %-10s | %s\n" "$config_profile" "$account_number" "$region" "$role_arn"
+  done | column -t -s '|'
 }
 
 if [ $# -gt 0 ]; then
