@@ -201,10 +201,7 @@ function list_config_profiles {
         sed -n -e "/^\[profile $profile_name\]/, /^\[/ {/^\[/d; p;}" ~/.aws/config | awk 'NF'
       ))
     else
-      profile_data=($(
-        profile_name="${config_profile}"
-        sed -n -e "/^\[profile $profile_name\]/, /^\[/ {/^\[/d; p;}" ~/.aws/config | awk 'NF'
-      ))
+	    profile_data=($(profile_name="${config_profile}"; awk -v profile="$config_profile" '$0 ~ "[profile " profile "]"{p=1} p && NF && !/^\[/{print; p=0}' ~/.aws/config))
     fi
 
     for field in "${profile_data[@]}"; do
