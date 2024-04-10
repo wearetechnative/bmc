@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Version: 202403141
+# Version: 202404101
 
 rprompt_config="true"
 aws_sso="false"
@@ -7,7 +7,10 @@ aws_mfa="false"
 
 mkdir -p ~/.config/aws-profile-select/
 
-if [[ -f ~/.config/aws-profile-select/env ]]; then source ~/.config/aws-profile-select/env; echo "MFA enabled";  fi
+if [[ -f ~/.config/aws-profile-select/env ]]; then
+  source ~/.config/aws-profile-select/env
+  echo "MFA enabled"
+fi
 
 # Enable setting of AWS_SDK_LOAD_CONFIG by default
 sdk=1
@@ -70,30 +73,6 @@ function main {
 
 }
 
-# read_aws_config() {
-#   oldCol=$COLUMNS
-#   COLUMNS=6
-#   config_file="$HOME/.aws/config"
-
-#   if [ -f "$config_file" ]; then
-#     while IFS= read -r line; do
-#       if [[ $line == \[* ]]; then
-#         current_profile=$(echo "$line" | sed 's/\[\(.*\)\]/\1/')
-#       elif [[ $line == role_arn* ]]; then
-#         role_arn=$(echo "$line" | awk -F'=' '{print $2}' | tr -d '[:space:]')
-#         account_number=$(echo "$role_arn" | cut -d':' -f5)
-
-#         if [[ "$account_number" =~ ^[0-9]+$ ]]; then
-#           printf "%s : %s\n" "$account_number" "$current_profile"
-#         fi
-#       fi
-#     done <"$config_file"
-#   else
-#     echo "AWS config file not found: $config_file"
-#   fi
-#   COLUMNS=$oldCol
-# }
-
 function usage {
   echo "Usage: aps [-n|--no-sdk] [-h|--help]"
   echo "For normal usage, just run aps and make your selection followed by Enter."
@@ -102,14 +81,13 @@ function usage {
 }
 
 function checkOS {
-if [ -e /etc/lsb-release ]; then
-   echo "linux"
-elif [ -e /System/Library/CoreServices/SystemVersion.plist ]; then
-    echo "macos" 
-else
+  if [ -f /etc/lsb-release ]; then
+    echo "linux"
+  elif [ -f /System/Library/CoreServices/SystemVersion.plist ]; then
+    echo "macos"
+  else
     echo "other"
-fi
- return $osType
+  fi
 
 }
 
@@ -120,7 +98,7 @@ function mfa {
 
   # search long-term
   # echo "!!! MFA: AWS_PROFILE: ${AWS_PROFILE}"
-   
+
   # Detecting source_profile to obtain mfa-device
   source_profile=$(sed -n -e "/\[.*${AWS_PROFILE}\]/,/^$/ s/^[[:space:]]*source_profile[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/config)
   # echo "!!! MFA: source_profile: ${source_profile}"
@@ -132,30 +110,21 @@ function mfa {
     source_profile_longterm="${source_profile}-long-term"
   fi
 
-
   expiration=$(sed -n -e "/\[$source_profile\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" "$HOME/.aws/credentials")
 
   osType=$(checkOS)
   if [[ ${osType} == "macos" ]]; then
-	  echo "ostype: macos" 
-	  expiration_date=$(date -j -f  "%Y-%m-%d %H:%M:%S" "${expiration}" "+%s" 2>/dev/null)
-	  dateCmd="date -j -f ";
-	 elif [[ ${osType} == "linux" ]]; then
-	  echo "ostype: linux" 
-          expiration_date=$(date -d "$expiration" +%s 2>/dev/null)
-	else
-		echo "!! ostype not linux or macos" 
-		exit 1
-fi
+    expiration_date=$(date -j -f "%Y-%m-%d %H:%M:%S" "${expiration}" "+%s" 2>/dev/null)
+    dateCmd="date -j -f "
+  elif [[ ${osType} == "linux" ]]; then
+    expiration_date=$(date -d "$expiration" +%s 2>/dev/null)
+  else
+    echo "!! ostype not linux or macos"
+  fi
 
-echo expiration_date: ${expiration_date}
-
-#  expiration_date=$(${dateCmd}  "%Y-%m-%d %H:%M:%S" "$(sed -n -e "/\[${source_profile}\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)" "+%s" 2>/dev/null)
+  #  expiration_date=$(${dateCmd}  "%Y-%m-%d %H:%M:%S" "$(sed -n -e "/\[${source_profile}\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)" "+%s" 2>/dev/null)
   date_now=$(date +%s)
   mfa_arn=$(sed -n -e "/\[${source_profile_longterm}\]/,/^$/ s/^[[:space:]]*aws_mfa_device[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)
-
-  echo date expiration  ${expiration_date}
-  echo date now: ${date_now}
 
   if [[ ${expiration_date} -lt ${date_now} ]]; then
     if [[ ! -z ${mfa_arn} ]]; then
