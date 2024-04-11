@@ -35,7 +35,7 @@ if [[ ! -z ${AWS_PROFILE} || ! -z ${AWS_DEFAULT_REGION} ]]; then
 
 
   # Extract fields needed from JSON_output with the use of jq-command
-  instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | "\(.InstanceId) - \(.PrivateIpAddress) - \(.PublicIpAddress) - \(.Tags[] | select(.Key=="Name") | .Value)"')
+  instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | "\(.InstanceId) - \(.PrivateIpAddress) - \(.PublicIpAddress) - \(.Tags[] | select(.Key=="Name") | .Value)"'|grep -v null)
 
   # Check if array constains instance prefix i-. Exit when no running instances are found
   if [[ ! ${instances[@]} == *"i-"* ]]; then
