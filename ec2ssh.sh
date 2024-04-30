@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-#
+
+shell_users=("root" "ubuntu" "ec2_user")
+
+
 while getopts 'i:' opt; do
   case "$opt" in
     i)
@@ -44,7 +47,19 @@ if [[ ! -z ${AWS_PROFILE} || ! -z ${AWS_DEFAULT_REGION} ]]; then
   fi
 
   # Print the proper fields
-  user=$(gum choose "root" "ubuntu" "other")
+  if [[ -z ${shell_users} ]];
+  then
+    shell_users=("root" "ubuntu" "other")
+    
+  fi
+
+  if [[ ${shell_users[@]} != *"other"* ]]; then
+    shell_users+=('other') 
+  fi
+
+    user=$(gum choose ${shell_users[@]})
+
+
 
   if [[ $user == "other" ]]; then
     user=$(gum input)
