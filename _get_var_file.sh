@@ -11,8 +11,8 @@ fi
 
 # Set TF_ENV variable
 # Find all '*.tfvars' files in the base directory
-TF_VARS=($(find "${base_directory}" -type f -name "*.tfvars" -o -name "*.tfvars.json" | sort))
-TF_VARS_BASE=($(find "${base_directory}" -type f -name "*.tfvars" -o -name " *.tfvars.json" -exec basename {} \; | sort))
+TF_VARS=($(find "${base_directory}" -type f -name "*.tfvars.*" | sort))
+TF_VARS_BASE=($(find "${base_directory}" -type f -name "*.tfvars.*" -exec basename {} \; | sort))
 TF_VARS_LEN=${#TF_VARS[*]}
 
 function multiple_vars() {
