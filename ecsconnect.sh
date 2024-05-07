@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # W. van der Toorren - TechNative B>V
 # version: 2024043001
-#
+# 
+ 
+#set -x
 
 # Init variables
 breadcrumbs=""
@@ -9,6 +11,20 @@ breadcrumbs=""
 print_breadcrumbs() {
   ## Function to print breadcrumbs, to give some information about the choices
   printf "\r%s\n" "$1"
+}
+
+checkPrerequisites() {
+ gumLocation=$(which gum)
+ if [[ -z ${gumLocation} ]]; then
+   echo "!! Tool 'gum' not found. Please install it from here: https://github.com/charmbracelet/gum"
+   exit 1
+fi
+
+if [[ -z ${AWS_PROFILE} ]]; then
+  echo "!! AWS_PROFILE  not set"
+  exit 1
+fi
+
 }
 
 
@@ -45,10 +61,6 @@ update_breadcrumbs() {
 # shift "$(($OPTIND - 1))"
 
 # Check AWS credentials via AWS_PROFILE
-if [[ -z ${AWS_PROFILE} ]]; then
-  echo "!! AWS_PROFILE  not set"
-  exit 1
-fi
 
 # if [[ -z ${AWS_DEFAULT_REGION} ]]; then
 #   echo "!! AWS_DEFAULT_REGION not set"
@@ -56,6 +68,10 @@ fi
 # fi
 
 # execute AWS CLI-command to retrieve info about clusters. Exit when command fails
+
+
+checkPrerequisites
+
 aws_output=$(aws ecs list-clusters 2>/dev/null)
 if [[ $? -ne 0 ]]; then
   echo "!! Error listing clusters. Check AWS credentials"
@@ -65,6 +81,10 @@ fi
 # Extract fields needed from JSON_output with the use of jq-command
 echo "-- Select cluster"
 clusters=$(echo "$aws_output" | jq -r '.clusterArns[] | split("/")[-1]')
+if [[ -z ${clusters} ]]; then
+  echo "!! No clusters found in current region: $(aws configure get region)"
+  exit 1
+fi
 cluster=$(gum choose $clusters)
 update_breadcrumbs "$cluster" # update breadcrumbs with clustername
 # clustertype=$(aws ecs describe-clusters --cluster ${cluster} | jq -r '.clusters[0].capacityProviders[]')

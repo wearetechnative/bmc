@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Version: 202404102
+# bla
 
 rprompt_config="true"
 aws_sso="false"
@@ -29,7 +30,7 @@ if [ -n "$ZSH_VERSION" ]; then
   else
     cmd_prompt="$PROMPTBAK"
   fi
-else∑
+else
   # bash-handling
   # Backup prompt as a separate variable if not already backed up
   if [ -z "$PS1BAK" ]; then
@@ -137,15 +138,6 @@ function mfa {
     echo "MFA Valid, until: ${expiration}"
   fi
 }
-
-# function selection_menu {
-#   # echo ${profiles[*]}
-#   # echo "-: Unset Profile"
-#   # for ((i = 0; i < $profiles_len; i++)); do
-#   #   echo "$i: ${profiles[$i]}"
-#   # done
-#   # read_selection
-# }
 
 function read_selection {
   PS3="Select a profile number: "
