@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # W. van der Toorren - TechNative B>V
 # version: 2024043001
-#
+# 
+ 
+#set -x
 
 # Init variables
 breadcrumbs=""
