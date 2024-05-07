@@ -38,7 +38,7 @@ if [[ ! -z ${AWS_PROFILE} || ! -z ${AWS_DEFAULT_REGION} ]]; then
 
 
   # Extract fields needed from JSON_output with the use of jq-command
-  instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | "\(.InstanceId) - \(.PrivateIpAddress) - \(.PublicIpAddress) - \(.Tags[] | select(.Key=="Name") | .Value)"'|grep -v null)
+  instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | select(.State.Code != 48) | "\(.InstanceId) - \(.PrivateIpAddress) - \(.PublicIpAddress) - \(.Tags[] | select(.Key=="Name") | .Value)"')
 
   # Check if array constains instance prefix i-. Exit when no running instances are found
   if [[ ! ${instances[@]} == *"i-"* ]]; then
@@ -50,16 +50,13 @@ if [[ ! -z ${AWS_PROFILE} || ! -z ${AWS_DEFAULT_REGION} ]]; then
   if [[ -z ${shell_users} ]];
   then
     shell_users=("root" "ubuntu" "other")
-    
   fi
 
   if [[ ${shell_users[@]} != *"other"* ]]; then
-    shell_users+=('other') 
+    shell_users+=('other')
   fi
 
-    user=$(gum choose ${shell_users[@]})
-
-
+  user=$(gum choose ${shell_users[@]})
 
   if [[ $user == "other" ]]; then
     user=$(gum input)
