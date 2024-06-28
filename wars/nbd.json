@@ -1,0 +1,36 @@
+{
+    "customerName": "nbd",
+    "role_name": "TechnativeRole",
+    "awsRegions": ["us-west-1", "eu-central-1"],
+    "environments": [
+        {
+            "awsAccountNumber": "123362123660",
+            "environmentName": "dgc-test"
+        },
+        {
+            "awsAccountNumber": "554721390833",
+            "environmentName": "mom-acc"
+        },
+        {
+            "awsAccountNumber": "222413177850",
+            "environmentName": "mips-acc"
+        },
+        {
+            "awsAccountNumber": "068357639487",
+            "environmentName": "frs-acc"
+        },
+        {
+            "awsAccountNumber": "730335270971",
+            "environmentName": "mmf-prod"
+        },
+        {
+            "awsAccountNumber": "393853019799",
+            "environmentName": "mmf-acc"
+        },
+         {
+            "awsAccountNumber": "360623034607",
+            "environmentName": "mgt"
+        }
+     ]
+}
+
