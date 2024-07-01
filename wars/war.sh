@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#Version: 2024070101
 
 # Check if jq is installed
 if ! command -v jq &> /dev/null
@@ -62,9 +63,13 @@ for environment in $environments; do
         prowler aws -f ${region}  --compliance aws_well_architected_framework_security_pillar_aws --output-directory ./security_pillar_output/
         prowler aws -f ${region} --compliance aws_well_architected_framework_reliability_pillar_aws --output-directory ./reliability_pillar_output/
         prowler aws -f ${region} --compliance aws_foundational_security_best_practices_aws --output-directory ./best_practices_output/
-
+        
         # Change back to the main directory
         cd - || exit
     done
 done
+       tarFile=${PWD}/${customerName}/scandata-${customerName}-${timestamp}.tgz
+       tar -czf ${tarFile} ./${customerName}
+       echo "--- Scanned data can be found in tar-ball: ${tarFile}"
+echo "--- Finished"
 
