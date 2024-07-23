@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Version: 202404102
-# bla
+# Version: 202405081
+
 
 rprompt_config="true"
 aws_sso="false"
-aws_mfa="false"
+aws_mfa="true"
+
+totpScript="rbw-menu.sh -t code -q new"
+clipboardCommand="xclip -selection clipboard"
 
 mkdir -p ~/.config/aws-profile-select/
 
@@ -125,18 +128,29 @@ function mfa {
 
   #  expiration_date=$(${dateCmd}  "%Y-%m-%d %H:%M:%S" "$(sed -n -e "/\[${source_profile}\]/,/^$/ s/^[[:space:]]*expiration[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)" "+%s" 2>/dev/null)
   date_now=$(date +%s)
+  date_now_future=$((date_now + 1800))
+##  echo " DEBUG: $date_now_future" 
   mfa_arn=$(sed -n -e "/\[${source_profile_longterm}\]/,/^$/ s/^[[:space:]]*aws_mfa_device[[:space:]]*=[[:space:]]*\(.*\)/\1/p" ${HOME}/.aws/credentials)
 
-  if [[ ${expiration_date} -lt ${date_now} ]]; then
+  if [[ ${expiration_date} -lt ${date_now_future} ]]; then
     if [[ ! -z ${mfa_arn} ]]; then
       echo aws-mfa --profile ${source_profile} --force --device ${mfa_arn}
-      aws-mfa --profile ${source_profile} --force --device ${mfa_arn}
+      if [[ ! -z $totpScript ]]; then
+        mfacode=$(${totpScript})
+        echo ${mfacode} |  ${clipboardCommand}
+        echo "-- Copied to clipboard"; 
+        echo "${mfacode}"
+      else 
+        echo "Code: ${mfacode}"
+      fi
+      aws-mfa --profile ${source_profile} --force --device ${mfa_arn} 
     else
       echo "!! MFA_arn not found. Can't renew session"
     fi
   else
     echo "MFA Valid, until: ${expiration}"
-  fi
+
+fi
 }
 
 function read_selection {
@@ -170,45 +184,49 @@ function read_selection {
 function check_sdk {
   # Set AWS_SDK_LOAD_CONFIG to true to make this useful for tools such as Terraform and Serverless framework
   if (($sdk == 1)); then
-    export AWS_SDK_LOAD_CONFIG=1
+    export AWS_SDK_LOAD_CONFIG=true
   else
-    export AWS_SDK_LOAD_CONFIG=0
+    export AWS_SDK_LOAD_CONFIG=false
   fi
 }
 
+
 function list_config_profiles {
+config_profiles=($(grep -E '\[profile .+\]' ~/.aws/config | sed 's/\[profile \(.*\)\]/\1/'))
+header="Profile Name                 | Account Number | Region       | Role ARN"
+output="$header\n"
+osType=$(checkOS)
 
-  config_profiles=($(grep -E '\[profile .+\]' ~/.aws/config | sed 's/\[profile \(.*\)\]/\1/'))
 
-  max_account_length=0
-  max_profile_length=0
-  max_region_length=0
+for config_profile in "${config_profiles[@]}"; do
 
-  # Bepaal de maximale lengte van elk veld
-  for config_profile in "${config_profiles[@]}"; do
-    osType="macos"
-    if [[ ${osType} == "macos" ]]; then
-      profile_data=($(
-        profile_name="${config_profile}"
-        sed -n -e "/^\[profile $profile_name\]/, /^\[/ {/^\[/d; p;}" ~/.aws/config | awk 'NF'
-      ))
-    else
-	    profile_data=($(profile_name="${config_profile}"; awk -v profile="$config_profile" '$0 ~ "[profile " profile "]"{p=1} p && NF && !/^\[/{print; p=0}' ~/.aws/config))
+
+if [[ ${osType} == "macos" ]]; then
+		profile_data=($(profile_name="${config_profile}"; awk -v profile="$config_profile" '$0 ~ "[profile " profile "]"{p=1} p && NF && !/^\[/{print; p=0}' ~/.aws/config))
+	else
+		profile_data=($(sed -n -e "/^\[profile $config_profile\]/,/^\[/ { /^\[/! p; }" ~/.aws/config | awk 'NF'))
+fi 
+
+
+
+  account_number=""
+  region=""
+  role_arn=""
+
+  for field in "${profile_data[@]}"; do
+    profkey=${field%%=*}
+    profvalue=${field#*=}
+
+    if [ "$profkey" = "role_arn" ]; then
+      account_number=$(echo "$profvalue" | awk -F ':' '{print $5}')
+      role_arn="$profvalue"
+    elif [ "$profkey" = "region" ]; then
+      region="$profvalue"
     fi
+  done
 
-    for field in "${profile_data[@]}"; do
-      key=$(echo "$field" | cut -d '=' -f 1)
-      value=$(echo "$field" | cut -d '=' -f 2-)
-
-      if [ "$key" = "role_arn" ]; then
-        account_number=$(echo "$value" | awk -F ':' '{print $5}')
-        role_arn="$value"
-      elif [ "$key" = "region" ]; then
-        region="$value"
-      fi
-    done
-
-    printf "%-20s | %-15s | %-10s | %s\n" "$config_profile" "$account_number" "$region" "$role_arn"
+  output=$(printf "%-30s | %-15s | %-12s | %s\n" "$config_profile" "$account_number" "$region" "$role_arn")
+  echo $output
   done | column -t -s '|'
 }
 
