@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Version: 202405081
+# Version: 202407231
 
 
 rprompt_config="true"
 aws_sso="false"
-aws_mfa="true"
+aws_mfa="false"
 
-totpScript="rbw-menu.sh -t code -q new"
-clipboardCommand="xclip -selection clipboard"
+totpScript=""  # example bitwarden: "rbw-menu.sh -t code -q new"
+clipboardCommand="" # examplke linux xclip: "xclip -selection clipboard"
 
 mkdir -p ~/.config/aws-profile-select/
 
