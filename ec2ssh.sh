@@ -4,7 +4,7 @@ shell_users=("root" "ubuntu" "ec2_user" "other")
 
 while getopts 'i:u:' opt; do
   case "$opt" in
-  k)
+  i)
     sshKey="$OPTARG"
     if [[ -f ${sshKey} ]]; then
       echo "Using ssh-key: '${OPTARG}' "
