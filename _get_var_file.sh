@@ -55,3 +55,11 @@ if [[ ${TF_VARS_LEN} -ge 2 && -z ${TF_VAR} ]]; then
 fi
 
 echo "Using TF variable-file: ${TF_VAR}"
+
+if [[ -f ./flake.nix ]]; then 
+  echo "!! NIX FLAKE DETECTED"
+  echo "You might run something like: nix run .\#"
+  echo "with one of the following:"
+  sed -n '/inherit$/,/;/ { /inherit$/ !p; }' flake.nix | tr -d ' \t;'
+  exit 1
+fi
