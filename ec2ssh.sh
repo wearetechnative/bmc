@@ -8,7 +8,7 @@ while getopts 'i:u:' opt; do
     sshKey="$OPTARG"
     if [[ -f ${sshKey} ]]; then
       echo "Using ssh-key: '${OPTARG}' "
-      sshKey="-i ${OPTARG}"
+      sshKey="-o IdentitiesOnly=yes -i ${OPTARG}"
     else
       echo "ssh-key not found: '${OPTARG}'. Not using it"
       unset sshKey
