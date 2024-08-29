@@ -1,5 +1,7 @@
 # Technative AWS/Terraform DevOps tools
-[AWS Profile Switcher](./aws-profile-select.md)
 
-[Terraform Backend Switcher, and Tools](./terraform-backend-tools.md)
+- [AWS Profile Switcher](./docs/aws-profile-select.md) - set Environment Vars to a profile from .aws/config
+- [AWS aws_config2browserext](./docs/aws_config2browserext) - Convert config for AWS browser Externsion (https://addons.mozilla.org/en-US/firefox/addon/aws-extend-switch-roles3/)
+- ...
+
 
