@@ -45,6 +45,10 @@ stdenv.mkDerivation rec {
     wrapProgram $out/bin/profsel.sh \
       --prefix PATH : ${lib.makeBinPath buildInputs }
 
+    cp profselcli.sh $out/bin/profselcli.sh
+    wrapProgram $out/bin/profselcli.sh \
+      --prefix PATH : ${lib.makeBinPath buildInputs }
+
     cp aws_config2browserext.sh $out/bin/aws_config2browserext.sh
     wrapProgram $out/bin/aws_config2browserext.sh \
       --prefix PATH : ${lib.makeBinPath buildInputs }
