@@ -1,5 +1,5 @@
 {
-  description = " AWS Utilities for Cloud Engineers" ;
+  description = "AWS Utilities for Cloud Engineers" ;
 
   inputs.nixpkgs.url = "nixpkgs/nixos-24.05";
   inputs.jsonify-aws-dotfiles.url = "github:wearetechnative/jsonify-aws-dotfiles";
