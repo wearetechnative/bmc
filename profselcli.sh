@@ -20,7 +20,8 @@ cli(){
   GROUP=`jsonify-aws-dotfiles | jq -r '[.config[].group]| unique| sort| .[]' | grep -v null | gum choose --height 25`
 
   if [ -z "${GROUP}" ] || [ "${GROUP}" = "user aborted" ]; then
-    exit 1
+    echo "111111"
+#    exit 1
   fi
 
   echo $GROUP
@@ -28,13 +29,15 @@ cli(){
   ACCOUNTTMP=`jsonify-aws-dotfiles | jq "[.config | with_entries(select(.value.group == \"$GROUP\")) | to_entries[] | {\"AWS Account\": .key, \"Role\": .value.role_arn}]" | dasel -r json -w csv | gum table -w 30,70 --height 25`
 
   if [ -z "${ACCOUNTTMP}" ]; then
-    exit 1
+    echo "222222"
+#    exit 1
   fi
 
   ACCOUNT=`echo $ACCOUNTTMP | cut -d ',' -f 1`
 
   if [ -z "${ACCOUNT}" ]; then
-    exit 1
+    echo "333333"
+#    exit 1
   fi
 
   echo "AWS_PROFILE set to ${ACCOUNT}"
