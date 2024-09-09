@@ -115,3 +115,5 @@ selectAWSProfile
 setDates
 setMFA
 export AWS_PROFILE=${selectedProfileName}
+
+# END OF SCRIPT
