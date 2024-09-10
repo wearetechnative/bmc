@@ -2,7 +2,7 @@
 
 shell_users=("root" "ubuntu" "ec2_user" "other")
 
-while getopts 'i:u:' opt; do
+while getopts 'i:h:u:' opt; do
 	case "$opt" in
 		i)
 			sshKey="$OPTARG"
@@ -14,6 +14,9 @@ while getopts 'i:u:' opt; do
 				unset sshKey
 			fi
 			;;
+    h)
+      instance_id=${OPTARG}
+      ;;
 		u)
 			user="$OPTARG"
 			echo "Using user: '${OPTARG}'"
@@ -45,7 +48,9 @@ instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | select(.St
 
 formatted_instances=$(echo -e "$header\n$instances")
 
-instance_id=$(echo -e "$formatted_instances" | gum table -w 20,16,16,8,50 | awk -F, '{print $1}')
+if [[ -z ${instance_id} ]]; then
+  instance_id=$(echo -e "$formatted_instances" | gum table -w 20,16,16,8,50 | awk -F, '{print $1}')
+fi
 
 instance_state=$(echo "$aws_output" | jq -r --arg INSTANCE_ID "$instance_id" '.Reservations[].Instances[] | select(.InstanceId == $INSTANCE_ID) | .State.Name')
 if [ "$instance_state" != "running" ]; then
