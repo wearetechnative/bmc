@@ -11,6 +11,7 @@ checkdeps "jq"
 checkdeps "awk"
 checkdeps "assumego"
 checkdeps "gum"
+deps_missing
 
 checkOS
 selectAWSProfile

@@ -11,6 +11,7 @@ checkdeps "jq"
 checkdeps "aws"
 checkdeps "gum"
 checkdeps "aws-mfa"
+deps_missing
 
 
 while [[ $# -gt 0 ]]; do

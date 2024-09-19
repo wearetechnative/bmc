@@ -26,23 +26,18 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ makeWrapper ];
 
+
   installPhase = ''
     mkdir -p $out/bin
 
-    cp aws-profile-select.sh $out/bin/aws-profile-select.sh
-    wrapProgram $out/bin/aws-profile-select.sh \
-      --prefix PATH : ${lib.makeBinPath buildInputs }
+    cp bmc *.sh $out/bin/
+    runHook postInstall
 
-    cp ecsconnect.sh $out/bin/ecsconnect.sh
-    wrapProgram $out/bin/ecsconnect.sh \
-      --prefix PATH : ${lib.makeBinPath buildInputs }
+#    wrapProgram $out/bin/aws-profile-select.sh --prefix PATH : ${lib.makeBinPath buildInputs }
+#    wrapProgram $out/bin/profsel.sh --prefix PATH : ${lib.makeBinPath buildInputs }
+#    wrapProgram $out/bin/ecsconnect.sh --prefix PATH : ${lib.makeBinPath buildInputs }
+#    wrapProgram $out/bin/ec2ls.sh --prefix PATH : ${lib.makeBinPath buildInputs }
+#    wrapProgram $out/bin/ec2connect.sh --prefix PATH : ${lib.makeBinPath buildInputs }
 
-    cp ec2ls.sh $out/bin/ec2ls.sh
-    wrapProgram $out/bin/ec2ls.sh \
-      --prefix PATH : ${lib.makeBinPath buildInputs }
-
-    cp profsel.sh $out/bin/profsel.sh
-    wrapProgram $out/bin/profsel.sh \
-      --prefix PATH : ${lib.makeBinPath buildInputs }
   '';
 }

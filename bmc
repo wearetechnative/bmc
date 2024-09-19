@@ -9,6 +9,7 @@ DESC=()
 NARGS=$#
 ARG1=$1
 
+
 #Printing the values of an array
 make_command(){
   CMDS+=("$1")
@@ -43,6 +44,10 @@ cli(){
   checkdeps "aws"
   checkdeps "gum"
   checkdeps "aws-mfa"
+  deps_missing
+
+  echo "hallo"
+  echo $MISSING_DEPS
 
   checkOS
   selectAWSProfile
@@ -61,6 +66,7 @@ console(){
   checkdeps "awk"
   checkdeps "assumego"
   checkdeps "gum"
+  deps_missing
 
   checkOS
   selectAWSProfile

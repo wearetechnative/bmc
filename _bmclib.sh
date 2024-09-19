@@ -1,3 +1,5 @@
+MISSING_DEPS=()
+
 function loadConfig(){
   conffile="${HOME}/.config/bmc/config.env"
   if [ -f ${conffile} ]; then
@@ -8,9 +10,16 @@ function loadConfig(){
 function checkdeps(){
   if ! command -v $1 &> /dev/null
   then
+    MISSING_DEPS+=("$1")
     echo "<$1> could not be found"
     echo "  install this program first"
-    ## exit 1
+  fi
+}
+
+function deps_missing(){
+  if [ ${#MISSING_DEPS[@]} -gt 0 ]
+  then
+    exit 1
   fi
 }
 
