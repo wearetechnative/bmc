@@ -1,42 +1,9 @@
-
 function loadConfig(){
   conffile="${HOME}/.config/bmc/config.env"
   if [ -f ${conffile} ]; then
     source $conffile
   fi
 }
-
-CMDS=();
-DESC=();
-NARGS=$#;
-ARG1=$1;
-
-make_command(){
-  CMDS+=($1);
-  DESC+=("$2");
-};
-
-usage(){
-  printf "\nUsage: %s [command]\n\nCommands:\n" $0;
-  line="              ";
-
-  i=0
-  for cmd in $CMDS;
-  do
-    i=i+1
-    printf "  %s %s ${DESC[$i]}\n" ${cmd} "${line:${cmd}}";
-  done
-};
-
-runme(){
-  if test $NARGS -eq 1;
-  then eval "$ARG1"||usage;
-  else usage;
-  fi;
-}
-
-
-
 
 function checkdeps(){
   if ! command -v $1 &> /dev/null

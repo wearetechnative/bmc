@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+
+# INCLUDE LIB
+thisdir="$(dirname "$0")"
+source "$thisdir/_bmclib.sh"
+
+
+CMDS=()
+DESC=()
+NARGS=$#
+ARG1=$1
+
+#Printing the values of an array
+make_command(){
+  CMDS+=("$1")
+  DESC+=("$2")
+};
+
+usage(){
+  printf "\nUsage: %s [command]\n\nCommands:\n" $0;
+
+  i=0
+  for cmd in "${CMDS[@]}"
+  do
+    printf "  %-10s %-40s \n" ${cmd} "${DESC[$i]}";
+    i=$((i + 1))
+  done
+
+
+#  echo $cmds
+#  for cmd in $cmds;
+#  do
+#    #echo "$cmd"
+#    printf "  %s %s ${DESC[$i]}\n" ${cmd} "${line:${cmd}}";
+#  done
+};
+
+runme(){
+  if test $NARGS -eq 1;
+  then eval "$ARG1"||usage;
+  else usage;
+  fi;
+}
+
+
+
+
+##### PLACE YOUR COMMANDS BELOW #####
+
+make_command "cli" "Set AWS_PROFILE by sourcing this command"
+cli(){
+
+  checkdeps "jsonify-aws-dotfiles"
+  checkdeps "jq"
+  checkdeps "aws"
+  checkdeps "gum"
+  checkdeps "aws-mfa"
+
+  checkOS
+  selectAWSProfile
+  setDates
+  setMFA
+  export AWS_PROFILE=${selectedProfileName}
+}
+
+make_command "console" "Open account in AWS console."
+console(){
+
+  # CHECK deps
+  loadConfig
+  checkdeps "jsonify-aws-dotfiles"
+  checkdeps "jq"
+  checkdeps "awk"
+  checkdeps "assumego"
+  checkdeps "gum"
+
+  checkOS
+  selectAWSProfile
+  setDates
+  setMFA
+
+  GRANTED_ALIAS_CONFIGURED="true" assumego -c $selectedProfileName
+}
+
+##### PLACE YOUR COMMANDS ABOVE #####
+
+runme
