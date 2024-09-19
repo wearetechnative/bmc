@@ -1,7 +1,7 @@
 MISSING_DEPS=()
 
 function show_version(){
-  version=`cat ./VERSION`
+  version=`cat $thisdir/VERSION`
   echo
   echo "    bmc v${version}"
   echo "    Bill McCloud's Toolbox"

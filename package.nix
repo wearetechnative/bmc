@@ -3,7 +3,6 @@
 , fetchFromGitHub
 , bash
 , pkgs
-, pkgJsonifyAwsDotfiles
 , makeWrapper
 }:
 stdenv.mkDerivation rec {
@@ -14,14 +13,7 @@ stdenv.mkDerivation rec {
   src = ./.;
 
   buildInputs = with pkgs; [
-      awscli2
-      aws-mfa
       bash
-      granted
-      jq
-      dasel
-      gum
-      pkgJsonifyAwsDotfiles
     ];
 
   nativeBuildInputs = [ makeWrapper ];
@@ -30,7 +22,7 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/bin
 
-    cp bmc *.sh $out/bin/
+    cp VERSION bmc *.sh $out/bin/
     runHook postInstall
 
 #    wrapProgram $out/bin/aws-profile-select.sh --prefix PATH : ${lib.makeBinPath buildInputs }
