@@ -1,5 +1,18 @@
 MISSING_DEPS=()
 
+function show_version(){
+  version=`cat ./VERSION`
+  echo
+  echo "    bmc v${version}"
+  echo "    Bill McCloud's Toolbox"
+  echo
+  echo "    http://github.com/wearetechnative/bmc"
+  echo
+  echo "    by Wouter, Pim, et al."
+  echo "    © Technative 2024"
+  echo
+}
+
 function loadConfig(){
   conffile="${HOME}/.config/bmc/config.env"
   if [ -f ${conffile} ]; then

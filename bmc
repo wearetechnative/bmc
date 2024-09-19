@@ -36,6 +36,11 @@ runme(){
 
 ##### PLACE YOUR COMMANDS BELOW #####
 
+make_command "version" "Show bmc version"
+version(){
+  show_version
+}
+
 make_command "cli" "Set AWS_PROFILE by sourcing this command"
 cli(){
 
