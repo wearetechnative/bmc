@@ -4,7 +4,6 @@
 thisdir="$(dirname "$0")"
 source "$thisdir/_bmclib.sh"
 
-
 CMDS=()
 DESC=()
 NARGS=$#
@@ -25,14 +24,6 @@ usage(){
     printf "  %-10s %-40s \n" ${cmd} "${DESC[$i]}";
     i=$((i + 1))
   done
-
-
-#  echo $cmds
-#  for cmd in $cmds;
-#  do
-#    #echo "$cmd"
-#    printf "  %s %s ${DESC[$i]}\n" ${cmd} "${line:${cmd}}";
-#  done
 };
 
 runme(){
@@ -41,9 +32,6 @@ runme(){
   else usage;
   fi;
 }
-
-
-
 
 ##### PLACE YOUR COMMANDS BELOW #####
 
