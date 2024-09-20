@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/bin
 
-    cp VERSION bmc *.sh $out/bin/
+    cp VERSION-bmc bmc *.sh $out/bin/
     runHook postInstall
 
 #    wrapProgram $out/bin/aws-profile-select.sh --prefix PATH : ${lib.makeBinPath buildInputs }

@@ -1,7 +1,7 @@
 MISSING_DEPS=()
 
 function show_version(){
-  version=`cat $thisdir/VERSION`
+  version=`cat $thisdir/VERSION-bmc`
   echo
   echo "    bmc v${version}"
   echo "    Bill McCloud's Toolbox"
@@ -91,7 +91,7 @@ function printAWSProfiles {
   .profiles | map("\(.group)\t\(.profile)\t\(.arn_number)") |
   join("\n")
 ' | awk 'BEGIN {print "Group\tName\tARN number"} {print}' | column -t -s $'\t'
-} 
+}
 
 function selectAWSProfile {
   awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum choose --height 25)

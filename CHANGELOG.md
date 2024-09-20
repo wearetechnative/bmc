@@ -1,5 +1,10 @@
 # BMC Changelog
 
+## 0.2.2
+- fix usage
+- Feature add usage in help
+- make VERSION unique for flake distribution
+
 ## 0.2.1
 - another fix usage
 

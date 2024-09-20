@@ -35,8 +35,9 @@ make_command(){
   DESC+=("$2")
 };
 
+make_command "usage" "Show this help."
 usage(){
-  printf "\nUsage: %s [command]\n\nCommands:\n" $0;
+  printf "\nUsage: %s [command]\n\nCommands:\n" $(basename $0);
 
   i=0
   for cmd in "${CMDS[@]}"
