@@ -12,8 +12,11 @@ function is_sourced() {
 is_sourced && sourced=1 || sourced=0
 
 if [ $sourced -eq 1 ]
-  thisdir="$(dirname "$(which bmc)")"
 then
+  #echo "SOURCED"
+  thisdir="$(dirname "$(which bmc)")"
+else
+  echo "NOT SOURCED"
   thisdir="$(dirname "$0")"
 fi
 

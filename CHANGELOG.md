@@ -1,7 +1,7 @@
 # BMC Changelog
 
-## next
-- fix usage
+## 0.2.1
+- another fix usage
 
 ## 0.2.0
 - Breaking: renamed cli command
