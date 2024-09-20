@@ -13,14 +13,10 @@ is_sourced && sourced=1 || sourced=0
 
 if [ $sourced -eq 1 ]
 then
-  #echo "SOURCED"
   thisdir="$(dirname "$(which bmc)")"
 else
-  echo "NOT SOURCED"
   thisdir="$(dirname "$0")"
 fi
-
-echo $thisdir
 
 # INCLUDE LIB
 source "$thisdir/_bmclib.sh"
