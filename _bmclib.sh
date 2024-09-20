@@ -108,6 +108,9 @@ function selectAWSProfile {
 }
 
 function setMFA {
+  checkOS
+  setDates
+  echo
   echo "MFA: ${mfa}"
   if [[  ${mfa} == "true" ]]; then
     awsMFADevice=$(awk -v profile="${sourceProfile}-long-term" ' $0 == "[" profile "]" {found=1; next} /^\[.*\]/ {found=0} found && /^aws_mfa_device/ {print $3; exit} ' ~/.aws/credentials)
@@ -127,9 +130,11 @@ function setMFA {
         if [[ $? -ne 0 ]]; then echo "!!  Error with AWS MFA code for device. Wrong TOPT?"; return;fi
       else
         echo "!! awsMFADevice not found. Can't renew session"
+        echo
       fi
     else
       echo "Current MFA Session Valid, until: $(convertTime ${currentMFASessionExpirationDate})"
+      echo
     fi
   fi
 }

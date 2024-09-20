@@ -1,7 +1,13 @@
 # BMC Changelog
 
+## 0.2.0
+- Breaking: renamed cli command
+- Feature: add more commands to bmc
+- Feature: more refactoring
+- Fix: new sourcing fix
+
 ## 0.1.1
-- FIX sourcing, detect being sourced 
+- Fix: sourcing, detect being sourced 
 
 ## 0.1.0
 

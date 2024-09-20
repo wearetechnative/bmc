@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 
 function is_sourced() {
-   if [ -n "$ZSH_VERSION" ]; then
-     case $ZSH_EVAL_CONTEXT in *:file:*) return 0;; esac
-   else  # Add additional POSIX-compatible shell names here, if needed.
-     case ${0##*/} in dash|-dash|bash|-bash|ksh|-ksh|sh|-sh) return 0;; esac
-   fi
-   return 1  # NOT sourced.
- }
+  if [ -n "$ZSH_VERSION" ]; then
+    case $ZSH_EVAL_CONTEXT in *:file:*) return 0;; esac
+  else  # Add additional POSIX-compatible shell names here, if needed.
+    case ${0##*/} in dash|-dash|bash|-bash|ksh|-ksh|sh|-sh) return 0;; esac
+  fi
+  return 1  # NOT sourced.
+}
 
 is_sourced && sourced=1 || sourced=0
 
 if [ $sourced -eq 1 ]
-  thisdir="$(dirname "$1")"
+  thisdir="$(dirname "$(which bmc)")"
 then
   thisdir="$(dirname "$0")"
 fi
+
+#echo $thisdir
 
 # INCLUDE LIB
 source "$thisdir/_bmclib.sh"
@@ -48,6 +50,26 @@ runme(){
   fi;
 }
 
+function prelude(){
+  loadConfig
+  # CHECK deps
+  checkdeps "jsonify-aws-dotfiles"
+  checkdeps "jq"
+  checkdeps "awk"
+  checkdeps "assumego"
+  checkdeps "gum"
+  deps_missing
+}
+
+function AWSProfileOrExit(){
+
+  if [ -z $AWS_PROFILE ]
+  then
+    echo "This command needs AWS_PROFILE to be set. run bmc profsel"
+    exit 1
+  fi
+}
+
 ##### PLACE YOUR COMMANDS BELOW #####
 
 make_command "version" "Show bmc version"
@@ -55,43 +77,49 @@ version(){
   show_version
 }
 
-make_command "cli" "Set AWS_PROFILE by sourcing this command"
-cli(){
+make_command "profsel" "Set AWS_PROFILE by sourcing this command"
+profsel(){
 
-  checkdeps "jsonify-aws-dotfiles"
-  checkdeps "jq"
-  checkdeps "aws"
-  checkdeps "gum"
-  checkdeps "aws-mfa"
-  deps_missing
-
-  echo $MISSING_DEPS
-
-  checkOS
+  prelude
   selectAWSProfile
-  setDates
   setMFA
-  export AWS_PROFILE=${selectedProfileName}
+  if [ $sourced -eq 1 ]
+  then
+    export AWS_PROFILE=${selectedProfileName}
+  else
+    echo "Source this script or copy/paste the line below to set profile:"
+    echo
+    echo "  export AWS_PROFILE=${selectedProfileName}"
+    echo
+  fi
 }
 
-make_command "console" "Open account in AWS console."
+make_command "console" "Open Firefox with AWS account in console."
 console(){
 
-  # CHECK deps
-  loadConfig
-  checkdeps "jsonify-aws-dotfiles"
-  checkdeps "jq"
-  checkdeps "awk"
-  checkdeps "assumego"
-  checkdeps "gum"
-  deps_missing
-
-  checkOS
+  prelude
   selectAWSProfile
-  setDates
   setMFA
 
   GRANTED_ALIAS_CONFIGURED="true" assumego -c $selectedProfileName
+}
+
+make_command "ec2ls" "List running ec2's."
+ec2ls(){
+  AWSProfileOrExit
+  $thisdir/ec2ls.sh
+}
+
+make_command "ec2ssh" "ssh connect to running ec2."
+ec2ssh(){
+  AWSProfileOrExit
+  $thisdir/ec2connect.sh
+}
+
+make_command "ecsconnect" "shell connect to ecs container."
+ecsconnect(){
+  AWSProfileOrExit
+  $thisdir/ecsconnect.sh
 }
 
 ##### PLACE YOUR COMMANDS ABOVE #####
