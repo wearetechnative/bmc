@@ -17,7 +17,7 @@ then
   thisdir="$(dirname "$0")"
 fi
 
-#echo $thisdir
+echo $thisdir
 
 # INCLUDE LIB
 source "$thisdir/_bmclib.sh"
