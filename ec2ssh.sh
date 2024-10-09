@@ -59,16 +59,18 @@ if [[ ${shell_users[@]} != *"other"* ]]; then
   shell_users+=('other')
 fi
 
-user=$(gum choose ${shell_users[@]})
 
-if [[ $user == "other" ]]; then
-  user=$(gum input)
+if [[ $user == "other" || -z $user ]]; then
+  user=$(gum choose ${shell_users[@]})
+  #user=$(gum input)
 fi
 instance=$(echo "$instances" | gum filter)
 instance_name=$(echo $instance | cut -f 1 -d " ")
-ssh $sshKey $user@$instance_name
-else
-echo "!! No AWS_PROFILE or AWS_DEFAULT_REGION set"
+if [[ $? -ne 0 ]]; then
+  echo "!! Error. Please check: "
+  echo "AWS_PROFILE, AWS_DEFAULT_REGION, Host connected to SSM" 
+  exit
+fi
 
 # execute AWS CLI-command to retrieve info about EC2-instances. Exit when command fails
 aws_output=$(aws ec2 describe-instances 2>/dev/null)
@@ -107,4 +109,5 @@ if [[ $user == "other" ]]; then
   user=$(gum input --prompt="Enter username >")
 fi
 
+echo "DEBUG: start ssh"
 ssh $sshKey $user@$instance_name

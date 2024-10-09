@@ -4,10 +4,11 @@
 
 rprompt_config="true"
 aws_sso="false"
-aws_mfa="false"
+aws_mfa="true"
 
-totpScript=""  # example bitwarden: "rbw-menu.sh -t code -q new"
-clipboardCommand="" # examplke linux xclip: "xclip -selection clipboard"
+totpScript="rbw-menu.sh -t code -q new"
+#totpScript=""
+clipboardCommand="xclip -selection clipboard"
 
 mkdir -p ~/.config/aws-profile-select/
 

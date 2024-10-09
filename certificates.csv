@@ -1,0 +1,13 @@
+DomainName,CertificateARN,ExpiryDate
+dr.backoffice.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/08f4592a-61c3-437b-8665-d8592707cc78,2023-07-27T01:59:59+02:00
+acc.backoffice.amsterdam.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/703368e2-7c4d-4d18-b66d-f1d95a126f7c,2024-11-02T00:59:59+01:00
+test.backoffice.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/08dd2d50-52f2-4284-883a-f76f333bd5d8,2024-12-26T00:59:59+01:00
+acc.backoffice.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/9399b794-6a56-4768-92c1-80dd238d3f25,2025-01-08T00:59:59+01:00
+backoffice.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/50b8492e-93cf-4da5-84d9-49a4a23c108e,2025-01-08T00:59:59+01:00
+www.dvig.nl,arn:aws:acm:eu-central-1:502143236739:certificate/b11d2ecb-d768-4ae2-b4f5-4151d0f68c98,2025-01-08T00:59:59+01:00
+acc.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/83457e10-0747-46a1-ba95-796f616f5f36,2025-01-08T00:59:59+01:00
+digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/83c1ca28-2164-4c91-b198-89a1b98b44b8,2025-01-08T00:59:59+01:00
+acc.pnh.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/17a68350-d2b4-4980-a84f-9de35791e980,2025-02-06T00:59:59+01:00
+backoffice20.test.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/22ff47dd-84cf-4345-84a9-5fb9b79e881d,2025-09-06T01:59:59+02:00
+backoffice20.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/84bf5263-ca32-4674-94d5-e852c3b1c732,2025-09-06T01:59:59+02:00
+dr.backoffice.digitaalvignet.nl,arn:aws:acm:eu-central-1:502143236739:certificate/c365414c-61bf-4d53-8ea3-2a55e9f29922,2025-09-12T01:59:59+02:00
