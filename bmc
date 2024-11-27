@@ -111,7 +111,7 @@ ec2ls(){
 }
 
 make_command "ec2connect" "connect to running ec2."
-ec2ssh(){
+ec2connect(){
   AWSProfileOrExit
   $thisdir/ec2connect.sh
 }
