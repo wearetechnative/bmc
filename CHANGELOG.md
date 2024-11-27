@@ -1,5 +1,8 @@
 # BMC Changelog
 
+## 0.2.4
+- fix renaming function error ec2connect
+
 ## 0.2.3
 - rename ec2ssh option to ec2connect
 - add options ssm and ssh connection method connecting to ec2
