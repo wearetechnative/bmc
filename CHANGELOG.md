@@ -1,5 +1,9 @@
 # BMC Changelog
 
+## 0.2.3
+- rename ec2ssh option to ec2connect
+- add options ssm and ssh connection method connecting to ec2
+
 ## 0.2.2
 - fix usage
 - Feature add usage in help

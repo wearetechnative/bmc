@@ -58,17 +58,26 @@ if [ "$instance_state" != "running" ]; then
   exit 1
 fi
 
-while [[ -z ${user} ]] ; do
-	header=$(echo -e "Available Users")
-	users_list=$(printf "%s\n" "${shell_users[@]}")
-	user=$(echo -e "$header\n$users_list" | gum table -w 20 | awk '{print $1}')
-	while [[ ${user} == "other" ]]; do
-		user=$(gum input --prompt="Enter username >")
-	done
-done
+connectionMethod=$(gum choose "ssh" "ssm")
 
-echo "-- Executing: ssh ${sshKey} ${user}@${instance_id}"
-ssh ${sshKey} ${user}@${instance_id}
+if [[ ${connectionMethod} == "ssh" ]]; then
+  while [[ -z ${user} ]] ; do
+    header=$(echo -e "Available Users")
+    users_list=$(printf "%s\n" "${shell_users[@]}")
+    user=$(echo -e "$header\n$users_list" | gum table -w 20 | awk '{print $1}')
+    while [[ ${user} == "other" ]]; do
+      user=$(gum input --prompt="Enter username >")
+    done
+  done
+
+  echo "-- Executing: ssh ${sshKey} ${user}@${instance_id}"
+  ssh ${sshKey} ${user}@${instance_id}
+fi
+
+if [[ ${connectionMethod} == "ssm" ]]; then
+  echo "-- Executing: aws ssm start-session --target ${instance_id}"
+  aws ssm start-session --target ${instance_id}
+fi
 
 
 echo "## END"
