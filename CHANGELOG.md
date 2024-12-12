@@ -1,7 +1,8 @@
 # BMC Changelog
 
-## 0.2.5
+## 0.2.5.1
 - Feature: Search option for ec2ls. Now you can search through the output list for a string
+- Fix bugs
 
 ## 0.2.4
 - fix renaming function error ec2connect

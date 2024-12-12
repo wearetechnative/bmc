@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo "DEBUG: params: $@"
 
 
 
@@ -17,7 +18,7 @@ function selectProfileGroup(){
 	echo -e "\n------  $profile  ------" 
 
 		#AWS_PROFILE="$profile" bmc ec2ls
-    AWS_PROFILE="$profile" bmc ec2ls 
+    AWS_PROFILE="$profile" ec2ListInstances
 
 		if [[ $? -ne 0 ]]; then
 			echo "[ERROR] Command failed for profile: $profile"
@@ -69,20 +70,34 @@ echo "$instances"
 }
 
 
+optionsGiven=false
+
 while getopts 'as:' opt; do
 	case "$opt" in
 		a)
 			selectProfileGroup
+      optionsGiven=true
 			;;
 		s)
 			searchString="$OPTARG"
 			findSearchPattern
+      optionsGiven=true
 			;;
-		?)
-			echo -e "Invalid command option."
-			exit 1
-			;;
+    *)
+      echo "Invalid option: $opt"
+      exit 1
+      ;;
 	esac
 done
+
+if ! $optionsGiven; then
+  if [[ -z ${AWS_PROFILE} ]]; then
+		echo "!!! AWS_PROFILE variable is not set. Exiting"
+  else
+    ec2ListInstances
+  fi
+fi
+
 shift "$(($OPTIND - 1))"
+
 
