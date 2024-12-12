@@ -25,6 +25,8 @@ CMDS=()
 DESC=()
 NARGS=$#
 ARG1=$1
+shift
+ARGREST=$@
 
 make_command(){
   CMDS+=("$1")
@@ -44,8 +46,8 @@ usage(){
 };
 
 runme(){
-  if test $NARGS -eq 1;
-  then eval "$ARG1"||usage;
+  if test $NARGS -ge 1;
+  then eval "$ARG1" "$ARGREST" ||usage;
   else usage;
   fi;
 }
@@ -107,7 +109,7 @@ console(){
 make_command "ec2ls" "List running ec2's."
 ec2ls(){
   AWSProfileOrExit
-  $thisdir/ec2ls.sh
+  $thisdir/ec2ls.sh "$@"
 }
 
 make_command "ec2connect" "connect to running ec2."
