@@ -49,7 +49,7 @@ instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | select(.St
 formatted_instances=$(echo -e "$header\n$instances")
 
 if [[ -z ${instance_id} ]]; then
-  instance_id=$(echo -e "$formatted_instances" | gum table -w 20,16,16,8,50 --height 20 | awk -F, '{print $1}')
+  instance_id=$(echo -e "$formatted_instances" | gum table -w 20,16,16,8,50 | awk -F, '{print $1}')
 fi
 
 instance_state=$(echo "$aws_output" | jq -r --arg INSTANCE_ID "$instance_id" '.Reservations[].Instances[] | select(.InstanceId == $INSTANCE_ID) | .State.Name')

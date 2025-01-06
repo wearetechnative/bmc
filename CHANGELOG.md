@@ -1,5 +1,8 @@
 # BMC Changelog
 
+## 0.2.5.2
+- Fix: table height to fix items not being visible
+
 ## 0.2.5.1
 - Feature: Search option for ec2ls. Now you can search through the output list for a string
 - Fix bugs
