@@ -64,7 +64,7 @@ if [[ ${connectionMethod} == "ssh" ]]; then
   while [[ -z ${user} ]] ; do
     header=$(echo -e "Available Users")
     users_list=$(printf "%s\n" "${shell_users[@]}")
-    user=$(echo -e "$header\n$users_list" | gum table -w 20 | awk '{print $1}')
+    user=$(echo -e "$header\n$users_list" | gum table -w 20 --height 20 | awk '{print $1}')
     while [[ ${user} == "other" ]]; do
       user=$(gum input --prompt="Enter username >")
     done
