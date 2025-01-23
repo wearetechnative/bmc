@@ -47,7 +47,6 @@ instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | select(.St
 ] | @csv')
 
 formatted_instances=$(echo -e "$header\n$instances")
-
 if [[ -z ${instance_id} ]]; then
   instance_id=$(echo -e "$formatted_instances" | gum table -w 20,16,16,8,50 --height 20 | awk -F, '{print $1}')
 fi
@@ -64,7 +63,7 @@ if [[ ${connectionMethod} == "ssh" ]]; then
   while [[ -z ${user} ]] ; do
     header=$(echo -e "Available Users")
     users_list=$(printf "%s\n" "${shell_users[@]}")
-    user=$(echo -e "$header\n$users_list" | gum table -w 20 --height 20 | awk '{print $1}')
+    user=$(echo -e "$header\n$users_list" | gum table -w 20 | awk '{print $1}')
     while [[ ${user} == "other" ]]; do
       user=$(gum input --prompt="Enter username >")
     done

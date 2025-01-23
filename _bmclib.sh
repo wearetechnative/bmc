@@ -13,12 +13,141 @@ function show_version(){
   echo
 }
 
+function selectEC2Instance() {
+	header=$(echo "$aws_output" | jq -r '["InstanceId", "PrivateIpAddress", "PublicIpAddress", "State", "Name"] | @csv')
+	instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | select(.State.Code != 48) | [
+	.InstanceId,
+	.PrivateIpAddress,
+	.PublicIpAddress // "null",
+	.State.Name,
+	(.Tags[] | select(.Key=="Name") | .Value)
+	] | @csv')
+
+	formatted_instances=$(echo -e "$header\n$instances")
+	if [[ -z ${instance_id} ]]; then
+		instance_id=$(echo -e "$formatted_instances" | gum table -w 20,16,16,8,50 --height 20 | awk -F, '{print $1}')
+	fi
+  echo $instance_id
+}
+
+
+
 function loadConfig(){
   conffile="${HOME}/.config/bmc/config.env"
   if [ -f ${conffile} ]; then
     source $conffile
   fi
 }
+
+getEc2State() {
+  local instanceId=$1
+  instance_state=$(aws ec2 describe-instances --instance-ids ${instanceID} --query 'Reservations[].Instances[].State.Name' --output text)
+  echo "${instance_state}"
+}
+
+isEc2HibernationEnabled() {
+  local instanceId=$1
+  result=$(aws ec2 describe-instances --instance-ids ${instanceID} --query 'Reservations[].Instances[].HibernationOptions.Configured' --output json | jq '.[0]')
+	if [ $result == "true" ]; then 
+		return 0
+	else
+		return 1
+	fi 
+}
+
+userConfirm() {
+	local prompt=$1
+  gum confirm "${prompt}"
+   echo $?
+}
+
+ec2Action() {
+    local instanceId=$1
+    local action=$2
+    local targetState=$3
+    local timeout=120 # Timeout in seconds
+    local interval=5  # Interval between checks
+
+    echo "Performing action '$action' on EC2 instance: $instanceId. Target state: $targetState"
+    local startTime=$(date +%s)
+
+    # Placeholder: Perform the action (e.g., AWS CLI)
+    case $action in
+        start)
+            echo "Sending start command for $instanceId"
+            ;;
+        stop)
+            echo "Sending stop command for $instanceId"
+            ;;
+        hibernate)
+            echo "Sending hibernate command for $instanceId"
+            ;;
+        *)
+            echo "Unknown action: $action"
+            return 1
+            ;;
+    esac
+
+    # Wait until the desired state is reached
+    while true; do
+        local currentState
+        currentState=$(getEc2State "$instanceId")
+        echo "Current state of $instanceId: $currentState"
+
+        if [[ $currentState == "$targetState" ]]; then
+            echo "Target state '$targetState' reached for EC2 instance: $instanceId"
+            return 0
+        fi
+
+        # Check if the timeout has been exceeded
+        local currentTime=$(date +%s)
+        if (( currentTime - startTime >= timeout )); then
+            echo "Error: Target state '$targetState' not reached within $timeout seconds for EC2 instance: $instanceId"
+            return 1
+        fi
+
+        sleep $interval
+    done
+}
+
+# Main logic for managing an EC2 instance
+manageEc2Instance() {
+    local instanceId=$1
+
+    echo "Managing EC2 instance: $instanceId"
+
+    # Get the current state of the EC2 instance
+    local originalState
+    originalState=$(getEc2State "$instanceId")
+    echo "Original state of EC2 instance $instanceId: $originalState"
+
+    if [[ $originalState == "stopped" ]]; then
+        # If the instance is stopped, start it
+        ec2Action "$instanceId" "start" "running"
+    elif [[ $originalState == "running" ]]; then
+        # If the instance is running, check for hibernation
+        if isEc2HibernationEnabled "$instanceId"; then
+            if userConfirm "Do you want to hibernate the instance?"; then
+                ec2Action "$instanceId" "hibernate" "stopped"
+            elif userConfirm "Do you want to stop the instance?"; then
+                ec2Action "$instanceId" "stop" "stopped"
+            fi
+        else
+            if userConfirm "Do you want to stop the instance?"; then
+                ec2Action "$instanceId" "stop" "stopped"
+            fi
+        fi
+    else
+        echo "Unknown state: $originalState"
+        exit 1
+    fi
+}
+
+# Run the script with an instance-id as an argument
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <instance-id>"
+    exit 1
+fi
 
 function checkdeps(){
   if ! command -v $1 &> /dev/null

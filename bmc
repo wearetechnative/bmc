@@ -109,19 +109,26 @@ console(){
 make_command "ec2ls" "List running ec2's."
 ec2ls(){
   AWSProfileOrExit
-  $thisdir/ec2ls.sh "$@"
+#  $thisdir/ec2ls.sh "$@"
+  listInstances
 }
 
 make_command "ec2connect" "connect to running ec2."
 ec2connect(){
   AWSProfileOrExit
-  $thisdir/ec2connect.sh
+  $thisdir/ec2connect.sh "$@"
 }
 
 make_command "ecsconnect" "shell connect to ecs container."
 ecsconnect(){
   AWSProfileOrExit
   $thisdir/ecsconnect.sh
+}
+
+make_command "ec2stopstart" "Stop/start an ec2-instance"
+ec2stopstart(){
+  instance=$(selectEC2Instance)
+	manageEc2Instance $instance
 }
 
 ##### PLACE YOUR COMMANDS ABOVE #####
