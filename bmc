@@ -115,7 +115,7 @@ ec2ls(){
 make_command "ec2connect" "connect to running ec2."
 ec2connect(){
   AWSProfileOrExit
-  $thisdir/ec2connect.sh
+  $thisdir/ec2connect.sh "$@"
 }
 
 make_command "ecsconnect" "shell connect to ecs container."

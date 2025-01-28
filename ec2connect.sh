@@ -29,8 +29,6 @@ while getopts 'i:h:u:' opt; do
 done
 shift "$(($OPTIND - 1))"
 
-
-
 aws_output=$(aws ec2 describe-instances)
 if [ $? -ne 0 ]; then
 	echo "!! Error: Can't build list of instances. Check error above."
