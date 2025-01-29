@@ -1,6 +1,10 @@
 # BMC Changelog
 
 
+## 0.2.6.0
+- Refactor ec2ls function, integrated in main library
+- ec2find option. Search for keyword in selected aws-profile
+
 ## 0.2.5.3
 - Fix: table height to fix items not being visible
 
