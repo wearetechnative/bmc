@@ -1,5 +1,6 @@
 MISSING_DEPS=()
 
+
 function show_version(){
   version=`cat $thisdir/VERSION-bmc`
   echo
@@ -12,6 +13,212 @@ function show_version(){
   echo "    © Technative 2024"
   echo
 }
+
+function selectProfileGroup(){
+	local awsProfileGroup=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum choose --height 25)
+  local aws_profiles=($(jsonify-aws-dotfiles | jq -r ".config | to_entries[] | select(.value.group == \"${awsProfileGroup}\") | .key"))
+  
+
+	if [ ${#aws_profiles[@]} -eq 0 ]; then
+		echo "No AWS-profiles found for group '$awsProfileGroup'."
+		exit 1
+	fi
+
+	echo "Starting EC2 listing for profiles..." 
+	for profile in "${aws_profiles[@]}"; do
+	echo -e "\n------  $profile  ------" 
+
+		#AWS_PROFILE="$profile" bmc ec2ls
+    AWS_PROFILE="$profile" ec2ListInstances
+
+		if [[ $? -ne 0 ]]; then
+			echo "[ERROR] Command failed for profile: $profile"
+		fi
+
+	done
+
+	echo -e "All profiles processed." 
+
+}
+
+
+function ec2FindInstance(){
+	local searchString=$1
+	if [[ -z ${searchString} ]]; then
+		echo "!!! No search string"
+    echo "Usage: $(basename $0) ec2find <search-string>"
+		exit 0
+	fi 
+
+	outputFile=$(mktemp)
+	echo "Searching for: ${searchString}"
+	selectProfileGroup > $outputFile
+	output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name,Profile\n"
+	while IFS= read -r line
+	do
+		if [[ ${line} == **---** ]]; then 
+			profileHit=$(echo "${line}" | sed 's/^-*//; s/-*$//; s/  */ /g')
+		fi
+		if [[ ${line} == **${searchString}** ]] ; then 
+			searchHit="true"
+			#     echo -e "\n--- String found in profile: ${profileHit}"
+			hitstring=$(echo ${line}|sed 's/│/,/g')
+			while read -r items; do
+				# Zet de waarden in de juiste CSV-indeling
+				instance_id=$(echo $items | awk -F "," '{print $2}')
+				private_ip=$(echo $items | awk -F "," '{print $3}')
+				public_ip=$(echo $items | awk -F "," '{print $4}')
+				state=$(echo $items | awk -F "," '{print $5}')
+				name=$(echo $items | awk -F "," '{print $7}')
+				hibernation_status=$(echo $items | awk -F "," '{print $6}')
+				profile=${profileHit}
+				output+="$instance_id,$private_ip,$public_ip,$state,$hibernation_status,$name,$profile\n"
+			done <<< ${hitstring} 
+		fi
+	done < $outputFile
+
+	if [[ -z ${searchHit} ]]; then
+		echo "!! String not found in AWS PROFILE Group: ${awsProfileGroup}"
+	fi
+
+	rm $outputFile
+
+	echo -e "$output" | gum table -p
+
+}
+
+function ec2ListInstances(){
+
+instances=$(aws ec2 describe-instances \
+    --query 'Reservations[*].Instances[*].[InstanceId, PrivateIpAddress, PublicIpAddress, State.Name, Tags[?Key==`Name`].Value | [0], HibernationOptions.Configured]' \
+    --output text)
+
+# Zet de tekst output om naar CSV-formaat
+output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name\n"
+while read -r line; do
+    # Zet de waarden in de juiste CSV-indeling
+    instance_id=$(echo $line | awk '{print $1}')
+    private_ip=$(echo $line | awk '{print $2}')
+    public_ip=$(echo $line | awk '{print $3}')
+    state=$(echo $line | awk '{print $4}')
+    name=$(echo $line | awk '{print $5}')
+    hibernation_status=$(echo $line | awk '{print $6}')
+
+    # Voeg de hibernation status vóór de Name toe aan de output
+    output+="$instance_id,$private_ip,$public_ip,$state,$hibernation_status,$name\n"
+done <<< "$instances"
+
+# Gebruik gum table om de CSV in een mooie tabel weer te geven
+echo -e "$output" | gum table -p
+}
+
+
+
+function ec2SelectInstance(){
+	aws_output=$(aws ec2 describe-instances)
+	if [ $? -ne 0 ]; then
+		echo "!! Error: Can't build list of instances. Check error above."
+		exit 1
+	fi
+  header=$(echo "$aws_output" | jq -r '["InstanceId", "PrivateIpAddress", "PublicIpAddress", "State", "Name"] | @csv')
+  instances=$(echo "$aws_output" | jq -r '.Reservations[].Instances[] | select(.State.Code != 48) | [
+  .InstanceId,
+  .PrivateIpAddress,
+  .PublicIpAddress // "null",
+  .State.Name,
+  (.Tags[] | select(.Key=="Name") | .Value)
+  ] | @csv')
+
+  formatted_instances=$(echo -e "$header\n$instances")
+    instance_id=$(echo -e "$formatted_instances" | gum table -w 20,16,16,8,50 --height 20 | awk -F, '{print $1}')
+    echo $instance_id
+}
+
+function ec2CheckInstanceStatus(){
+  local instance_id=$1
+  ec2instancestate=$(aws ec2 describe-instances --instance-ids ${instance_id} --query 'Reservations[].Instances[].State.Name' --output text)
+  echo ${ec2instancestate}
+}
+
+function ec2CheckHibernationState() {
+	local instance_id=$1
+	ec2hibernationenabled=$(aws ec2 describe-instances --instance-ids ${instance_id} --query 'Reservations[].Instances[].HibernationOptions.Configured' --output json | jq '.[0]')
+	case ${ec2hibernationenabled} in 
+		true)
+			return 0
+			;;
+		*)
+			return 1
+			;;
+	esac
+}
+
+function ec2CheckNewInstanceState(){
+	local  instance_id=$1
+	local  desiredinstancestate=$2
+	local  elapsed=0
+	local  interval=5
+	local  timeout=300
+
+	while [[ ${elapsed} -lt ${timeout}  && ${currentinstancestate} != ${desiredinstancestate} ]] ; do
+		sleep ${interval}
+		((elapsed += interval))
+    currentinstancestate=$(ec2CheckInstanceStatus ${instance_id})
+	done 
+
+	if [[ ${currentinstancestate} == ${desiredinstancestate} ]]; then 
+		echo "New state reached: ${instance_id} - ${currentinstancestate}"; 
+	else 
+		echo "Instance has not reached desired state within ${timeout} seconds. Check instance state. Current state: ${currentinstancestate}";
+	fi
+	exit 0
+}
+
+export -f ec2CheckNewInstanceState
+
+
+function ec2StopStartInstance(){
+	local instance_id=$(ec2SelectInstance)
+	local instance_state=$(ec2CheckInstanceStatus ${instance_id})
+	case ${instance_state} in
+		stopped)
+			aws ec2 start-instances --instance-ids ${instance_id} >/dev/null
+			#ec2CheckNewInstanceState ${instance_id} started
+			answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c ec2CheckNewInstanceState ${instance_id} running)
+
+			;;
+		running)
+			local stoppingoptions="stop\nexit menu"
+			if $(ec2CheckHibernationState ${instance_id}); then
+				local stoppingoptions="hibernate\n${stoppingoptions}"
+			fi
+			stoppingmethod=$(echo -e $stoppingoptions | gum choose --header "Choose stop-method for instance: ${instance_id}")
+
+			case ${stoppingmethod} in
+				hibernate)
+					aws ec2 stop-instances --instance-ids ${instance_id} --hibernate  >/dev/null
+					#ec2CheckNewInstanceState ${instance_id} stopped
+					answer=$(gum spin --spinner meter --title "Hibernating instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} stopped")
+					;;
+				stop)
+					aws ec2 stop-instances --instance-ids ${instance_id}  >/dev/null
+					#ec2CheckNewInstanceState ${instance_id} stopped
+					answer=$(gum spin --spinner meter --title "Stopping instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} stopped")
+					;;
+							esac
+			;;
+	*)
+					echo -e "Instance ${instance_id} not in running/stopped state.\nCurrent state: ${instance_state}\n"
+					exit 0
+					;;
+esac
+ 
+ if [[ ! -z ${answer} ]]; then
+	echo "ANSWER: $answer"
+fi
+
+}
+
 
 function loadConfig(){
   conffile="${HOME}/.config/bmc/config.env"
