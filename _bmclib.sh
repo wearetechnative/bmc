@@ -161,15 +161,16 @@ function ec2CheckNewInstanceState(){
 	local  timeout=300
 
 	while [[ ${elapsed} -lt ${timeout}  && ${currentinstancestate} != ${desiredinstancestate} ]] ; do
-		sleep ${interval}
 		((elapsed += interval))
-    currentinstancestate=$(ec2CheckInstanceStatus ${instance_id})
+    currentinstancestate=$(aws ec2 describe-instances --instance-ids ${instance_id} --query 'Reservations[].Instances[].State.Name' --output text)
+
+		sleep ${interval}
 	done 
 
 	if [[ ${currentinstancestate} == ${desiredinstancestate} ]]; then 
-		echo "New state reached: ${instance_id} - ${currentinstancestate}"; 
+		echo "Instance ${instance_id} has reached new state ${currentinstancestate} in ${elapsed} seconds."; 
 	else 
-		echo "Instance has not reached desired state within ${timeout} seconds. Check instance state. Current state: ${currentinstancestate}";
+		echo "Instance ${instance_id} has not reached desired state ${currentinstancestate} within ${timeout} seconds.";
 	fi
 	exit 0
 }
@@ -184,7 +185,7 @@ function ec2StopStartInstance(){
 		stopped)
 			aws ec2 start-instances --instance-ids ${instance_id} >/dev/null
 			#ec2CheckNewInstanceState ${instance_id} started
-			answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c ec2CheckNewInstanceState ${instance_id} running)
+			answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} running")
 
 			;;
 		running)
