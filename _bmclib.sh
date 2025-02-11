@@ -175,7 +175,6 @@ function ec2CheckNewInstanceState(){
 	exit 0
 }
 
-export -f ec2CheckNewInstanceState
 
 
 function ec2StopStartInstance(){
@@ -302,8 +301,30 @@ function printAWSProfiles {
 }
 
 function selectAWSProfile {
-  awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum choose --height 25)
-  selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
+  if [[ $# -gt 0 ]]; then
+    while getopts 'lp:' opt; do
+      case "$opt" in
+        l)
+          printAWSProfiles
+          return
+          ;;
+        p)
+          preferedProfile=$OPTARG
+          ;;
+        *)
+          ;;
+      esac
+    done
+    shift "$(($OPTIND - 1))"
+  fi
+
+  if [[ -z $preferedProfile ]]; then 
+    awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum choose --height 25)
+    selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
+  else
+    selectedProfile=$preferedProfile
+  fi
+
   selectedProfileName=$(echo "${selectedProfile}" | awk -F "," '{print $1}')
   selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
   selectedProfileAccountID=$(echo "${selectedProfileARN}" | awk -F ":" '{print $5}')
@@ -313,6 +334,8 @@ function selectAWSProfile {
   sourceProfile=$(jsonify-aws-dotfiles | jq -r --arg arn "$selectedProfileARN" ' .config | to_entries | map(select(.value.role_arn == $arn)) | .[0].value.source_profile // "Error" ')
 
   if [[ ${sourceProfile} == "Error" ]]; then sourceProfile=${selectedProfileName}; fi
+
+  unset preferedProfile
 }
 
 function setMFA {

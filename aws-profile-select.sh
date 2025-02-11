@@ -13,26 +13,11 @@ checkdeps "gum"
 checkdeps "aws-mfa"
 deps_missing
 
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    -l|--list)
-      printAWSProfiles
-      break
-      ;;
-    *)
-      echo "Unkown option: $1"
-      ;;
-  esac
-done
-
-if [[ -z $1 ]]; then
-    loadConfig
-    checkOS
-    selectAWSProfile
-    setDates
-    setMFA
-    export AWS_PROFILE=${selectedProfileName}
-fi
+loadConfig
+checkOS
+selectAWSProfile "$@"
+setDates
+setMFA
+export AWS_PROFILE=${selectedProfileName}
 
 # END OF SCRIPT
