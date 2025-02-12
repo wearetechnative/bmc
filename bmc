@@ -83,7 +83,7 @@ make_command "profsel" "Set AWS_PROFILE by sourcing this command"
 profsel(){
 
   prelude
-  selectAWSProfile
+  selectAWSProfile "$@"
   setMFA
   if [ $sourced -eq 1 ]
   then
@@ -127,7 +127,6 @@ ec2stopstart(){
 
 make_command "ec2stopstart" "Stop/start ec2 instance"
 ec2find(){
-  AWSProfileOrExit
   ec2FindInstance "$@"
 }
 
