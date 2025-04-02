@@ -83,17 +83,43 @@ make_command "profsel" "Set AWS_PROFILE by sourcing this command"
 profsel(){
 
   prelude
+
+  if [[ $# -gt 0 ]]; then
+    while getopts 'lp:' opt; do
+      case "$opt" in
+        l)
+          printAWSProfiles
+          return
+          ;;
+        p)
+          preferedProfile=$OPTARG
+          ;;
+        *)
+          ;;
+      esac
+    done
+    shift "$(($OPTIND - 1))"
+  fi
+
   selectAWSProfile "$@"
   setMFA
-  if [ $sourced -eq 1 ]
-  then
-    export AWS_PROFILE=${selectedProfileName}
+
+  #echo $selectedProfileName
+
+  if [[ -z $selectedProfileName ]]; then
+    echo "No profile selected"
   else
-    echo "Source this script or copy/paste the line below to set profile:"
-    echo
-    echo "  export AWS_PROFILE=${selectedProfileName}"
-    echo
+    if [ $sourced -eq 1 ]; then
+      export AWS_PROFILE=${selectedProfileName}
+    else
+      echo "Source this script or copy/paste the line below to set profile:"
+      echo
+      echo "  export AWS_PROFILE=${selectedProfileName}"
+      echo
+    fi
+
   fi
+
 }
 
 make_command "console" "Open Firefox with AWS account in console."

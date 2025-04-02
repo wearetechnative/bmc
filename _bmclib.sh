@@ -17,16 +17,16 @@ function show_version(){
 function selectProfileGroup(){
 	local awsProfileGroup=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum choose --height 25)
   local aws_profiles=($(jsonify-aws-dotfiles | jq -r ".config | to_entries[] | select(.value.group == \"${awsProfileGroup}\") | .key"))
-  
+
 
 	if [ ${#aws_profiles[@]} -eq 0 ]; then
 		echo "No AWS-profiles found for group '$awsProfileGroup'."
 		exit 1
 	fi
 
-	echo "Starting EC2 listing for profiles..." 
+	echo "Starting EC2 listing for profiles..."
 	for profile in "${aws_profiles[@]}"; do
-	echo -e "\n------  $profile  ------" 
+	echo -e "\n------  $profile  ------"
 
 		#AWS_PROFILE="$profile" bmc ec2ls
     AWS_PROFILE="$profile" ec2ListInstances
@@ -37,7 +37,7 @@ function selectProfileGroup(){
 
 	done
 
-	echo -e "All profiles processed." 
+	echo -e "All profiles processed."
 
 }
 
@@ -48,7 +48,7 @@ function ec2FindInstance(){
 		echo "!!! No search string"
     echo "Usage: $(basename $0) ec2find <search-string>"
 		exit 0
-	fi 
+	fi
 
 	outputFile=$(mktemp)
 	echo "Searching for: ${searchString}"
@@ -56,10 +56,10 @@ function ec2FindInstance(){
 	output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name,Profile\n"
 	while IFS= read -r line
 	do
-		if [[ ${line} == **---** ]]; then 
+		if [[ ${line} == **---** ]]; then
 			profileHit=$(echo "${line}" | sed 's/^-*//; s/-*$//; s/  */ /g')
 		fi
-		if [[ ${line} == **${searchString}** ]] ; then 
+		if [[ ${line} == **${searchString}** ]] ; then
 			searchHit="true"
 			#     echo -e "\n--- String found in profile: ${profileHit}"
 			hitstring=$(echo ${line}|sed 's/│/,/g')
@@ -73,7 +73,7 @@ function ec2FindInstance(){
 				hibernation_status=$(echo $items | awk -F "," '{print $6}')
 				profile=${profileHit}
 				output+="$instance_id,$private_ip,$public_ip,$state,$hibernation_status,$name,$profile\n"
-			done <<< ${hitstring} 
+			done <<< ${hitstring}
 		fi
 	done < $outputFile
 
@@ -143,7 +143,7 @@ function ec2CheckInstanceStatus(){
 function ec2CheckHibernationState() {
 	local instance_id=$1
 	ec2hibernationenabled=$(aws ec2 describe-instances --instance-ids ${instance_id} --query 'Reservations[].Instances[].HibernationOptions.Configured' --output json | jq '.[0]')
-	case ${ec2hibernationenabled} in 
+	case ${ec2hibernationenabled} in
 		true)
 			return 0
 			;;
@@ -165,11 +165,11 @@ function ec2CheckNewInstanceState(){
     currentinstancestate=$(aws ec2 describe-instances --instance-ids ${instance_id} --query 'Reservations[].Instances[].State.Name' --output text)
 
 		sleep ${interval}
-	done 
+	done
 
-	if [[ ${currentinstancestate} == ${desiredinstancestate} ]]; then 
-		echo "Instance ${instance_id} has reached new state ${currentinstancestate} in ${elapsed} seconds."; 
-	else 
+	if [[ ${currentinstancestate} == ${desiredinstancestate} ]]; then
+		echo "Instance ${instance_id} has reached new state ${currentinstancestate} in ${elapsed} seconds.";
+	else
 		echo "Instance ${instance_id} has not reached desired state ${currentinstancestate} within ${timeout} seconds.";
 	fi
 	exit 0
@@ -212,7 +212,7 @@ function ec2StopStartInstance(){
 					exit 0
 					;;
 esac
- 
+
  if [[ ! -z ${answer} ]]; then
 	echo "ANSWER: $answer"
 fi
@@ -301,44 +301,45 @@ function printAWSProfiles {
 }
 
 function selectAWSProfile {
-  if [[ $# -gt 0 ]]; then
-    while getopts 'lp:' opt; do
-      case "$opt" in
-        l)
-          printAWSProfiles
-          return
-          ;;
-        p)
-          preferedProfile=$OPTARG
-          ;;
-        *)
-          ;;
-      esac
-    done
-    shift "$(($OPTIND - 1))"
-  fi
 
-  if [[ -z $preferedProfile ]]; then 
+  if [[ -z $preferedProfile ]]; then
     awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum choose --height 25)
     selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
+    selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
   else
-    selectedProfile=$preferedProfile
+    selectedProfileARN=$(jsonify-aws-dotfiles| jq -r ".config.\"${preferedProfile}\".role_arn")
+    selectedProfile="$preferedProfile,$selectedProfileARN"
   fi
 
   selectedProfileName=$(echo "${selectedProfile}" | awk -F "," '{print $1}')
-  selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
   selectedProfileAccountID=$(echo "${selectedProfileARN}" | awk -F ":" '{print $5}')
-
-  #  if ! expr "${selectedProfileAccountID}" + 0 &>/dev/null; then echo "Error determing AccountID from ARN" ; fi
 
   sourceProfile=$(jsonify-aws-dotfiles | jq -r --arg arn "$selectedProfileARN" ' .config | to_entries | map(select(.value.role_arn == $arn)) | .[0].value.source_profile // "Error" ')
 
-  if [[ ${sourceProfile} == "Error" ]]; then sourceProfile=${selectedProfileName}; fi
+  if [[ ${sourceProfile} == "Error" ]]; then
+    inCredentials=$(jsonify-aws-dotfiles | jq -r ".credentials.\"$selectedProfileName\"")
+    if [ "$inCredentials" = 'null' ]; then
+      #echo "unsetting"
+      unset sourceProfile
+      #unset selectedProfileName
+    else
+      sourceProfile=${selectedProfileName}
+    fi
+  fi
+
+  #echo $selectedProfileName
 
   unset preferedProfile
 }
 
 function setMFA {
+  if [[ -z $sourceProfile ]]; then
+    echo "Error could not set MFA without valid sourceProfile"
+    exit 1
+  else
+    echo "sourceProfile $sourceProfile"
+  fi
+
   checkOS
   setDates
   echo
@@ -360,7 +361,7 @@ function setMFA {
         aws-mfa --profile ${sourceProfile} --force --device ${awsMFADevice}
         if [[ $? -ne 0 ]]; then echo "!!  Error with AWS MFA code for device. Wrong TOPT?"; return;fi
       else
-        echo "!! awsMFADevice not found. Can't renew session"
+        echo "!! AWS MFA Device not found. Can't renew session"
         echo
       fi
     else
