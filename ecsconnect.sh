@@ -126,4 +126,4 @@ container=$(gum choose $containers)
 taskarn=$(echo "$aws_output" | jq -r '.tasks[0].taskArn')
 update_breadcrumbs "$container"
 
-aws ecs execute-command --cluster ${cluster} --interactive --container ${container} --command /bin/bash --task ${taskarn}
+aws ecs execute-command --cluster ${cluster} --interactive --container ${container} --command /bin/sh --task ${taskarn}
