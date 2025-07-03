@@ -1,6 +1,9 @@
 # BMC Changelog
 
 
+## 0.2.6.2
+- Fix spinner ec2stopstart function
+
 ## 0.2.6.0
 - Refactor ec2ls function, integrated in main library
 - ec2find option. Search for keyword in selected aws-profile
