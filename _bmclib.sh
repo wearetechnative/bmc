@@ -184,7 +184,9 @@ function ec2StopStartInstance(){
 		stopped)
 			aws ec2 start-instances --instance-ids ${instance_id} >/dev/null
 			#ec2CheckNewInstanceState ${instance_id} started
-			answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} running")
+			#answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} running")
+      answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c "source ./_bmclib.sh && ec2CheckNewInstanceState ${instance_id} running")
+
 
 			;;
 		running)
@@ -203,7 +205,8 @@ function ec2StopStartInstance(){
 				stop)
 					aws ec2 stop-instances --instance-ids ${instance_id}  >/dev/null
 					#ec2CheckNewInstanceState ${instance_id} stopped
-					answer=$(gum spin --spinner meter --title "Stopping instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} stopped")
+					#answer=$(gum spin --spinner meter --title "Stopping instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} stopped")
+					answer=$(gum spin --spinner meter --title "Stopping instance ${instance_id}" -- bash -c "source ./_bmclib.sh && ec2CheckNewInstanceState ${instance_id} stopped")
 					;;
 							esac
 			;;
