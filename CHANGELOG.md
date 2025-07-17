@@ -1,5 +1,7 @@
 # BMC Changelog
 
+## 0.2.6.3
+- Fix e2stopstart function, rewriting function call
 
 ## 0.2.6.2
 - Fix spinner ec2stopstart function
