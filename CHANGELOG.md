@@ -1,5 +1,8 @@
 # BMC Changelog
 
+## 0.2.6.4
+- Set session duration to 3600s
+
 ## 0.2.6.3
 - Fix e2stopstart function, rewriting function call
 
