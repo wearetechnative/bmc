@@ -1,5 +1,8 @@
 # BMC Changelog
 
+## 0.2.6.5
+- Add -p flag to console option. user bmc console -p <profile-name> to directly open the console with the profile.\
+
 ## 0.2.6.4
 - Set session duration to 3600s
 
