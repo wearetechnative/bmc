@@ -126,7 +126,25 @@ make_command "console" "Open Firefox with AWS account in console."
 console(){
 
   prelude
-  selectAWSProfile
+
+  if [[ $# -gt 0 ]]; then
+    while getopts 'lp:' opt; do
+      case "$opt" in
+        l)
+          printAWSProfiles
+          return
+          ;;
+        p)
+          preferedProfile=$OPTARG
+          ;;
+        *)
+          ;;
+      esac
+    done
+    shift "$(($OPTIND - 1))"
+  fi
+
+  selectAWSProfile "$@"
   setMFA
 
   GRANTED_ALIAS_CONFIGURED="true" GRANTED_ENABLE_AUTO_REASSUME=tru  assumego --duration 3600s -c $selectedProfileName 
