@@ -150,7 +150,7 @@ console(){
   selectAWSProfile "$@"
   setMFA
 
-  GRANTED_ALIAS_CONFIGURED="true" GRANTED_ENABLE_AUTO_REASSUME=tru  assumego --duration 3600s -c $selectedProfileName --service $preferedService 
+  GRANTED_ALIAS_CONFIGURED="true" GRANTED_ENABLE_AUTO_REASSUME=tru  assumego --duration 3600s -c $selectedProfileName ${preferedService:+--service "$preferedService"}
 }
 
 make_command "ec2ls" "List running ec2's."
