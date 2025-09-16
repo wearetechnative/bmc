@@ -1,5 +1,10 @@
 # BMC Changelog
 
+## NEXT
+
+- open profile selection when AWS_PROFILE is not set
+- cleanups
+
 ## 0.2.6.6
 - Add -s flag to console option. user bmc console -s <service-name> to directly open the console with the prefered service.\
 

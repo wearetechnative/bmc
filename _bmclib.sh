@@ -26,9 +26,8 @@ function selectProfileGroup(){
 
 	echo "Starting EC2 listing for profiles..."
 	for profile in "${aws_profiles[@]}"; do
-	echo -e "\n------  $profile  ------"
+  	echo -e "\n------  $profile  ------"
 
-		#AWS_PROFILE="$profile" bmc ec2ls
     AWS_PROFILE="$profile" ec2ListInstances
 
 		if [[ $? -ne 0 ]]; then
@@ -61,7 +60,6 @@ function ec2FindInstance(){
 		fi
 		if [[ ${line} == **${searchString}** ]] ; then
 			searchHit="true"
-			#     echo -e "\n--- String found in profile: ${profileHit}"
 			hitstring=$(echo ${line}|sed 's/│/,/g')
 			while read -r items; do
 				# Zet de waarden in de juiste CSV-indeling
@@ -184,11 +182,7 @@ function ec2StopStartInstance(){
 	case ${instance_state} in
 		stopped)
 			aws ec2 start-instances --instance-ids ${instance_id} >/dev/null
-			#ec2CheckNewInstanceState ${instance_id} started
-			#answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} running")
       answer=$(gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c "source ${bmcpath}/_bmclib.sh && ec2CheckNewInstanceState ${instance_id} running")
-
-
 			;;
 		running)
 			local stoppingoptions="stop\nexit menu"
@@ -200,13 +194,10 @@ function ec2StopStartInstance(){
 			case ${stoppingmethod} in
 				hibernate)
 					aws ec2 stop-instances --instance-ids ${instance_id} --hibernate  >/dev/null
-					#ec2CheckNewInstanceState ${instance_id} stopped
 					answer=$(gum spin --spinner meter --title "Hibernating instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} stopped")
 					;;
 				stop)
 					aws ec2 stop-instances --instance-ids ${instance_id}  >/dev/null
-					#ec2CheckNewInstanceState ${instance_id} stopped
-					#answer=$(gum spin --spinner meter --title "Stopping instance ${instance_id}" -- bash -c "ec2CheckNewInstanceState ${instance_id} stopped")
 					answer=$(gum spin --spinner meter --title "Stopping instance ${instance_id}" -- bash -c "source ${bmcpath}/_bmclib.sh && ec2CheckNewInstanceState ${instance_id} stopped")
 					;;
 							esac
@@ -265,7 +256,7 @@ function setDates {
 
   if [[ ${osType} == "macos" ]]; then
     currentMFASessionExpirationDate=$(date -j -f "%Y-%m-%d %H:%M:%S" "${expiration}" "+%s" 2>/dev/null)
-    dateCmd="date -j -f "
+    #dateCmd="date -j -f "
   elif [[ ${osType} == "linux" ]]; then
     currentMFASessionExpirationDate=$(date -d "$expiration" +%s 2>/dev/null)
   else
@@ -304,10 +295,18 @@ function printAWSProfiles {
 ' | awk 'BEGIN {print "Group\tName\tARN number"} {print}' | column -t -s $'\t'
 }
 
+function useOrSelectAWSProfile {
+  if [[ -z $AWS_PROFILE ]]; then
+    selectAWSProfile "$@"
+    setMFA
+    export AWS_PROFILE=$selectedProfileName
+  fi
+}
+
 function selectAWSProfile {
 
   if [[ -z $preferedProfile ]]; then
-    awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum choose --height 25)
+    awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum filter --height 25)
     selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
     selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
   else
@@ -316,22 +315,18 @@ function selectAWSProfile {
   fi
 
   selectedProfileName=$(echo "${selectedProfile}" | awk -F "," '{print $1}')
-  selectedProfileAccountID=$(echo "${selectedProfileARN}" | awk -F ":" '{print $5}')
 
   sourceProfile=$(jsonify-aws-dotfiles | jq -r --arg arn "$selectedProfileARN" ' .config | to_entries | map(select(.value.role_arn == $arn)) | .[0].value.source_profile // "Error" ')
 
   if [[ ${sourceProfile} == "Error" ]]; then
     inCredentials=$(jsonify-aws-dotfiles | jq -r ".credentials.\"$selectedProfileName\"")
     if [ "$inCredentials" = 'null' ]; then
-      #echo "unsetting"
       unset sourceProfile
-      #unset selectedProfileName
     else
       sourceProfile=${selectedProfileName}
     fi
   fi
 
-  #echo $selectedProfileName
 
   unset preferedProfile
 }
@@ -374,4 +369,3 @@ function setMFA {
     fi
   fi
 }
-
