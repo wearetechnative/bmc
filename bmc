@@ -162,7 +162,9 @@ ec2ls(){
 
 make_command "ec2connect" "connect to running ec2."
 ec2connect(){
-  AWSProfileOrExit
+  if [[ -z ${AWS_PROFILE} ]]; then
+  selectAWSProfile "$@" $thisdir/ec2connect.sh "$@"
+  fi
   $thisdir/ec2connect.sh "$@"
 }
 
