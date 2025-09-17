@@ -128,7 +128,7 @@ console(){
   prelude
 
   if [[ $# -gt 0 ]]; then
-    while getopts 'lp:s' opt; do
+    while getopts 'lp:s:' opt; do
       case "$opt" in
         l)
           printAWSProfiles
@@ -138,7 +138,7 @@ console(){
           preferedProfile=$OPTARG
           ;;
         s)
-          awsService=$OPTARG
+          preferedService=$OPTARG
           ;;
         *)
           ;;
@@ -150,7 +150,7 @@ console(){
   selectAWSProfile "$@"
   setMFA
 
-  GRANTED_ALIAS_CONFIGURED="true" GRANTED_ENABLE_AUTO_REASSUME=tru  assumego --duration 3600s -c $selectedProfileName
+  GRANTED_ALIAS_CONFIGURED="true" GRANTED_ENABLE_AUTO_REASSUME=tru  assumego --duration 3600s -c $selectedProfileName ${preferedService:+--service "$preferedService"}
 }
 
 make_command "ec2ls" "List running ec2's."
