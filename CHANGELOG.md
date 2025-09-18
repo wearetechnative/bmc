@@ -1,8 +1,8 @@
 # BMC Changelog
 
-## NEXT
-
+## 2.7.0 - 18 sept 2025
 - open profile selection when AWS_PROFILE is not set
+- use filter in stead of table/choose
 - cleanups
 
 ## 0.2.6.7

@@ -307,7 +307,16 @@ function selectAWSProfile {
 
   if [[ -z $preferedProfile ]]; then
     awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum filter --height 25)
-    selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
+
+    #OLD TABLE SELECTOR
+    #selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
+
+    selectedProfileTable=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | sed -e s/\"//g | sed -e s/ROLE/ACCOUNT\ ID,ROLE/ | sed -e s/arn:aws:iam::// | sed -e s/:role\\//,/ | column -s, -t)
+    header=$(echo "  $selectedProfileTable" | head -n1)
+    selectedProfile=$(echo "$selectedProfileTable" |tail -n +2 | gum filter --header="$header")
+
+    IFS=' ' read -r -a array <<< "$selectedProfile"
+    selectedProfile="${array[0]},arn:aws:iam::${array[1]}:role/${array[2]}"
     selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
   else
     selectedProfileARN=$(jsonify-aws-dotfiles| jq -r ".config.\"${preferedProfile}\".role_arn")
@@ -326,7 +335,6 @@ function selectAWSProfile {
       sourceProfile=${selectedProfileName}
     fi
   fi
-
 
   unset preferedProfile
 }
