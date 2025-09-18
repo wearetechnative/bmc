@@ -104,8 +104,6 @@ profsel(){
   selectAWSProfile "$@"
   setMFA
 
-  #echo $selectedProfileName
-
   if [[ -z $selectedProfileName ]]; then
     echo "No profile selected"
   else
@@ -155,33 +153,36 @@ console(){
 
 make_command "ec2ls" "List running ec2's."
 ec2ls(){
-  AWSProfileOrExit
+  prelude
+  useOrSelectAWSProfile
   ec2ListInstances
- # $thisdir/ec2ls.sh "$@"
 }
 
 make_command "ec2connect" "connect to running ec2."
 ec2connect(){
-  if [[ -z ${AWS_PROFILE} ]]; then
-  selectAWSProfile "$@" $thisdir/ec2connect.sh "$@"
-  fi
+  prelude
+  useOrSelectAWSProfile
   $thisdir/ec2connect.sh "$@"
 }
 
 make_command "ec2stopstart" "Stop/start ec2 instance"
 ec2stopstart(){
-  AWSProfileOrExit
+  prelude
+  useOrSelectAWSProfile
   ec2StopStartInstance "$@"
 }
 
-make_command "ec2stopstart" "Stop/start ec2 instance"
+make_command "ec2find" "find ec2 instance"
 ec2find(){
+  prelude
+  useOrSelectAWSProfile
   ec2FindInstance "$@"
 }
 
 make_command "ecsconnect" "shell connect to ecs container."
 ecsconnect(){
-  AWSProfileOrExit
+  prelude
+  useOrSelectAWSProfile
   $thisdir/ecsconnect.sh
 }
 
