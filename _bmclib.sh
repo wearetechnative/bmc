@@ -315,8 +315,11 @@ function selectAWSProfile {
     header=$(echo "  $selectedProfileTable" | head -n1)
     selectedProfile=$(echo "$selectedProfileTable" |tail -n +2 | gum filter --header="$header")
 
-    IFS=' ' read -r -a array <<< "$selectedProfile"
-    selectedProfile="${array[0]},arn:aws:iam::${array[1]}:role/${array[2]}"
+    # Split the selectedProfile string in a way that works in both bash and zsh
+    local profile_name=$(echo "$selectedProfile" | awk '{print $1}')
+    local account_id=$(echo "$selectedProfile" | awk '{print $2}')
+    local role_name=$(echo "$selectedProfile" | awk '{print $3}')
+    selectedProfile="${profile_name},arn:aws:iam::${account_id}:role/${role_name}"
     selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
   else
     selectedProfileARN=$(jsonify-aws-dotfiles| jq -r ".config.\"${preferedProfile}\".role_arn")
