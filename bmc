@@ -9,13 +9,21 @@ function is_sourced() {
   return 1  # NOT sourced.
 }
 
+echo $0
+
 is_sourced && sourced=1 || sourced=0
 
-if [ $sourced -eq 1 ]
+if [ "$0" = "./bmc" ]
 then
-  thisdir="$(dirname "$(which bmc)")"
-else
+  echo "RUNNING IN DEVMODE"
   thisdir="$(dirname "$0")"
+else
+  if [ $sourced -eq 1 ]
+  then
+    thisdir="$(dirname "$(which bmc)")"
+  else
+    thisdir="$(dirname "$0")"
+  fi
 fi
 
 # INCLUDE LIB

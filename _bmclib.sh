@@ -319,6 +319,7 @@ function selectAWSProfile {
     local profile_name=$(echo "$selectedProfile" | awk '{print $1}')
     local account_id=$(echo "$selectedProfile" | awk '{print $2}')
     local role_name=$(echo "$selectedProfile" | awk '{print $3}')
+
     selectedProfile="${profile_name},arn:aws:iam::${account_id}:role/${role_name}"
     selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
   else
