@@ -21,7 +21,7 @@ function selectProfileGroup(){
 
 	if [ ${#aws_profiles[@]} -eq 0 ]; then
 		echo "No AWS-profiles found for group '$awsProfileGroup'."
-		exit 1
+		# exit 1
 	fi
 
 	echo "Starting EC2 listing for profiles..."
