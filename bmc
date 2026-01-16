@@ -133,27 +133,57 @@ console(){
 
   prelude
 
+  forceProfileSelection=false
   if [[ $# -gt 0 ]]; then
-    while getopts 'lp:s:' opt; do
-      case "$opt" in
-        l)
+    # Manual parsing to handle -p without value
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        -l)
           printAWSProfiles
           return
           ;;
-        p)
-          preferedProfile=$OPTARG
+        -p)
+          shift
+          # Check if next arg exists and doesn't start with -
+          if [[ -n $1 && $1 != -* ]]; then
+            preferedProfile="$1"
+            shift
+          else
+            forceProfileSelection=true
+          fi
           ;;
-        s)
-          preferedService=$OPTARG
+        -s)
+          shift
+          if [[ -n $1 ]]; then
+            preferedService="$1"
+            shift
+          fi
           ;;
         *)
+          shift
           ;;
       esac
     done
-    shift "$(($OPTIND - 1))"
   fi
 
-  selectAWSProfile "$@"
+  # Use AWS_PROFILE if set and not forcing selection
+  if [[ -n $AWS_PROFILE && $forceProfileSelection == false && -z $preferedProfile ]]; then
+    selectedProfileName=$AWS_PROFILE
+    # Determine sourceProfile from AWS_PROFILE for MFA
+    selectedProfileARN=$(jsonify-aws-dotfiles | jq -r ".config.\"${AWS_PROFILE}\".role_arn")
+    if [[ $selectedProfileARN != "null" && -n $selectedProfileARN ]]; then
+      sourceProfile=$(jsonify-aws-dotfiles | jq -r --arg arn "$selectedProfileARN" '.config | to_entries | map(select(.value.role_arn == $arn)) | .[0].value.source_profile // "Error"')
+      if [[ ${sourceProfile} == "Error" ]]; then
+        sourceProfile=${selectedProfileName}
+      fi
+    else
+      # Profile is in credentials, not config
+      sourceProfile=${selectedProfileName}
+    fi
+  else
+    selectAWSProfile
+  fi
+
   setMFA
 
   GRANTED_ALIAS_CONFIGURED="true" GRANTED_ENABLE_AUTO_REASSUME=tru  assumego --duration 3600s -c $selectedProfileName ${preferedService:+--service "$preferedService"}
