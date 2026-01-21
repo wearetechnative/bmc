@@ -110,20 +110,21 @@ profsel(){
   fi
 
   selectAWSProfile "$@"
-  setMFA
 
   if [[ -z $selectedProfileName ]]; then
     echo "No profile selected"
-  else
-    if [ $sourced -eq 1 ]; then
-      export AWS_PROFILE=${selectedProfileName}
-    else
-      echo "Source this script or copy/paste the line below to set profile:"
-      echo
-      echo "  export AWS_PROFILE=${selectedProfileName}"
-      echo
-    fi
+    return
+  fi
 
+  setMFA
+
+  if [ $sourced -eq 1 ]; then
+    export AWS_PROFILE=${selectedProfileName}
+  else
+    echo "Source this script or copy/paste the line below to set profile:"
+    echo
+    echo "  export AWS_PROFILE=${selectedProfileName}"
+    echo
   fi
 
 }

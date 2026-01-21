@@ -4,6 +4,7 @@
 - Feature: `bmc console` respects AWS_PROFILE environment variable when set
 - Feature: `bmc console -p` (without value) forces profile selection even when AWS_PROFILE is set
 - Enhancement: Reduced friction when AWS_PROFILE is already configured
+- Fix: `bmc profsel` no longer exits the shell when profile selection is cancelled (Ctrl-C) or no profile is chosen
 
 ## 2.7.0 - 18 sept 2025
 - open profile selection when AWS_PROFILE is not set
