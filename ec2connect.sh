@@ -56,7 +56,12 @@ if [ "$instance_state" != "running" ]; then
   exit 1
 fi
 
-connectionMethod=$(gum choose "ssh" "ssm")
+# Auto-select SSH if -u or -i flags were provided
+if [[ -n ${user} || -n ${sshKey} ]]; then
+  connectionMethod="ssh"
+else
+  connectionMethod=$(gum choose "ssh" "ssm")
+fi
 
 if [[ ${connectionMethod} == "ssh" ]]; then
   while [[ -z ${user} ]] ; do
