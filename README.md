@@ -21,6 +21,37 @@ Example:
 BMC_AUTO_START_STOPPED_INSTANCES="always"
 ```
 
+### MFA / TOTP Configuration
+- `totpScript` - Array containing command and arguments to generate TOTP codes for MFA authentication
+- `clipboardCopyCommand` - Array containing command and arguments to copy text to clipboard
+- `clipboardPasteCommand` - Array containing command and arguments to paste text from clipboard
+
+Examples:
+```bash
+# Using rbw-menu.sh for TOTP generation
+totpScript=("/path/to/rbw-menu.sh" "-t" "code" "-q" "new")
+
+# Using pass for TOTP generation
+totpScript=("pass" "otp" "aws/mfa")
+
+# Simple TOTP script without arguments
+totpScript=("/usr/local/bin/get-totp.sh")
+
+# Clipboard commands (Linux with xclip)
+clipboardCopyCommand=("xclip" "-selection" "clipboard")
+clipboardPasteCommand=("xclip" "-selection" "clipboard" "-o")
+
+# Clipboard commands (macOS)
+clipboardCopyCommand=("pbcopy")
+clipboardPasteCommand=("pbpaste")
+
+# Clipboard commands (custom wrapper)
+clipboardCopyCommand=("/usr/local/bin/clipcopy")
+clipboardPasteCommand=("/usr/local/bin/clippaste")
+```
+
+**Note**: All commands should be configured as bash arrays to properly handle arguments and paths with spaces.
+
 ## TODO
 
 - [ ] ci testing

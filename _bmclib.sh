@@ -374,12 +374,12 @@ function setMFA {
       if [[ ! -z ${awsMFADevice} ]]; then
         echo aws-mfa --profile ${sourceProfile} --force --device ${awsMFADevice}
         if [[ ! -z $totpScript ]]; then
-          totpCode=$(${totpScript})
-          echo ${totpCode} |  ${clipboardCommand}
+          totpCode=$("${totpScript[@]}")
+          echo ${totpCode} |  "${clipboardCopyCommand[@]}"
           echo "-- Copied to clipboard";
           echo "${totpCode}"
         else
-          echo "Code: ${totpCode}"
+          echo "-- No TOTP script configured. Please enter MFA code manually."
         fi
         aws-mfa --profile ${sourceProfile} --force --device ${awsMFADevice}
         if [[ $? -ne 0 ]]; then echo "!!  Error with AWS MFA code for device. Wrong TOPT?"; return;fi

@@ -9,6 +9,9 @@
 - Feature: `bmc ec2connect` now prompts to start stopped EC2 instances before connecting, streamlining the workflow
 - Feature: New config option `BMC_AUTO_START_STOPPED_INSTANCES` to control stopped instance behavior (values: "always", "never", "prompt")
 - Enhancement: Improved error messages in `bmc ec2connect` - removed redundant "Not executing the SSH-command" text
+- Fix: TOTP script now properly executes with command-line arguments using correct array expansion
+- Fix: Clipboard copy now uses correct variable name `clipboardCopyCommand` instead of undefined `clipboardCommand`
+- Enhancement: Clear feedback message when TOTP script is not configured instead of displaying undefined variable
 
 ## 2.7.0 - 18 sept 2025
 - open profile selection when AWS_PROFILE is not set
