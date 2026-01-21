@@ -360,24 +360,29 @@ function setMFA {
     echo "Error could not set MFA without valid sourceProfile"
     return 1
   else
-    echo "sourceProfile $sourceProfile"
+    echo "-- Using AWS source-profile: $sourceProfile"
   fi
 
   checkOS
   setDates
   echo
-  echo "MFA: ${mfa}"
   if [[  ${mfa} == "true" ]]; then
     awsMFADevice=$(awk -v profile="${sourceProfile}-long-term" ' $0 == "[" profile "]" {found=1; next} /^\[.*\]/ {found=0} found && /^aws_mfa_device/ {print $3; exit} ' ~/.aws/credentials)
     if [[ -z ${currentMFASessionExpirationDate} ]]; then expiration="1" ;fi
     if [[ ${currentMFASessionExpirationDate} -lt ${date_now} ]]; then
       if [[ ! -z ${awsMFADevice} ]]; then
-        echo aws-mfa --profile ${sourceProfile} --force --device ${awsMFADevice}
+        echo "-- Refreshing MFA session for ${sourceProfile}..."
         if [[ ! -z $totpScript ]]; then
+          echo "-- Executing TOTP script..."
           totpCode=$("${totpScript[@]}")
-          echo ${totpCode} |  "${clipboardCopyCommand[@]}"
-          echo "-- Copied to clipboard";
           echo "${totpCode}"
+          if [[ ! -z $clipboardCopyCommand ]]; then
+            if echo ${totpCode} | "${clipboardCopyCommand[@]}" 2>/dev/null; then
+              echo "-- Copied to clipboard"
+            else
+              echo "-- Note: Clipboard copy failed (command not found or error)"
+            fi
+          fi
         else
           echo "-- No TOTP script configured. Please enter MFA code manually."
         fi

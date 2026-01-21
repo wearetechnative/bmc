@@ -9,8 +9,6 @@ function is_sourced() {
   return 1  # NOT sourced.
 }
 
-echo $0
-
 is_sourced && sourced=1 || sourced=0
 
 if [ "$0" = "./bmc" ]

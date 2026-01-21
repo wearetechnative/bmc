@@ -12,6 +12,9 @@
 - Fix: TOTP script now properly executes with command-line arguments using correct array expansion
 - Fix: Clipboard copy now uses correct variable name `clipboardCopyCommand` instead of undefined `clipboardCommand`
 - Enhancement: Clear feedback message when TOTP script is not configured instead of displaying undefined variable
+- Fix: Clipboard copy now properly validates command exists before showing success message
+- Enhancement: Added informative message before executing TOTP script to improve user awareness
+- Enhancement: Improved MFA session messages to be more user-friendly and less debug-like
 
 ## 2.7.0 - 18 sept 2025
 - open profile selection when AWS_PROFILE is not set
