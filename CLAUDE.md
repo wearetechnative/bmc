@@ -17,3 +17,4 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
 - always remember openspec settings and documents
+- never add claude or claude-code references in git commit messages
