@@ -1,6 +1,6 @@
 # BMC Changelog
 
-## NEXT VERSION
+## 0.2.8.0 - 21 jan 2026
 - Feature: `bmc console` respects AWS_PROFILE environment variable when set
 - Feature: `bmc console -p` (without value) forces profile selection even when AWS_PROFILE is set
 - Enhancement: Reduced friction when AWS_PROFILE is already configured
