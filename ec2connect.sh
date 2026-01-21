@@ -1,5 +1,33 @@
 #!/usr/bin/env bash
 
+# Load config file for BMC_AUTO_START_STOPPED_INSTANCES setting
+conffile="${HOME}/.config/bmc/config.env"
+if [ -f ${conffile} ]; then
+  source $conffile
+fi
+
+# Default to "prompt" if not set
+BMC_AUTO_START_STOPPED_INSTANCES=${BMC_AUTO_START_STOPPED_INSTANCES:-"prompt"}
+
+# Helper function to start an instance and wait for it to be running
+startInstanceAndWait() {
+  local instance_id=$1
+  local bmcpath=$(dirname $0)
+
+  # Source _bmclib.sh to access ec2CheckNewInstanceState function
+  source ${bmcpath}/_bmclib.sh
+
+  echo "-- Starting instance ${instance_id}..."
+  aws ec2 start-instances --instance-ids ${instance_id} >/dev/null
+  if [ $? -ne 0 ]; then
+    echo "!! Error: Failed to start instance. Check error above."
+    exit 1
+  fi
+
+  gum spin --spinner meter --title "Starting instance ${instance_id}" -- bash -c "source ${bmcpath}/_bmclib.sh && ec2CheckNewInstanceState ${instance_id} running"
+  echo "-- Instance ${instance_id} is now running"
+}
+
 shell_users=("root" "ubuntu" "ec2_user" "other")
 
 while getopts 'i:h:u:' opt; do
@@ -51,9 +79,36 @@ if [[ -z ${instance_id} ]]; then
 fi
 
 instance_state=$(echo "$aws_output" | jq -r --arg INSTANCE_ID "$instance_id" '.Reservations[].Instances[] | select(.InstanceId == $INSTANCE_ID) | .State.Name')
+
+# Handle non-running instances
 if [ "$instance_state" != "running" ]; then
-  echo "!!! Instance chosen is not running. Current state is : ${instance_state}. Not executing the SSH-command"
-  exit 1
+  if [ "$instance_state" = "stopped" ]; then
+    # Instance is stopped - handle based on config
+    case "$BMC_AUTO_START_STOPPED_INSTANCES" in
+      always)
+        # Auto-start without prompting
+        startInstanceAndWait "$instance_id"
+        ;;
+      never)
+        # Exit with error message
+        echo "!!! Instance chosen is not running. Current state is : ${instance_state}."
+        exit 1
+        ;;
+      *)
+        # Prompt user (default behavior)
+        if gum confirm "Instance ${instance_id} is stopped. Start it?"; then
+          startInstanceAndWait "$instance_id"
+        else
+          echo "Instance not started. Exiting."
+          exit 0
+        fi
+        ;;
+    esac
+  else
+    # Instance is in another non-running state (pending, stopping, etc.)
+    echo "!!! Instance chosen is not running. Current state is : ${instance_state}."
+    exit 1
+  fi
 fi
 
 # Auto-select SSH if -u or -i flags were provided
