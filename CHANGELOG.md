@@ -1,5 +1,14 @@
 # BMC Changelog
 
+## NEXT VERSION
+- Feature: New `bmc ec2scheduler` command to manage InstanceScheduler tags
+- Enhancement: List all EC2 instances showing scheduler status (enabled/disabled/none)
+- Enhancement: Toggle InstanceScheduler tags between enabled/disabled states for existing tagged instances
+- Enhancement: Guide users to add scheduler tags manually via AWS Console for untagged instances
+- Enhancement: Open AWS Console directly to instance details page using `assumego` with region-specific URLs
+- Enhancement: Automatically extract region from instance availability zone for console URLs
+- Enhancement: Easily manage EC2 instance scheduling for maintenance or long-running tasks
+
 ## 0.2.8.0 - 21 jan 2026
 - Feature: `bmc console` respects AWS_PROFILE environment variable when set
 - Feature: `bmc console -p` (without value) forces profile selection even when AWS_PROFILE is set

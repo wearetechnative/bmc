@@ -1,6 +1,6 @@
 # MFA Authentication User Experience
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Clear User-Facing Messages
 The system SHALL display clear, user-friendly messages during MFA authentication that focus on user actions rather than technical implementation details.

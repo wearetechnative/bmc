@@ -216,6 +216,13 @@ ec2find(){
   ec2FindInstance "$@"
 }
 
+make_command "ec2scheduler" "Toggle InstanceScheduler tag to enable/disable scheduling"
+ec2scheduler(){
+  prelude
+  useOrSelectAWSProfile
+  $thisdir/ec2scheduler.sh
+}
+
 make_command "ecsconnect" "shell connect to ecs container."
 ecsconnect(){
   prelude

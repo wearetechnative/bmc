@@ -1,6 +1,6 @@
 # Proposal: Improve MFA User Experience with Better Messages
 
-## Problem
+## Why
 
 The MFA authentication flow in BMC displays debug-oriented messages that are confusing for end users:
 
@@ -13,7 +13,7 @@ The MFA authentication flow in BMC displays debug-oriented messages that are con
 
 These messages make the MFA flow feel like debugging output rather than a polished user experience, and can mislead users about whether operations succeeded.
 
-## Proposed Solution
+## What Changes
 
 Replace debug-oriented messages with clear, actionable user feedback:
 
@@ -32,29 +32,19 @@ Replace debug-oriented messages with clear, actionable user feedback:
 - Show helpful error when clipboard fails: "Note: Clipboard copy failed (command not found or error)"
 - Suppress clipboard command stderr to avoid noise
 
-## Benefits
+## Impact
 
+**Benefits:**
 - **Professional UX**: Messages feel intentional and user-focused
 - **Clear status**: Users understand what's happening at each step
 - **Accurate feedback**: Success messages only shown when operations actually succeed
 - **Reduced confusion**: Technical implementation details hidden from users
 - **Better troubleshooting**: Error messages are helpful rather than just command failures
 
-## Scope
-
-This change modifies:
+**Affected code:**
 1. `bmc` line 12 - Remove `echo $0` debug output
 2. `_bmclib.sh` lines 358-391 - Improve all MFA-related user messages
 3. Clipboard validation - Check success before showing confirmation
 
-## Dependencies
-
-- Builds on the TOTP script fixes from `fix-totp-script-handling`
-- No breaking changes to functionality, only message improvements
-
-## Out of Scope
-
-- Changing MFA authentication logic
-- Modifying TOTP script execution behavior
-- Altering clipboard command functionality
-- Adding new configuration options
+**Affected specs:**
+- Creates new `mfa-authentication` spec documenting MFA user experience requirements

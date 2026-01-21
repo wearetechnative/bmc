@@ -1,6 +1,6 @@
 # Proposal: Fix TOTP Script Handling and Clipboard Integration
 
-## Problem
+## Why
 
 The current TOTP script functionality in BMC has several implementation issues that prevent it from working correctly:
 
@@ -14,7 +14,7 @@ These issues prevent users from:
 - Having TOTP codes automatically copied to clipboard
 - Seeing meaningful output when TOTP script is not configured
 
-## Proposed Solution
+## What Changes
 
 Fix the TOTP script execution and clipboard integration to work correctly with array-based configuration and proper variable handling:
 
@@ -32,28 +32,11 @@ Fix the if/else logic to only display messages when they make sense:
 ### 4. Documentation
 Update config.env comments and README to document the proper array syntax for totpScript
 
-## Benefits
+## Impact
 
-- **Working TOTP integration**: Users can properly configure external TOTP generators (like password managers)
-- **Proper clipboard support**: TOTP codes are correctly copied to clipboard using the configured command
-- **Clear feedback**: Users see appropriate messages based on their configuration
-- **Better UX**: Eliminates confusing undefined variable messages
-- **Example compatibility**: Works with existing config patterns like rbw-menu.sh with arguments
-
-## Scope
-
-This change modifies:
+**Affected code:**
 1. `_bmclib.sh` lines 376-383 - Fix array expansion and variable references
 2. Config documentation - Add examples and clarify array syntax for totpScript and clipboard commands
 
-## Dependencies
-
-- Existing config.env structure (no breaking changes)
-- Bash array expansion support (already required by BMC)
-
-## Out of Scope
-
-- Adding new TOTP generation methods
-- Changing the MFA authentication flow
-- Adding automatic clipboard paste functionality
-- Supporting non-array configuration formats (arrays are more flexible)
+**Affected specs:**
+- Creates new `totp-integration` spec documenting TOTP script and clipboard functionality
