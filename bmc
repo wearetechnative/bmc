@@ -230,6 +230,103 @@ ecsconnect(){
   $thisdir/ecsconnect.sh
 }
 
+make_command "gencompletions" "Generate shell completion scripts for bash or zsh"
+gencompletions(){
+  local shell_type="$1"
+
+  if [[ -z "$shell_type" ]]; then
+    echo "Error: Please specify shell type (bash or zsh)"
+    echo "Usage: bmc gencompletions <bash|zsh>"
+    exit 1
+  fi
+
+  case "$shell_type" in
+    bash)
+      cat << 'EOF'
+# Bash completion for bmc command
+_bmc_completion() {
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # Get available commands dynamically from bmc usage output
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        opts=$(bmc usage 2>/dev/null | awk 'NR>3 && NF>0 {print $1}')
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+}
+
+complete -F _bmc_completion bmc
+EOF
+      echo ""
+      echo "# Installation instructions:"
+      echo "# 1. Add to your ~/.bashrc:"
+      echo "#    source <(bmc gencompletions bash)"
+      echo "#"
+      echo "# 2. Or save to a file and source it:"
+      echo "#    bmc gencompletions bash > ~/.bmc-completion.bash"
+      echo "#    echo 'source ~/.bmc-completion.bash' >> ~/.bashrc"
+      echo "#"
+      echo "# 3. Or install system-wide (requires root):"
+      echo "#    bmc gencompletions bash | sudo tee /etc/bash_completion.d/bmc"
+      echo "#"
+      echo "# Then restart your shell or run: source ~/.bashrc"
+      ;;
+    zsh)
+      cat << 'EOF'
+#compdef bmc
+
+# Zsh completion for bmc command
+_bmc() {
+    local -a commands
+    local -a command_descriptions
+
+    # Get available commands dynamically from bmc usage output
+    local usage_output
+    usage_output=$(bmc usage 2>/dev/null)
+
+    # Parse commands and descriptions
+    while IFS= read -r line; do
+        if [[ $line =~ ^[[:space:]]+([a-z0-9_-]+)[[:space:]]+(.+)$ ]]; then
+            local cmd="${match[1]}"
+            local desc="${match[2]}"
+            commands+=("$cmd")
+            command_descriptions+=("$cmd:$desc")
+        fi
+    done <<< "$usage_output"
+
+    if (( CURRENT == 2 )); then
+        _describe 'bmc command' command_descriptions
+    fi
+}
+
+_bmc "$@"
+EOF
+      echo ""
+      echo "# Installation instructions:"
+      echo "# 1. Add to your ~/.zshrc:"
+      echo "#    source <(bmc gencompletions zsh)"
+      echo "#"
+      echo "# 2. Or save to a completion directory:"
+      echo "#    mkdir -p ~/.zsh/completions"
+      echo "#    bmc gencompletions zsh > ~/.zsh/completions/_bmc"
+      echo "#    # Add to ~/.zshrc if not already present:"
+      echo "#    fpath=(~/.zsh/completions \$fpath)"
+      echo "#    autoload -Uz compinit"
+      echo "#    compinit"
+      echo "#"
+      echo "# Then restart your shell or run: source ~/.zshrc"
+      ;;
+    *)
+      echo "Error: Unsupported shell type '$shell_type'"
+      echo "Supported shells: bash, zsh"
+      exit 1
+      ;;
+  esac
+}
+
 ##### PLACE YOUR COMMANDS ABOVE #####
 
 runme

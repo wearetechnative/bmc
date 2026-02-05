@@ -29,6 +29,55 @@ The `ec2scheduler` command helps manage instances that use the `InstanceSchedule
 - `bmc console` - Open AWS Console in browser with profile selection
 - `bmc profsel` - Select and set AWS profile environment variables
 - `bmc ecsconnect` - Connect to ECS container
+- `bmc gencompletions` - Generate shell completion scripts for bash or zsh
+
+## Shell Completion
+
+BMC supports tab-completion for bash and zsh shells. This enables auto-completion of commands and improves usability.
+
+### Bash Completion
+
+Add one of the following to your `~/.bashrc`:
+
+**Option 1: Direct sourcing (recommended)**
+```bash
+source <(bmc gencompletions bash)
+```
+
+**Option 2: Save to file**
+```bash
+bmc gencompletions bash > ~/.bmc-completion.bash
+echo 'source ~/.bmc-completion.bash' >> ~/.bashrc
+```
+
+**Option 3: System-wide installation (requires root)**
+```bash
+bmc gencompletions bash | sudo tee /etc/bash_completion.d/bmc
+```
+
+Then restart your shell or run: `source ~/.bashrc`
+
+### Zsh Completion
+
+Add one of the following to your `~/.zshrc`:
+
+**Option 1: Direct sourcing (recommended)**
+```bash
+source <(bmc gencompletions zsh)
+```
+
+**Option 2: Save to completion directory**
+```bash
+mkdir -p ~/.zsh/completions
+bmc gencompletions zsh > ~/.zsh/completions/_bmc
+
+# Add to ~/.zshrc if not already present:
+fpath=(~/.zsh/completions $fpath)
+autoload -Uz compinit
+compinit
+```
+
+Then restart your shell or run: `source ~/.zshrc`
 
 ## Configuration
 

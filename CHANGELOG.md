@@ -1,6 +1,11 @@
 # BMC Changelog
 
 ## NEXT VERSION
+- Feature: New `bmc gencompletions` command to generate shell completion scripts for bash and zsh
+- Feature: Tab-completion support for all bmc commands in bash
+- Feature: Tab-completion with command descriptions for all bmc commands in zsh
+- Enhancement: Dynamic command discovery in completion scripts - automatically includes new commands
+- Enhancement: Multiple installation options for shell completion (direct sourcing, file-based, system-wide)
 - Feature: New `bmc ec2scheduler` command to manage InstanceScheduler tags
 - Enhancement: List all EC2 instances showing scheduler status (enabled/disabled/none)
 - Enhancement: Toggle InstanceScheduler tags between enabled/disabled states for existing tagged instances
