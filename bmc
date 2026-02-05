@@ -302,7 +302,7 @@ _bmc() {
     fi
 }
 
-_bmc "$@"
+_bmc
 EOF
       echo ""
       echo "# Installation instructions:"

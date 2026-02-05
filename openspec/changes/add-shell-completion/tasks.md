@@ -29,3 +29,8 @@
 - [x] 5.1 Validate with `openspec validate add-shell-completion --strict --no-interactive`
 - [x] 5.2 Test on multiple shell versions (bash 4+, zsh 5.8+)
 - [x] 5.3 Verify completion works for all registered commands
+
+## 6. Bug Fix - Zsh Completion Function Call
+- [x] 6.1 Fix zsh completion script to use `_bmc` instead of `_bmc "$@"`
+- [x] 6.2 Test that zsh completion works correctly with the fix
+- [x] 6.3 Verify function is called by completion system, not at load time
