@@ -18,24 +18,21 @@ if [ "$instance_count" -eq 0 ]; then
   exit 0
 fi
 
-# Build the table with instance details and scheduler status
-header=$(echo "$instances_json" | jq -r '["InstanceId", "Name", "State", "SchedulerStatus", "SchedulerValue"] | @csv')
+# Build the table with instance details and Ignore_scheduler status
+header=$(echo "$instances_json" | jq -r '["InstanceId", "Name", "State", "IgnoreUntil"] | @csv')
 instances=$(echo "$instances_json" | jq -r '.[] |
-  ((.Tags[]? | select(.Key=="InstanceScheduler" or .Key=="InstanceScheduler_DISABLED") | .Key) // "none") as $tagKey |
-  ((.Tags[]? | select(.Key=="InstanceScheduler" or .Key=="InstanceScheduler_DISABLED") | .Value) // "N/A") as $tagValue |
-  (if $tagKey == "InstanceScheduler" then "enabled" elif $tagKey == "InstanceScheduler_DISABLED" then "disabled" else "none" end) as $status |
+  ((.Tags[]? | select(.Key=="Ignore_scheduler") | .Value) // "N/A") as $ignoreUntil |
   [
     .InstanceId,
     ((.Tags[]? | select(.Key=="Name") | .Value) // "N/A"),
     .State.Name,
-    $status,
-    $tagValue
+    $ignoreUntil
   ] | @csv')
 
 formatted_instances=$(echo -e "$header\n$instances")
 
 # Let user select an instance
-selected_line=$(echo "$formatted_instances" | gum table -w 20,35,12,16,20 --height 20)
+selected_line=$(echo "$formatted_instances" | gum table -w 20,35,12,30 --height 20)
 
 if [ -z "$selected_line" ]; then
   echo "-- No instance selected. Exiting."
@@ -49,20 +46,20 @@ instance_id=$(echo "$selected_line" | awk -F, '{print $1}' | tr -d '"')
 instance_data=$(echo "$instances_json" | jq -r --arg INSTANCE_ID "$instance_id" '
   .[] | select(.InstanceId == $INSTANCE_ID) |
   {
-    tagKey: ((.Tags[]? | select(.Key=="InstanceScheduler" or .Key=="InstanceScheduler_DISABLED") | .Key) // ""),
-    tagValue: ((.Tags[]? | select(.Key=="InstanceScheduler" or .Key=="InstanceScheduler_DISABLED") | .Value) // ""),
+    instanceScheduler: ((.Tags[]? | select(.Key=="InstanceScheduler") | .Value) // ""),
+    ignoreScheduler: ((.Tags[]? | select(.Key=="Ignore_scheduler") | .Value) // ""),
     availabilityZone: .Placement.AvailabilityZone
   }')
 
-current_tag_key=$(echo "$instance_data" | jq -r '.tagKey // empty')
-current_tag_value=$(echo "$instance_data" | jq -r '.tagValue // empty')
+instance_scheduler_value=$(echo "$instance_data" | jq -r '.instanceScheduler // empty')
+ignore_scheduler_value=$(echo "$instance_data" | jq -r '.ignoreScheduler // empty')
 availability_zone=$(echo "$instance_data" | jq -r '.availabilityZone')
 
 # Extract region from availability zone (remove last character, e.g., eu-central-1a -> eu-central-1)
 region="${availability_zone%?}"
 
 # Handle instances without scheduler tags
-if [ -z "$current_tag_key" ] || [ "$current_tag_key" = "null" ]; then
+if [ -z "$instance_scheduler_value" ] || [ "$instance_scheduler_value" = "null" ]; then
   echo ""
   echo "Instance: ${instance_id}"
   echo "Status: No scheduler tag configured"
@@ -112,46 +109,90 @@ if [ -z "$current_tag_key" ] || [ "$current_tag_key" = "null" ]; then
   fi
 fi
 
-# Determine new tag key
-if [ "$current_tag_key" = "InstanceScheduler" ]; then
-  new_tag_key="InstanceScheduler_DISABLED"
-  action_desc="disable scheduler"
-  new_status="disabled"
-else
-  new_tag_key="InstanceScheduler"
-  action_desc="enable scheduler"
-  new_status="enabled"
-fi
-
-# Show current status and ask for confirmation
+# Show current Ignore_scheduler status
 echo ""
 echo "Instance: ${instance_id}"
-echo "Current tag: ${current_tag_key}"
-echo "Current value: ${current_tag_value}"
+if [ -n "$ignore_scheduler_value" ] && [ "$ignore_scheduler_value" != "null" ]; then
+  echo "Current ignore override: ${ignore_scheduler_value}"
+else
+  echo "Current ignore override: Not set"
+fi
 echo ""
-if ! gum confirm "Do you want to ${action_desc}?"; then
+
+# Present action menu
+action=$(gum choose "Set ignore until time" "Remove ignore override" "Cancel")
+
+if [ -z "$action" ] || [ "$action" = "Cancel" ]; then
   echo "-- Cancelled. No changes made."
   exit 0
 fi
 
-# Perform the tag toggle
-echo ""
-echo "-- $(echo ${action_desc:0:1} | tr '[a-z]' '[A-Z]')${action_desc:1} for instance ${instance_id}..."
+# Handle menu selection
+case "$action" in
+  "Set ignore until time")
+    # Prompt for time in HH:MM format
+    while true; do
+      time_input=$(gum input --placeholder "Example: 22:00" --prompt "Enter time (HH:MM): ")
 
-# Delete old tag
-aws ec2 delete-tags --resources "$instance_id" --tags "Key=${current_tag_key}" >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "!! Error: Failed to remove old tag '${current_tag_key}'. Check error above."
-  exit 1
-fi
+      if [ -z "$time_input" ]; then
+        echo "-- Cancelled. No changes made."
+        exit 0
+      fi
 
-# Create new tag with same value
-aws ec2 create-tags --resources "$instance_id" --tags "Key=${new_tag_key},Value=${current_tag_value}" >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "!! Error: Failed to create new tag '${new_tag_key}'. Check error above."
-  exit 1
-fi
+      # Validate time format (HH:MM with 24-hour format)
+      if echo "$time_input" | grep -qE '^([01][0-9]|2[0-3]):[0-5][0-9]$'; then
+        break
+      else
+        echo "!! Invalid time format. Please use HH:MM (24-hour format, e.g., 22:00, 08:30)"
+        echo ""
+      fi
+    done
 
-echo "-- Successfully toggled scheduler tag on instance ${instance_id}"
-echo "   From: ${current_tag_key} (value: ${current_tag_value})"
-echo "   To:   ${new_tag_key} (value: ${current_tag_value})"
+    # Prompt for timezone
+    timezone_input=$(gum input --placeholder "Examples: Europe/Amsterdam, America/New_York, UTC" --prompt "Enter timezone: ")
+
+    if [ -z "$timezone_input" ]; then
+      echo "-- Cancelled. No changes made."
+      exit 0
+    fi
+
+    # Combine time and timezone
+    ignore_value="${time_input} ${timezone_input}"
+
+    echo ""
+    echo "-- Setting ignore override for instance ${instance_id}..."
+    echo "   Ignore until: ${ignore_value}"
+
+    # Create or update Ignore_scheduler tag
+    aws ec2 create-tags --resources "$instance_id" --tags "Key=Ignore_scheduler,Value=${ignore_value}" >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+      echo "!! Error: Failed to set Ignore_scheduler tag. Check error above."
+      exit 1
+    fi
+
+    echo "-- Successfully set ignore override"
+    echo "   Instance ${instance_id} will ignore scheduled stops until ${ignore_value}"
+    echo "   The tag will be automatically removed after this time."
+    ;;
+
+  "Remove ignore override")
+    # Check if tag exists
+    if [ -z "$ignore_scheduler_value" ] || [ "$ignore_scheduler_value" = "null" ]; then
+      echo "-- No ignore override is currently set."
+      exit 0
+    fi
+
+    echo ""
+    echo "-- Removing ignore override for instance ${instance_id}..."
+
+    # Delete Ignore_scheduler tag
+    aws ec2 delete-tags --resources "$instance_id" --tags "Key=Ignore_scheduler" >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+      echo "!! Error: Failed to remove Ignore_scheduler tag. Check error above."
+      exit 1
+    fi
+
+    echo "-- Successfully removed ignore override"
+    echo "   Instance ${instance_id} will resume normal schedule."
+    ;;
+esac

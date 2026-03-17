@@ -6,13 +6,14 @@
 - Feature: Tab-completion with command descriptions for all bmc commands in zsh
 - Enhancement: Dynamic command discovery in completion scripts - automatically includes new commands
 - Enhancement: Multiple installation options for shell completion (direct sourcing, file-based, system-wide)
-- Feature: New `bmc ec2scheduler` command to manage InstanceScheduler tags
-- Enhancement: List all EC2 instances showing scheduler status (enabled/disabled/none)
-- Enhancement: Toggle InstanceScheduler tags between enabled/disabled states for existing tagged instances
-- Enhancement: Guide users to add scheduler tags manually via AWS Console for untagged instances
-- Enhancement: Open AWS Console directly to instance details page using `assumego` with region-specific URLs
-- Enhancement: Automatically extract region from instance availability zone for console URLs
-- Enhancement: Easily manage EC2 instance scheduling for maintenance or long-running tasks
+- **Breaking**: `bmc ec2scheduler` now manages Ignore_scheduler tags instead of toggling InstanceScheduler/InstanceScheduler_DISABLED tags
+- Feature: Set time-based scheduler overrides with Ignore_scheduler tag (e.g., "22:00 Europe/Amsterdam")
+- Feature: Interactive menu to set or remove scheduler overrides
+- Feature: Time format validation (HH:MM 24-hour format)
+- Feature: Free-form timezone input with helpful examples
+- Enhancement: Temporary overrides that automatically expire and return instance to normal schedule
+- Enhancement: Table display shows Ignore_scheduler status and ignore-until time
+- Enhancement: Guide users to add InstanceScheduler tags via AWS Console for untagged instances (unchanged)
 
 ## 0.2.8.0 - 21 jan 2026
 - Feature: `bmc console` respects AWS_PROFILE environment variable when set
