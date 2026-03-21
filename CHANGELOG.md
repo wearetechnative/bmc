@@ -1,6 +1,6 @@
 # BMC Changelog
 
-## NEXT VERSION
+## 0.2.9.0 - 21 mar 2026
 - Feature: New `bmc gencompletions` command to generate shell completion scripts for bash and zsh
 - Feature: Tab-completion support for all bmc commands in bash
 - Feature: Tab-completion with command descriptions for all bmc commands in zsh
@@ -14,6 +14,7 @@
 - Enhancement: Temporary overrides that automatically expire and return instance to normal schedule
 - Enhancement: Table display shows Ignore_scheduler status and ignore-until time
 - Enhancement: Guide users to add InstanceScheduler tags via AWS Console for untagged instances (unchanged)
+- Enhancement: add back navigation in profile selection - users can now return to group menu by canceling profile selection instead of restarting command
 
 ## 0.2.8.0 - 21 jan 2026
 - Feature: `bmc console` respects AWS_PROFILE environment variable when set
