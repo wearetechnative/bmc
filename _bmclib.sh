@@ -306,34 +306,36 @@ function useOrSelectAWSProfile {
 function selectAWSProfile {
 
   if [[ -z $preferedProfile ]]; then
-    awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum filter --height 25)
+    while true; do
+      awsProfileGroups=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum filter --height 25)
 
-    # Check if profile group selection was cancelled
-    if [[ -z $awsProfileGroups ]]; then
-      unset selectedProfileName
-      return
-    fi
+      # Check if profile group selection was cancelled
+      if [[ -z $awsProfileGroups ]]; then
+        unset selectedProfileName
+        return
+      fi
 
-    #OLD TABLE SELECTOR
-    #selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
+      #OLD TABLE SELECTOR
+      #selectedProfile=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | gum table -w 40,120 --height 30)
 
-    selectedProfileTable=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | sed -e s/\"//g | sed -e s/ROLE/ACCOUNT\ ID,ROLE/ | sed -e s/arn:aws:iam::// | sed -e s/:role\\//,/ | column -s, -t)
-    header=$(echo "  $selectedProfileTable" | head -n1)
-    selectedProfile=$(echo "$selectedProfileTable" |tail -n +2 | gum filter --header="$header")
+      selectedProfileTable=$(jsonify-aws-dotfiles | jq -r --arg group "$awsProfileGroups" '.config | to_entries | map(select(.value.group == $group)) | (["AWS ACCOUNT", "ROLE"] | @csv), (.[] | [.key, .value.role_arn] | @csv)' | sed -e s/\"//g | sed -e s/ROLE/ACCOUNT\ ID,ROLE/ | sed -e s/arn:aws:iam::// | sed -e s/:role\\//,/ | column -s, -t)
+      header=$(echo "  $selectedProfileTable" | head -n1)
+      selectedProfile=$(echo "$selectedProfileTable" |tail -n +2 | gum filter --header="$header")
 
-    # Check if profile selection was cancelled
-    if [[ -z $selectedProfile ]]; then
-      unset selectedProfileName
-      return
-    fi
+      # Check if profile selection was cancelled
+      if [[ -z $selectedProfile ]]; then
+        continue
+      fi
 
-    # Split the selectedProfile string in a way that works in both bash and zsh
-    local profile_name=$(echo "$selectedProfile" | awk '{print $1}')
-    local account_id=$(echo "$selectedProfile" | awk '{print $2}')
-    local role_name=$(echo "$selectedProfile" | awk '{print $3}')
+      # Split the selectedProfile string in a way that works in both bash and zsh
+      local profile_name=$(echo "$selectedProfile" | awk '{print $1}')
+      local account_id=$(echo "$selectedProfile" | awk '{print $2}')
+      local role_name=$(echo "$selectedProfile" | awk '{print $3}')
 
-    selectedProfile="${profile_name},arn:aws:iam::${account_id}:role/${role_name}"
-    selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
+      selectedProfile="${profile_name},arn:aws:iam::${account_id}:role/${role_name}"
+      selectedProfileARN=$(echo "${selectedProfile}" | awk -F "," '{print $2}')
+      break
+    done
   else
     selectedProfileARN=$(jsonify-aws-dotfiles| jq -r ".config.\"${preferedProfile}\".role_arn")
     selectedProfile="$preferedProfile,$selectedProfileARN"
