@@ -52,7 +52,7 @@ function ec2FindInstance(){
 	outputFile=$(mktemp)
 	echo "Searching for: ${searchString}"
 	selectProfileGroup > $outputFile
-	output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name,Profile\n"
+	output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name,Scheduler,Profile\n"
 	while IFS= read -r line
 	do
 		if [[ ${line} == **---** ]]; then
@@ -67,10 +67,11 @@ function ec2FindInstance(){
 				private_ip=$(echo $items | awk -F "," '{print $3}')
 				public_ip=$(echo $items | awk -F "," '{print $4}')
 				state=$(echo $items | awk -F "," '{print $5}')
-				name=$(echo $items | awk -F "," '{print $7}')
 				hibernation_status=$(echo $items | awk -F "," '{print $6}')
+				name=$(echo $items | awk -F "," '{print $7}')
+				scheduler_status=$(echo $items | awk -F "," '{print $8}')
 				profile=${profileHit}
-				output+="$instance_id,$private_ip,$public_ip,$state,$hibernation_status,$name,$profile\n"
+				output+="$instance_id,$private_ip,$public_ip,$state,$hibernation_status,$name,$scheduler_status,$profile\n"
 			done <<< ${hitstring}
 		fi
 	done < $outputFile
@@ -88,11 +89,11 @@ function ec2FindInstance(){
 function ec2ListInstances(){
 
 instances=$(aws ec2 describe-instances \
-    --query 'Reservations[*].Instances[*].[InstanceId, PrivateIpAddress, PublicIpAddress, State.Name, Tags[?Key==`Name`].Value | [0], HibernationOptions.Configured]' \
+    --query 'Reservations[*].Instances[*].[InstanceId, PrivateIpAddress, PublicIpAddress, State.Name, Tags[?Key==`Name`].Value | [0], HibernationOptions.Configured, Tags[?Key==`InstanceScheduler`].Value | [0]]' \
     --output text)
 
 # Zet de tekst output om naar CSV-formaat
-output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name\n"
+output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name,Scheduler\n"
 while read -r line; do
     # Zet de waarden in de juiste CSV-indeling
     instance_id=$(echo $line | awk '{print $1}')
@@ -101,9 +102,27 @@ while read -r line; do
     state=$(echo $line | awk '{print $4}')
     name=$(echo $line | awk '{print $5}')
     hibernation_status=$(echo $line | awk '{print $6}')
+    scheduler_tag=$(echo $line | awk '{print $7}')
+
+    # Normalize hibernation status to yes/no
+    case "$hibernation_status" in
+        True|true)
+            hibernation_status="yes"
+            ;;
+        *)
+            hibernation_status="no"
+            ;;
+    esac
+
+    # Normalize scheduler status to yes/no
+    if [ "$scheduler_tag" != "None" ] && [ -n "$scheduler_tag" ]; then
+        scheduler_status="yes"
+    else
+        scheduler_status="no"
+    fi
 
     # Voeg de hibernation status vóór de Name toe aan de output
-    output+="$instance_id,$private_ip,$public_ip,$state,$hibernation_status,$name\n"
+    output+="$instance_id,$private_ip,$public_ip,$state,$hibernation_status,$name,$scheduler_status\n"
 done <<< "$instances"
 
 # Gebruik gum table om de CSV in een mooie tabel weer te geven
