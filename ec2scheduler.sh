@@ -18,21 +18,24 @@ if [ "$instance_count" -eq 0 ]; then
   exit 0
 fi
 
-# Build the table with instance details and Ignore_scheduler status
-header=$(echo "$instances_json" | jq -r '["InstanceId", "Name", "State", "IgnoreUntil"] | @csv')
+# Build the table with instance details, Scheduler status, and Ignore_scheduler status
+header=$(echo "$instances_json" | jq -r '["InstanceId", "Name", "State", "Scheduler", "IgnoreUntil"] | @csv')
 instances=$(echo "$instances_json" | jq -r '.[] |
+  ((.Tags[]? | select(.Key=="InstanceScheduler") | .Value) // "") as $instanceScheduler |
   ((.Tags[]? | select(.Key=="Ignore_scheduler") | .Value) // "N/A") as $ignoreUntil |
+  (if $instanceScheduler != "" then "yes" else "no" end) as $schedulerStatus |
   [
     .InstanceId,
     ((.Tags[]? | select(.Key=="Name") | .Value) // "N/A"),
     .State.Name,
+    $schedulerStatus,
     $ignoreUntil
   ] | @csv')
 
 formatted_instances=$(echo -e "$header\n$instances")
 
 # Let user select an instance
-selected_line=$(echo "$formatted_instances" | gum table -w 20,35,12,30 --height 20)
+selected_line=$(echo "$formatted_instances" | gum table -w 20,30,12,10,30 --height 20)
 
 if [ -z "$selected_line" ]; then
   echo "-- No instance selected. Exiting."

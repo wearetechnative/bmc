@@ -1,5 +1,12 @@
 # BMC Changelog
 
+## 0.3.0.0 - 23 mar 2026
+- Enhancement: `bmc ec2scheduler` now displays Scheduler column showing if InstanceScheduler tag is configured (yes/no)
+- Enhancement: `bmc ec2ls` now displays Hibernate values as "yes/no" instead of "true/false/None" for better readability
+- Enhancement: `bmc ec2ls` now displays Scheduler column showing if InstanceScheduler tag is configured (yes/no)
+- Enhancement: `bmc ec2find` now includes Scheduler column in search results
+- Note: Automated tools parsing CSV output from `bmc ec2ls` or `bmc ec2find` may need updates due to new column order
+
 ## 0.2.9.0 - 21 mar 2026
 - Feature: New `bmc gencompletions` command to generate shell completion scripts for bash and zsh
 - Feature: Tab-completion support for all bmc commands in bash
