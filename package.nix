@@ -8,7 +8,7 @@
 stdenv.mkDerivation rec {
 
   pname = "bmc";
-  version = "0.2.7.1";
+  version = "0.2.10.0";
 
   src = ./.;
 
