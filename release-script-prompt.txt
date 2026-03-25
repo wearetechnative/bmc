@@ -1,0 +1,315 @@
+================================================================================
+AI PROMPT: GENERATE RELEASE SCRIPT FOR ANY PROJECT
+================================================================================
+
+Use this prompt to generate a comprehensive release script for your project.
+Simply fill in the project-specific details and give it to an AI assistant.
+
+================================================================================
+GENERIC TEMPLATE - CUSTOMIZE FOR YOUR PROJECT
+================================================================================
+
+Create an interactive git release script (release.sh) with the following requirements:
+
+## Core Functionality
+- Interactive CLI in English with color-coded output (info/success/warning/error)
+- Support for semantic versioning: patch/minor/major selection
+- Automatic version calculation from current version
+- Git commit, tag, and push automation
+- Double confirmation workflow (commit + push separately)
+- Rollback support on cancellation
+
+## Version Management
+The script should update version numbers in these files:
+1. [SPECIFY YOUR VERSION FILE, e.g., VERSION, version.txt, package.json]
+2. [SPECIFY PACKAGE FILES, e.g., Cargo.toml, pyproject.toml, setup.py]
+3. [ADD ANY OTHER FILES WITH VERSION NUMBERS]
+
+Current version format: [SPECIFY FORMAT, e.g., X.Y.Z, X.Y.Z.BUILD, vX.Y.Z]
+
+## Changelog Management
+- Support for CHANGELOG.md updates
+- Two modes:
+  1. Use existing "## NEXT VERSION" section (replace with actual version + date)
+  2. Interactive entry of new changelog items
+- Automatic date insertion (format: "DD Mon YYYY", e.g., "25 Mar 2026")
+- Categories: Feature/Enhancement/Fix/Breaking
+
+## Safety Checks (pre-flight)
+1. Verify git repository exists
+2. Check for uncommitted changes (block if found)
+3. Verify remote repository connectivity
+4. Check if target version tag already exists (block if found)
+5. [ADD PROJECT-SPECIFIC CHECKS, e.g., tests pass, build succeeds]
+
+## Optional Integrations
+Include these optional features with graceful degradation:
+
+### [INTEGRATION 1 - e.g., Package Manager]
+- [Describe what should be checked/done]
+- Interactive prompt to handle before release
+- Skip gracefully if tool not available
+
+Example: Poetry
+- Prompt to update poetry.lock
+- Include in commit if updated
+- Skip if Poetry not installed
+
+### [INTEGRATION 2 - e.g., Build System]
+- [Describe what should be checked/done]
+- Optional update/validation
+- Skip gracefully if tool not available
+
+Example: Docker
+- Check if Dockerfile exists
+- Prompt to build and tag image with version
+- Skip if Docker not installed
+
+### [INTEGRATION 3 - if applicable]
+- [Describe what should be checked/done]
+
+## Workflow Steps
+1. Display current version
+2. Run all safety checks
+3. Prompt for release type (patch/minor/major) with preview
+4. Show calculated new version
+5. Run optional integrations (with prompts)
+6. Update CHANGELOG.md (interactive or use NEXT VERSION)
+7. Update all version files
+8. Show diff preview of all changes
+9. Confirm commit
+10. Create git commit with message: "release: bump version to X.Y.Z"
+11. Create annotated git tag with changelog excerpt
+12. Show release summary
+13. Confirm push
+14. Push commit + tag to remote
+
+## Output Format
+- Use colored output (blue=info, green=success, yellow=warning, red=error)
+- Show clear section headers with separators
+- Display summary table before commit
+- Show git diff before committing
+- Provide rollback instructions on cancel
+
+## Error Handling
+- Exit with clear error messages
+- Rollback changes on cancellation
+- Provide actionable guidance for fixing issues
+- Non-zero exit codes on failure
+
+## Example Session Output
+The script should produce output similar to:
+```
+ℹ Current version: 0.2.11.0
+✓ Remote is reachable
+✓ Version tag is available
+
+Select release type:
+  1) Patch   (0.2.12.0) - Bug fixes, no new features
+  2) Minor   (0.3.0.0) - New features, backwards compatible
+  3) Major   (1.0.0.0) - Breaking changes
+
+Enter choice (1-3): _
+```
+
+Please generate a complete bash script following these specifications.
+
+================================================================================
+EXAMPLE: PYTHON PROJECT
+================================================================================
+
+Create an interactive git release script (release.sh) with the following requirements:
+
+[Use Core Functionality from above]
+
+## Version Management
+Update version numbers in these files:
+1. VERSION (format: X.Y.Z)
+2. pyproject.toml (line: version = "X.Y.Z")
+3. src/myproject/__init__.py (line: __version__ = "X.Y.Z")
+
+## Safety Checks
+[Standard checks from above] +
+1. Run pytest to ensure all tests pass
+2. Verify package builds: python -m build
+3. Check if pyproject.toml is valid
+
+## Optional Integrations
+
+### Poetry Lock File
+- Prompt to update poetry.lock
+- Run: poetry lock --no-update
+- Include in commit if updated
+- Skip if Poetry not installed
+
+### Docker Image
+- Check if Dockerfile exists
+- Prompt to build and tag Docker image with version
+- Tag format: myproject:X.Y.Z and myproject:latest
+- Skip if Docker not installed
+
+[Use standard Workflow Steps from above]
+
+================================================================================
+EXAMPLE: RUST PROJECT
+================================================================================
+
+Create an interactive git release script (release.sh) with the following requirements:
+
+[Use Core Functionality from above]
+
+## Version Management
+Update version numbers in these files:
+1. Cargo.toml (line: version = "X.Y.Z")
+2. Cargo.lock (automatically updated by cargo)
+
+## Safety Checks
+[Standard checks from above] +
+1. Run cargo test to ensure all tests pass
+2. Run cargo clippy to check for warnings
+3. Verify cargo build --release succeeds
+
+## Optional Integrations
+
+### Cargo Dependencies
+- Prompt to update Cargo.lock
+- Run: cargo update
+- Include in commit if updated
+
+### Cross-compilation Check
+- Prompt to verify cross-compilation works
+- Skip if cross not installed
+
+[Use standard Workflow Steps from above]
+
+================================================================================
+EXAMPLE: NODE.JS PROJECT
+================================================================================
+
+Create an interactive git release script (release.sh) with the following requirements:
+
+[Use Core Functionality from above]
+
+## Version Management
+Update version numbers in these files:
+1. package.json (field: "version")
+2. package-lock.json (field: "version")
+
+## Safety Checks
+[Standard checks from above] +
+1. Run npm test to ensure all tests pass
+2. Run npm run build if build script exists
+3. Check if package.json is valid JSON
+
+## Optional Integrations
+
+### NPM Dependencies
+- Prompt to update package-lock.json
+- Run: npm update
+- Include in commit if updated
+- Skip if npm not installed
+
+### Publish to NPM
+- Prompt to publish package to npm registry
+- Run: npm publish
+- Skip if not desired
+
+[Use standard Workflow Steps from above]
+
+================================================================================
+REPLICATION: BMC PROJECT EXACT FEATURES
+================================================================================
+
+If you want to replicate the exact BMC project release script:
+
+Create an interactive git release script exactly like the BMC project with these features:
+
+## Version Format
+- Format: X.Y.Z.BUILD (e.g., 0.2.11.0)
+- Files to update:
+  1. VERSION-bmc
+  2. package.nix (line: version = "X.Y.Z.BUILD";)
+  3. flake.lock (optional update)
+
+## Core Features
+- Semantic versioning (patch/minor/major)
+- CHANGELOG.md with "## NEXT VERSION" support or interactive entry
+- Date format: "DD Mon YYYY" (e.g., "25 mar 2026")
+- Color-coded interactive CLI in English
+- Double confirmation (commit + push)
+- Rollback on cancel
+- Annotated git tags with release notes from CHANGELOG
+
+## Safety Checks
+1. Git repository validation
+2. Uncommitted changes detection (block if found)
+3. Remote repository connectivity check
+4. Tag existence verification (block if duplicate)
+
+## Integration 1: OpenSpec
+- Detect completed OpenSpec changes (✓ Complete status)
+- Interactive prompt to archive changes before release
+- Run: openspec archive <change-id> --yes
+- Auto-commit archived changes: "chore: archive completed openspec changes before release"
+- Skip gracefully if openspec CLI not installed
+
+## Integration 2: Nix Flake
+- Verify Nix flake with: nix flake check
+- Interactive prompt to update flake.lock
+- Run: nix flake update
+- Include flake.lock in release commit if updated
+- Skip gracefully if Nix not installed
+
+## Workflow
+1. Display current version from VERSION-bmc
+2. Check remote connectivity
+3. Prompt for release type with version preview
+4. Check if tag v${VERSION} already exists
+5. OpenSpec: prompt to archive completed changes
+6. CHANGELOG: choose "NEXT VERSION" or new entries
+7. Update: VERSION-bmc, package.nix, CHANGELOG.md
+8. Nix: optional flake check and flake.lock update
+9. Show diff of all changes
+10. Confirm commit
+11. Git commit: "release: bump version to X.Y.Z.BUILD"
+12. Git tag: v${VERSION} with changelog excerpt
+13. Show summary with file list
+14. Confirm push
+15. Push commit + tag to origin main
+
+## Output Style
+- Blue ℹ for info messages
+- Green ✓ for success messages
+- Yellow ⚠ for warnings
+- Red ✗ for errors
+- Section separators with ═══
+- Clear summary tables
+
+Generate a complete bash script with set -e, color codes, and all error handling.
+
+================================================================================
+USAGE INSTRUCTIONS
+================================================================================
+
+1. Copy the appropriate template (Generic, Python, Rust, Node.js, or BMC)
+2. Fill in project-specific details marked with [BRACKETS]
+3. Paste the entire prompt into an AI assistant (Claude, ChatGPT, etc.)
+4. Review the generated script
+5. Make the script executable: chmod +x release.sh
+6. Test it: ./release.sh
+7. Commit it to your project repository
+
+================================================================================
+TIPS FOR CUSTOMIZATION
+================================================================================
+
+- Add your project's specific file formats and version locations
+- Include your test framework (pytest, cargo test, npm test, etc.)
+- Add build verification steps if needed
+- Include any CI/CD integrations
+- Add Docker/container build steps if applicable
+- Include dependency update prompts for your package manager
+- Adjust version format to match your project (X.Y.Z vs X.Y.Z.BUILD vs vX.Y.Z)
+- Customize changelog categories for your project style
+
+================================================================================
