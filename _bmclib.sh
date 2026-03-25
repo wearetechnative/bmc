@@ -377,45 +377,57 @@ function selectAWSProfile {
 }
 
 function setMFA {
+  # Determine output destination based on jsonOutput flag and fd 3 availability
+  local outfd=1
+  if [[ "$jsonOutput" == "true" ]]; then
+    # If fd 3 is available, JSON goes there and progress can go to stdout
+    # Otherwise, JSON goes to stdout and progress goes to stderr
+    if { true >&3; } 2>/dev/null; then
+      outfd=1  # Progress to stdout when JSON uses fd 3
+    else
+      outfd=2  # Progress to stderr when JSON uses stdout
+    fi
+  fi
+
   if [[ -z $sourceProfile ]]; then
-    echo "Error could not set MFA without valid sourceProfile"
+    echo "Error could not set MFA without valid sourceProfile" >&${outfd}
     return 1
   else
-    echo "-- Using AWS source-profile: $sourceProfile"
+    echo "-- Using AWS source-profile: $sourceProfile" >&${outfd}
   fi
 
   checkOS
   setDates
-  echo
+  echo >&${outfd}
   if [[  ${mfa} == "true" ]]; then
     awsMFADevice=$(awk -v profile="${sourceProfile}-long-term" ' $0 == "[" profile "]" {found=1; next} /^\[.*\]/ {found=0} found && /^aws_mfa_device/ {print $3; exit} ' ~/.aws/credentials)
     if [[ -z ${currentMFASessionExpirationDate} ]]; then expiration="1" ;fi
     if [[ ${currentMFASessionExpirationDate} -lt ${date_now} ]]; then
       if [[ ! -z ${awsMFADevice} ]]; then
-        echo "-- Refreshing MFA session for ${sourceProfile}..."
+        echo "-- Refreshing MFA session for ${sourceProfile}..." >&${outfd}
         if [[ ! -z $totpScript ]]; then
-          echo "-- Executing TOTP script..."
+          echo "-- Executing TOTP script..." >&${outfd}
           totpCode=$("${totpScript[@]}")
-          echo "${totpCode}"
+          echo "${totpCode}" >&${outfd}
           if [[ ! -z $clipboardCopyCommand ]]; then
             if echo ${totpCode} | "${clipboardCopyCommand[@]}" 2>/dev/null; then
-              echo "-- Copied to clipboard"
+              echo "-- Copied to clipboard" >&${outfd}
             else
-              echo "-- Note: Clipboard copy failed (command not found or error)"
+              echo "-- Note: Clipboard copy failed (command not found or error)" >&${outfd}
             fi
           fi
         else
-          echo "-- No TOTP script configured. Please enter MFA code manually."
+          echo "-- No TOTP script configured. Please enter MFA code manually." >&${outfd}
         fi
         aws-mfa --profile ${sourceProfile} --force --device ${awsMFADevice}
-        if [[ $? -ne 0 ]]; then echo "!!  Error with AWS MFA code for device. Wrong TOPT?"; return;fi
+        if [[ $? -ne 0 ]]; then echo "!!  Error with AWS MFA code for device. Wrong TOPT?" >&${outfd}; return;fi
       else
-        echo "!! AWS MFA Device not found. Can't renew session"
-        echo
+        echo "!! AWS MFA Device not found. Can't renew session" >&${outfd}
+        echo >&${outfd}
       fi
     else
-      echo "Current MFA Session Valid, until: $(convertTime ${currentMFASessionExpirationDate})"
-      echo
+      echo "Current MFA Session Valid, until: $(convertTime ${currentMFASessionExpirationDate})" >&${outfd}
+      echo >&${outfd}
     fi
   fi
 }

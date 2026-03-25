@@ -13,7 +13,7 @@ is_sourced && sourced=1 || sourced=0
 
 if [ "$0" = "./bmc" ]
 then
-  echo "RUNNING IN DEVMODE"
+  echo "RUNNING IN DEVMODE" >&2
   thisdir="$(dirname "$0")"
 else
   if [ $sourced -eq 1 ]
@@ -85,15 +85,37 @@ version(){
   show_version
 }
 
-make_command "profsel" "Set AWS_PROFILE by sourcing this command"
+make_command "profsel" "Set AWS_PROFILE by sourcing this command (--json for JSON output)"
 profsel(){
 
   prelude
 
+  jsonOutput=false
   if [[ $# -gt 0 ]]; then
+    # Manual parsing to handle --json long flag
+    local args=()
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --json)
+          jsonOutput=true
+          shift
+          ;;
+        *)
+          args+=("$1")
+          shift
+          ;;
+      esac
+    done
+    set -- "${args[@]}"
+
+    # Now use getopts for short flags
     while getopts 'lp:' opt; do
       case "$opt" in
         l)
+          if [[ "$jsonOutput" == "true" ]]; then
+            echo "Error: -l and --json flags are incompatible" >&2
+            return 1
+          fi
           printAWSProfiles
           return
           ;;
@@ -110,13 +132,54 @@ profsel(){
   selectAWSProfile "$@"
 
   if [[ -z $selectedProfileName ]]; then
-    echo "No profile selected"
-    return
+    if [[ "$jsonOutput" == "true" ]]; then
+      if { true >&3; } 2>/dev/null; then
+        echo '{"error": "no profile selected"}' >&3
+      else
+        echo '{"error": "no profile selected"}'
+      fi
+      return 1
+    else
+      echo "No profile selected"
+      return
+    fi
+  fi
+
+  # Check if profile was found (ARN might be "null" if profile doesn't exist)
+  if [[ "$selectedProfileARN" == "null" || -z "$selectedProfileARN" ]]; then
+    if [[ "$jsonOutput" == "true" ]]; then
+      if { true >&3; } 2>/dev/null; then
+        echo '{"error": "profile not found"}' >&3
+      else
+        echo '{"error": "profile not found"}'
+      fi
+      return 1
+    else
+      echo "Error: Profile not found"
+      return 1
+    fi
   fi
 
   setMFA
 
-  if [ $sourced -eq 1 ]; then
+  if [[ "$jsonOutput" == "true" ]]; then
+    # Output JSON format to fd 3 (or stdout if fd 3 not available)
+    if { true >&3; } 2>/dev/null; then
+      # fd 3 is available, output JSON there
+      jq -n \
+        --arg source_profile "$sourceProfile" \
+        --arg profile_name "$selectedProfileName" \
+        --arg profile_arn "$selectedProfileARN" \
+        '{source_profile: $source_profile, profile_name: $profile_name, profile_arn: $profile_arn}' >&3
+    else
+      # fd 3 not available, fall back to stdout
+      jq -n \
+        --arg source_profile "$sourceProfile" \
+        --arg profile_name "$selectedProfileName" \
+        --arg profile_arn "$selectedProfileARN" \
+        '{source_profile: $source_profile, profile_name: $profile_name, profile_arn: $profile_arn}'
+    fi
+  elif [ $sourced -eq 1 ]; then
     export AWS_PROFILE=${selectedProfileName}
   else
     echo "Source this script or copy/paste the line below to set profile:"
