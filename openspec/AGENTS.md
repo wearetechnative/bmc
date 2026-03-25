@@ -44,7 +44,11 @@ Skip proposal for:
 1. Review `openspec/project.md`, `openspec list`, and `openspec list --specs` to understand current context.
 2. Choose a unique verb-led `change-id` and scaffold `proposal.md`, `tasks.md`, optional `design.md`, and spec deltas under `openspec/changes/<id>/`.
 3. Draft spec deltas using `## ADDED|MODIFIED|REMOVED Requirements` with at least one `#### Scenario:` per requirement.
-4. Run `openspec validate <id> --strict --no-interactive` and resolve any issues before sharing the proposal.
+4. **ALWAYS include documentation tasks** in `tasks.md`:
+   - Update CHANGELOG.md with feature/enhancement/fix entries
+   - Update README.md with usage examples for user-facing changes
+   - Add practical examples and integration guidance
+5. Run `openspec validate <id> --strict --no-interactive` and resolve any issues before sharing the proposal.
 
 ### Stage 2: Implementing Changes
 Track these steps as TODOs and complete them one by one.
@@ -53,8 +57,13 @@ Track these steps as TODOs and complete them one by one.
 3. **Read tasks.md** - Get implementation checklist
 4. **Implement tasks sequentially** - Complete in order
 5. **Confirm completion** - Ensure every item in `tasks.md` is finished before updating statuses
-6. **Update checklist** - After all work is done, set every task to `- [x]` so the list reflects reality
-7. **Approval gate** - Do not start implementation until the proposal is reviewed and approved
+6. **Update documentation** - ALWAYS update these files when implementing changes:
+   - **CHANGELOG.md** - Add entry under "## NEXT VERSION" (or create new version section)
+   - **README.md** - Update relevant sections with new features, flags, or usage examples
+   - Document new features, enhancements, breaking changes, or fixes
+   - Include practical examples for user-facing features
+7. **Update checklist** - After all work is done, set every task to `- [x]` so the list reflects reality
+8. **Approval gate** - Do not start implementation until the proposal is reviewed and approved
 
 ### Stage 3: Archiving Changes
 After deployment, create separate PR to:
@@ -202,6 +211,11 @@ If multiple capabilities are affected, create multiple delta files under `change
 - [ ] 1.2 Implement API endpoint
 - [ ] 1.3 Add frontend component
 - [ ] 1.4 Write tests
+
+## 2. Documentation (REQUIRED)
+- [ ] 2.1 Update CHANGELOG.md with feature/enhancement/fix entry
+- [ ] 2.2 Update README.md with usage examples and new features
+- [ ] 2.3 Add practical examples for user-facing changes
 ```
 
 5. **Create design.md when needed:**
