@@ -1,5 +1,15 @@
 # BMC Changelog
 
+## 0.2.11.0 - 25 mar 2026
+- Feature: `bmc profsel --json` flag for machine-readable JSON output of profile selection
+- Feature: File descriptor 3 support for JSON output, allowing progress messages to remain visible during interactive selection
+- Feature: JSON output format: `{"source_profile": "...", "profile_name": "...", "profile_arn": "..."}`
+- Feature: Error handling with JSON error messages: `{"error": "..."}`
+- Enhancement: Intelligent output routing - JSON to fd 3 (when available) or stdout (fallback), progress to stdout or stderr
+- Enhancement: Support for both interactive (`bmc profsel --json`) and non-interactive (`bmc profsel -p profile --json`) modes
+- Enhancement: Backward compatible - works with and without fd 3 redirection
+- Enhancement: Usage examples for scripting integration: `PROFILE=$(bmc profsel --json 3>&1 >/dev/null)`
+
 ## 0.2.10.0 - 23 mar 2026
 - Enhancement: `bmc ec2scheduler` now displays Scheduler column showing if InstanceScheduler tag is configured (yes/no)
 - Enhancement: `bmc ec2ls` now displays Hibernate values as "yes/no" instead of "true/false/None" for better readability
