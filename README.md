@@ -25,9 +25,65 @@ The `ec2scheduler` command helps manage instances that use the `InstanceSchedule
 - Temporarily disable scheduling for maintenance or long-running tasks
 - Re-enable scheduling when ready
 
+### AWS Profile Selection
+- `bmc profsel` - Select and set AWS profile environment variables
+
+The `profsel` command helps you interactively select AWS profiles from your `~/.aws/config` file and set the `AWS_PROFILE` environment variable.
+
+**Basic usage:**
+```bash
+# Interactive profile selection
+. bmc profsel
+
+# Pre-select a specific profile
+. bmc profsel -p my-profile
+
+# List available profiles
+bmc profsel -l
+```
+
+**JSON output for scripting:**
+
+The `--json` flag enables machine-readable output for integration with scripts and automation tools:
+
+```bash
+# Interactive selection with JSON output (progress visible)
+PROFILE_DATA=$(bmc profsel --json 3>&1 >/dev/null)
+
+# Non-interactive with specific profile
+PROFILE_DATA=$(bmc profsel -p my-profile --json 3>&1 >/dev/null)
+
+# Extract fields from JSON
+PROFILE_NAME=$(echo "$PROFILE_DATA" | jq -r '.profile_name')
+SOURCE_PROFILE=$(echo "$PROFILE_DATA" | jq -r '.source_profile')
+PROFILE_ARN=$(echo "$PROFILE_DATA" | jq -r '.profile_arn')
+```
+
+**JSON output format:**
+```json
+{
+  "source_profile": "my-org",
+  "profile_name": "my-dev-profile",
+  "profile_arn": "arn:aws:iam::123456789012:role/DevRole"
+}
+```
+
+**Error cases:**
+```json
+{"error": "profile not found"}
+{"error": "no profile selected"}
+```
+
+**File descriptor 3 support:**
+
+When using `--json`, output is directed to file descriptor 3 (if available), allowing progress messages to remain visible during interactive selection. This provides the best experience for both interactive use and scripting:
+
+- JSON output → fd 3 (captured in variable)
+- Progress messages → stdout (visible during execution)
+- Backward compatible: falls back to stdout if fd 3 is not redirected
+
 ### Other Commands
 - `bmc console` - Open AWS Console in browser with profile selection
-- `bmc profsel` - Select and set AWS profile environment variables
 - `bmc ecsconnect` - Connect to ECS container
 - `bmc gencompletions` - Generate shell completion scripts for bash or zsh
 
