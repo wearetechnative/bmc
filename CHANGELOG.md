@@ -1,5 +1,9 @@
 # BMC Changelog
 
+## NEXT VERSION
+- Fix: `bmc profsel -p <profile>` now correctly recognizes source profiles (credentials-based profiles without role_arn)
+- Fix: Removed confusing usage menu display when profile is not found - error message is now shown alone
+
 ## 0.2.11.0 - 25 mar 2026
 - Feature: `bmc profsel --json` flag for machine-readable JSON output of profile selection
 - Feature: File descriptor 3 support for JSON output, allowing progress messages to remain visible during interactive selection

@@ -145,8 +145,10 @@ profsel(){
     fi
   fi
 
-  # Check if profile was found (ARN might be "null" if profile doesn't exist)
-  if [[ "$selectedProfileARN" == "null" || -z "$selectedProfileARN" ]]; then
+  # Check if profile was found
+  # Note: ARN might be "null" for source profiles (credentials-based), which is valid
+  # Only error if ARN is null AND sourceProfile is not set (profile truly doesn't exist)
+  if [[ ("$selectedProfileARN" == "null" || -z "$selectedProfileARN") && -z "$sourceProfile" ]]; then
     if [[ "$jsonOutput" == "true" ]]; then
       if { true >&3; } 2>/dev/null; then
         echo '{"error": "profile not found"}' >&3
@@ -156,7 +158,7 @@ profsel(){
       return 1
     else
       echo "Error: Profile not found"
-      return 1
+      return
     fi
   fi
 
