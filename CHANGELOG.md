@@ -1,6 +1,6 @@
 # BMC Changelog
 
-## NEXT VERSION
+## 0.2.12.0 - 30 Mar 2026
 - Fix: `bmc ec2ls` Name column now displays complete names when Name tag contains spaces
 - Fix: `bmc profsel -p <profile>` now correctly recognizes source profiles (credentials-based profiles without role_arn)
 - Fix: Removed confusing usage menu display when profile is not found - error message is now shown alone
