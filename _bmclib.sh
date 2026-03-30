@@ -96,13 +96,13 @@ instances=$(aws ec2 describe-instances \
 output="InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name,Scheduler\n"
 while read -r line; do
     # Zet de waarden in de juiste CSV-indeling
-    instance_id=$(echo $line | awk '{print $1}')
-    private_ip=$(echo $line | awk '{print $2}')
-    public_ip=$(echo $line | awk '{print $3}')
-    state=$(echo $line | awk '{print $4}')
-    name=$(echo $line | awk '{print $5}')
-    hibernation_status=$(echo $line | awk '{print $6}')
-    scheduler_tag=$(echo $line | awk '{print $7}')
+    instance_id=$(echo "$line" | awk -F'\t' '{print $1}')
+    private_ip=$(echo "$line" | awk -F'\t' '{print $2}')
+    public_ip=$(echo "$line" | awk -F'\t' '{print $3}')
+    state=$(echo "$line" | awk -F'\t' '{print $4}')
+    name=$(echo "$line" | awk -F'\t' '{print $5}')
+    hibernation_status=$(echo "$line" | awk -F'\t' '{print $6}')
+    scheduler_tag=$(echo "$line" | awk -F'\t' '{print $7}')
 
     # Normalize hibernation status to yes/no
     case "$hibernation_status" in
