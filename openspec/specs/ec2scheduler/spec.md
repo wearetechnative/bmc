@@ -2,31 +2,27 @@
 
 ## Purpose
 The `bmc ec2scheduler` command provides convenient management of EC2 instance scheduler overrides using the `Ignore_scheduler` tag. This allows users to temporarily extend an instance's runtime beyond scheduled stop times without completely disabling the scheduler. The override is time-based and automatically expires, returning the instance to its normal schedule.
-
 ## Requirements
-
 ### Requirement: List All EC2 Instances
-The `bmc ec2scheduler` command SHALL list all EC2 instances in an interactive table, showing their Ignore_scheduler status.
+The `bmc ec2scheduler` command SHALL list all EC2 instances in an interactive table, showing their scheduler configuration status and Ignore_scheduler status.
 
-#### Scenario: List instances with Ignore_scheduler tag
-- **WHEN** user runs `bmc ec2scheduler` and instances exist with the `Ignore_scheduler` tag
-- **THEN** the command SHALL display those instances with the ignore-until time value from the tag
-
-#### Scenario: List instances without Ignore_scheduler tag
-- **WHEN** user runs `bmc ec2scheduler` and instances exist without the `Ignore_scheduler` tag
-- **THEN** the command SHALL display those instances with the ignore-until column showing "N/A" or empty
-
-#### Scenario: List all instances regardless of Ignore_scheduler tag presence
+#### Scenario: Display scheduler configuration status
 - **WHEN** user runs `bmc ec2scheduler`
-- **THEN** the command SHALL display all non-terminated EC2 instances in the current AWS profile
-
-#### Scenario: No instances exist
-- **WHEN** user runs `bmc ec2scheduler` and no EC2 instances exist in the current AWS profile
-- **THEN** the command SHALL display a message indicating no instances were found and exit gracefully
+- **THEN** the command SHALL display a "Scheduler" column showing whether the InstanceScheduler tag is configured
+- **AND** the Scheduler column SHALL display "yes" if the InstanceScheduler tag exists with any value
+- **AND** the Scheduler column SHALL display "no" if the InstanceScheduler tag is missing
 
 #### Scenario: Display ignore override information
 - **WHEN** displaying the instance table
-- **THEN** the command SHALL show at minimum: instance ID, instance name (from Name tag), instance state, and the Ignore_scheduler value (time until which instance will ignore scheduled stops)
+- **THEN** the command SHALL show at minimum: instance ID, instance name (from Name tag), instance state, scheduler configuration status (yes/no), and the Ignore_scheduler value (time until which instance will ignore scheduled stops)
+
+#### Scenario: List instances with scheduler tag
+- **WHEN** user runs `bmc ec2scheduler` and instances exist with the `InstanceScheduler` tag
+- **THEN** the Scheduler column SHALL display "yes" for those instances
+
+#### Scenario: List instances without scheduler tag
+- **WHEN** user runs `bmc ec2scheduler` and instances exist without the `InstanceScheduler` tag
+- **THEN** the Scheduler column SHALL display "no" for those instances
 
 ### Requirement: Interactive Instance Selection
 The `bmc ec2scheduler` command SHALL use an interactive table interface for users to select which instance to manage.
@@ -148,3 +144,4 @@ The `bmc ec2scheduler` command SHALL provide clear feedback about ignore overrid
 - **WHEN** a tag operation fails (e.g., due to AWS API errors or permission issues)
 - **THEN** the command SHALL display a clear error message explaining what went wrong
 - **AND** the command SHALL exit with a non-zero status code
+
