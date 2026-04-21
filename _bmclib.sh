@@ -302,6 +302,37 @@ function convertTime() {
   fi
 }
 
+function accountSelectGroup(){
+  local group=$(jsonify-aws-dotfiles | jq -r '[.config[].group] | unique | sort | .[]' | grep -v null | gum filter --height 25)
+  if [[ -z "$group" ]]; then
+    return 1
+  fi
+  echo "$group"
+}
+
+function accountListAccounts(){
+  local group="$1"
+  local json=$(jsonify-aws-dotfiles)
+  local profiles=$(echo "$json" | jq -r --arg group "$group" '
+    .config | to_entries
+    | map(select(.value.group == $group))
+    | map({
+        name: .key,
+        account_id: (.value.role_arn // "" | capture("arn:aws:iam::(?<n>\\d+):").n // "N/A"),
+        role: (.value.role_arn // "" | capture(":role/(?<r>.+)$").r // "N/A")
+      })
+    | (["Profile Name","Account ID","Role Name"] | @csv),
+      (.[] | [.name, .account_id, .role] | @csv)
+  ')
+
+  if [[ -z "$profiles" || $(echo "$profiles" | wc -l) -le 1 ]]; then
+    echo "No accounts found for group '$group'."
+    return 0
+  fi
+
+  echo "$profiles" | gum table -p
+}
+
 function printAWSProfiles {
   jsonify-aws-dotfiles | jq -r '
   .config | to_entries |

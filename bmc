@@ -295,6 +295,17 @@ ecsconnect(){
   $thisdir/ecsconnect.sh
 }
 
+make_command "accountls" "List AWS accounts for a selected customer"
+accountls(){
+  prelude
+  local group
+  group=$(accountSelectGroup)
+  if [[ $? -ne 0 || -z "$group" ]]; then
+    return 1
+  fi
+  accountListAccounts "$group"
+}
+
 make_command "gencompletions" "Generate shell completion scripts for bash or zsh"
 gencompletions(){
   local shell_type="$1"
