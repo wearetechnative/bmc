@@ -12,7 +12,7 @@ The EC2 instance table is built three times with identical hardcoded column list
 - `ec2find` uses the shared builder and always appends `"Profile"` to the configured column list
 - Unknown column names in config silently produce `"n/a"` values
 - Documentation updated to list all available column names
-- `ec2ls` outputs plain tab-separated text to stdout (pipeable, terminal scrollback)
+- `ec2ls` outputs a formatted table to stdout using `lipgloss.NewTable()` — bordered, aligned, bold header; pipeable and scrollable via terminal scrollback
 - Interactive selection tables (ec2connect, ec2stopstart, ec2scheduler) show a footer with row count and key hints, and resize to fit the terminal
 
 ## Capabilities
@@ -32,6 +32,6 @@ The EC2 instance table is built three times with identical hardcoded column list
 - `cmd/ec2scheduler.go`: No logic change; benefits from shared builder via `selectInstanceID`
 - `cmd/ec2find.go`: Uses shared builder; always appends `"Profile"` column
 - `cmd/instancehelper.go`: New file containing `selectInstanceID`
-- `internal/ui/table.go`: `PrintTable` exported for plain output; `SelectFromTable` gains footer + terminal-height-aware sizing via `/dev/tty`
+- `internal/ui/table.go`: `PrintTable` renders a lipgloss-bordered table to stdout; `SelectFromTable` gains footer + terminal-height-aware sizing via `/dev/tty`
 - `cmd/ec2ls.go`: Uses `ui.PrintTable` instead of interactive table
 - Bean: bmc-599m

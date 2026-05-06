@@ -5,7 +5,7 @@
 ### Added
 - **Back navigation in TUI menus**: Press ESC in any list to go back to the previous menu level; press Ctrl+C to cancel entirely. Works in `bmc profsel` (group → profile) and `bmc ecsconnect` (cluster → service → task → container)
 - **Configurable EC2 columns**: Set `columns` in `[ec2]` section of `~/.config/bmc/config.toml` to control which columns appear in EC2 tables and in what order. Default order now puts `Name` second. All EC2 commands (`ec2ls`, `ec2connect`, `ec2stopstart`, `ec2scheduler`, `ec2find`) use the same column list
-- **ec2ls plain output**: `bmc ec2ls` now writes tab-separated text to stdout — pipeable and scrollable via terminal scrollback
+- **ec2ls formatted output**: `bmc ec2ls` now renders a bordered table with bold headers using lipgloss — pipeable and scrollable via terminal scrollback
 - **Selection table improvements**: Interactive EC2 selection tables (ec2connect, ec2stopstart, ec2scheduler) now show a footer with row count and key hints, and adapt height to the terminal
 
 ### Fixed

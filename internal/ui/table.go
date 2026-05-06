@@ -3,11 +3,11 @@ package ui
 import (
 	"fmt"
 	"os"
-	"strings"
 
-	"github.com/charmbracelet/bubbles/table"
+	btable "github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	lgtable "github.com/charmbracelet/lipgloss/table"
 	"golang.org/x/term"
 )
 
@@ -16,7 +16,7 @@ var tableStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 type tableModel struct {
-	table      table.Model
+	table      btable.Model
 	selected   []string
 	quitting   bool
 	selectMode bool
@@ -98,14 +98,14 @@ func runTable(columns []string, rows [][]string, selectMode bool, out *[]string)
 			}
 		}
 	}
-	cols := make([]table.Column, len(columns))
+	cols := make([]btable.Column, len(columns))
 	for i, c := range columns {
-		cols[i] = table.Column{Title: c, Width: widths[i] + 2}
+		cols[i] = btable.Column{Title: c, Width: widths[i] + 2}
 	}
 
-	tableRows := make([]table.Row, len(rows))
+	tableRows := make([]btable.Row, len(rows))
 	for i, r := range rows {
-		tableRows[i] = table.Row(r)
+		tableRows[i] = btable.Row(r)
 	}
 
 	// Desired height: all rows, capped at terminal height - 5 (border + header + footer + margin).
@@ -119,26 +119,26 @@ func runTable(columns []string, rows [][]string, selectMode bool, out *[]string)
 				height = max
 			}
 		}
-		t := table.New(
-			table.WithColumns(cols),
-			table.WithRows(tableRows),
-			table.WithFocused(true),
-			table.WithHeight(height),
+		t := btable.New(
+			btable.WithColumns(cols),
+			btable.WithRows(tableRows),
+			btable.WithFocused(true),
+			btable.WithHeight(height),
 		)
-		s := table.DefaultStyles()
+		s := btable.DefaultStyles()
 		s.Header = s.Header.Bold(true)
 		s.Selected = s.Selected.Foreground(lipgloss.Color("229")).Background(lipgloss.Color("57")).Bold(false)
 		t.SetStyles(s)
 		m := tableModel{table: t, selectMode: selectMode, totalRows: len(rows), wantHeight: wantHeight}
 		p = tea.NewProgram(m, tea.WithInput(tty), tea.WithOutput(tty))
 	} else {
-		t := table.New(
-			table.WithColumns(cols),
-			table.WithRows(tableRows),
-			table.WithFocused(true),
-			table.WithHeight(height),
+		t := btable.New(
+			btable.WithColumns(cols),
+			btable.WithRows(tableRows),
+			btable.WithFocused(true),
+			btable.WithHeight(height),
 		)
-		s := table.DefaultStyles()
+		s := btable.DefaultStyles()
 		s.Header = s.Header.Bold(true)
 		s.Selected = s.Selected.Foreground(lipgloss.Color("229")).Background(lipgloss.Color("57")).Bold(false)
 		t.SetStyles(s)
@@ -156,13 +156,22 @@ func runTable(columns []string, rows [][]string, selectMode bool, out *[]string)
 	return nil
 }
 
-// PrintTable writes a plain tab-separated table to stdout.
-// Use this for display-only commands that benefit from terminal scrollback.
+// PrintTable writes a bordered, formatted table to stdout using lipgloss.
 func PrintTable(columns []string, rows [][]string) {
-	fmt.Fprintln(os.Stdout, strings.Join(columns, "\t"))
+	t := lgtable.New().
+		Border(lipgloss.NormalBorder()).
+		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("240"))).
+		Headers(columns...).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			if row == lgtable.HeaderRow {
+				return lipgloss.NewStyle().Bold(true)
+			}
+			return lipgloss.NewStyle()
+		})
 	for _, row := range rows {
-		fmt.Fprintln(os.Stdout, strings.Join(row, "\t"))
+		t = t.Row(row...)
 	}
+	fmt.Fprintln(os.Stdout, t.String())
 }
 
 func printPlainTable(columns []string, rows [][]string) {
