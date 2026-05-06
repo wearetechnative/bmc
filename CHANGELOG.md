@@ -13,6 +13,7 @@
 - **Selection table improvements**: Interactive EC2 selection tables (ec2connect, ec2stopstart, ec2scheduler) now show a footer with row count and key hints, and adapt height to the terminal
 
 ### Fixed
+- **TUI colors in eval context**: Running `eval "$(bmc profsel)"` now correctly shows colors and styling. Previously lipgloss detected piped stdout as a non-TTY and fell back to plain output despite the TUI rendering to `/dev/tty`
 - **TUI list sizing**: List height is now clamped to the actual terminal height and updates on resize; spurious pagination dots no longer appear on short lists; eval-context and sub-group lists render correctly via `/dev/tty`
 - **TUI blank rows**: Short lists (≤ 4 items, e.g. connection method and SSH user pickers) no longer show blank rows between the last item and the bottom of the list
 - **profsel wrapper hint**: Running `bmc profsel` directly in a terminal now prints a tip on stderr pointing to `bmc install-shell-integration` when the shell wrapper is not in use
