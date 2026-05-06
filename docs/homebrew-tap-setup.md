@@ -50,6 +50,10 @@ To add Homebrew distribution to another repo:
 ## Install bmc via Homebrew
 
 ```sh
+# One-liner (taps and installs in one step):
+brew install wearetechnative/tap/bmc
+
+# Or tap once, then install by name:
 brew tap wearetechnative/tap
 brew install bmc
 ```
