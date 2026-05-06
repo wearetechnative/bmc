@@ -1,47 +1,55 @@
 # Homebrew Tap Setup
 
-One-time setup to enable `brew install wearetechnative/tap/bmc`.
+The release workflow uses the `wearetechnative-releaser` GitHub App to push Homebrew formulas to `wearetechnative/homebrew-tap`. The app credentials are stored as **organization-level secrets**, so this setup works for all repos in the org.
 
-## 1. Create the tap repository
+## One-time org setup (already done)
 
-1. Go to [github.com/wearetechnative](https://github.com/wearetechnative)
-2. Create a new **public** repository named `homebrew-tap`
-3. Initialize with a README (so the repo is not empty)
-4. Create a `Formula/` directory in the repository (add a `.gitkeep` file if needed)
+The following are set up once and reused by every repo:
 
-The repository must be at `github.com/wearetechnative/homebrew-tap` for GoReleaser's `brews:` config to work.
+1. **GitHub App**: `wearetechnative-releaser` is installed on `wearetechnative/homebrew-tap` with Contents (write) permission
+2. **Org secrets** at `github.com/organizations/wearetechnative/settings/secrets/actions`:
+   - `RELEASER_APP_ID` — the App ID of `wearetechnative-releaser`
+   - `RELEASER_PRIVATE_KEY` — the private key (`.pem` content) of the app
 
-## 2. Generate a Personal Access Token
+## Per-repo setup (for each new Go repo)
 
-1. Go to **GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens**
-2. Click **Generate new token**
-3. Set:
-   - **Resource owner**: `wearetechnative`
-   - **Repository access**: Only selected repositories → `wearetechnative/homebrew-tap`
-   - **Permissions**: Contents → Read and write
-4. Generate and copy the token
+To add Homebrew distribution to another repo:
 
-## 3. Add the token as a repository secret
+1. **Install the GitHub App on the new formula repo** (if it's a separate tap):
+   - Go to the app settings → Install App → select the target repo
 
-1. Go to `github.com/wearetechnative/bmc` → **Settings → Secrets and variables → Actions**
-2. Click **New repository secret**
-3. Name: `HOMEBREW_TAP_TOKEN`
-4. Value: paste the token from step 2
-5. Click **Add secret**
+2. **Copy the workflow step** into the repo's release workflow:
 
-## 4. Verify
+```yaml
+- name: Generate Homebrew tap token
+  uses: actions/create-github-app-token@v1
+  id: tap-token
+  with:
+    app-id: ${{ secrets.RELEASER_APP_ID }}
+    private-key: ${{ secrets.RELEASER_PRIVATE_KEY }}
+    owner: wearetechnative
+    repositories: homebrew-tap
 
-After the next release (`./release.sh` + push), GoReleaser will automatically create or update `Formula/bmc.rb` in `wearetechnative/homebrew-tap`.
+- name: Run GoReleaser
+  uses: goreleaser/goreleaser-action@v6
+  with:
+    args: release --clean
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    HOMEBREW_TAP_TOKEN: ${{ steps.tap-token.outputs.token }}
+```
 
-Users can then install bmc with:
+3. **Configure GoReleaser** (`.goreleaser.yml`) with a `brews:` section pointing to `wearetechnative/homebrew-tap` using `{{ .Env.HOMEBREW_TAP_TOKEN }}`.
+
+## How it works
+
+- `actions/create-github-app-token@v1` generates a short-lived token (1 hour) scoped to `homebrew-tap`
+- GoReleaser uses that token to push `Formula/bmc.rb` to the tap repo
+- No personal access tokens involved — the app is owned by the org
+
+## Install bmc via Homebrew
 
 ```sh
 brew tap wearetechnative/tap
 brew install bmc
 ```
-
-## Notes
-
-- The `GITHUB_TOKEN` secret is provided automatically by GitHub Actions — no setup needed
-- The `HOMEBREW_TAP_TOKEN` must be a PAT because the default `GITHUB_TOKEN` cannot write to other repositories
-- If the secret is missing when a release is pushed, GoReleaser will fail at the Homebrew step; the binaries will still be published to GitHub Releases
