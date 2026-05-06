@@ -40,7 +40,7 @@ changelog:
       - "^test:"
       - "^chore:"
 
-homebrew_casks:
+brews:
   - name: bmc
     directory: Formula
     repository:
@@ -53,3 +53,7 @@ homebrew_casks:
     homepage: "https://github.com/wearetechnative/bmc"
     description: "Bill McCloud's AWS toolbox — profile selection, EC2/ECS operations, console access"
     license: "Apache-2.0"
+    install: |
+      bin.install "bmc"
+    test: |
+      system "#{bin}/bmc version"
