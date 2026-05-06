@@ -42,6 +42,7 @@ changelog:
 
 brews:
   - name: bmc
+    directory: Formula
     repository:
       owner: wearetechnative
       name: homebrew-tap
