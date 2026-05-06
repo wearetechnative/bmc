@@ -1,4 +1,4 @@
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: TUI colors work in piped stdout context
 The TUI SHALL render colors and styling when stdout is not a TTY, as long as `/dev/tty` is available.

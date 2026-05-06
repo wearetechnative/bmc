@@ -1,5 +1,11 @@
 # BMC Changelog
 
+## NEXT VERSION
+
+### Changed
+- **Documentation**: Rewrote `docs/aws-profile-select.md` to reflect the current Go CLI, including shell integration via `eval "$(bmc profsel)"` and `/dev/tty` color rendering behavior
+- **OpenSpec specs**: Translated `tui-color-rendering` spec from Dutch to English
+
 ## [0.2.15] - 06 May 2026
 
 ### Fixed
