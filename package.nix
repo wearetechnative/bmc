@@ -1,35 +1,21 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, bash
-, pkgs
-, makeWrapper
+{ lib
+, buildGoModule
 }:
-stdenv.mkDerivation rec {
 
+buildGoModule rec {
   pname = "bmc";
-  version = "0.2.10.0";
+  version = lib.fileContents ./VERSION-bmc;
 
   src = ./.;
 
-  buildInputs = with pkgs; [
-      bash
-    ];
+  vendorHash = "sha256-fsfVuZSDowv0CbKtxm+wVl2A0r+X0tIStdcR6QLvUbc=";
 
-  nativeBuildInputs = [ makeWrapper ];
+  ldflags = [ "-s" "-w" "-X github.com/wearetechnative/bmc/cmd.Version=${version}" ];
 
-
-  installPhase = ''
-    mkdir -p $out/bin
-
-    cp VERSION-bmc bmc *.sh $out/bin/
-    runHook postInstall
-
-#    wrapProgram $out/bin/aws-profile-select.sh --prefix PATH : ${lib.makeBinPath buildInputs }
-#    wrapProgram $out/bin/profsel.sh --prefix PATH : ${lib.makeBinPath buildInputs }
-#    wrapProgram $out/bin/ecsconnect.sh --prefix PATH : ${lib.makeBinPath buildInputs }
-#    wrapProgram $out/bin/ec2ls.sh --prefix PATH : ${lib.makeBinPath buildInputs }
-#    wrapProgram $out/bin/ec2connect.sh --prefix PATH : ${lib.makeBinPath buildInputs }
-
-  '';
+  meta = with lib; {
+    description = "Bill McCloud's AWS toolbox — profile selection, EC2/ECS operations, console access";
+    homepage = "https://github.com/wearetechnative/bmc";
+    license = licenses.asl20;
+    mainProgram = "bmc";
+  };
 }

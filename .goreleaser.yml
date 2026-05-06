@@ -1,0 +1,58 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: bmc
+    binary: bmc
+    main: ./main.go
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/wearetechnative/bmc/cmd.Version={{.Version}}
+
+archives:
+  - id: bmc
+    name_template: "bmc_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format: tar.gz
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+brews:
+  - name: bmc
+    repository:
+      owner: wearetechnative
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@wearetechnative.com
+    homepage: "https://github.com/wearetechnative/bmc"
+    description: "Bill McCloud's AWS toolbox — profile selection, EC2/ECS operations, console access"
+    license: "Apache-2.0"
+    install: |
+      bin.install "bmc"
+    test: |
+      system "#{bin}/bmc version"

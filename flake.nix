@@ -1,7 +1,7 @@
 {
-  description = "AWS Utilities for Cloud Engineers" ;
+  description = "AWS Utilities for Cloud Engineers";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-24.05";
+  inputs.nixpkgs.url = "nixpkgs/nixos-25.11";
 
   outputs = { self, nixpkgs }:
     let
@@ -10,8 +10,6 @@
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
     in
     {
-      nixosModules.default = import ./module.nix self;
-
       packages = forAllSystems (system:
         let
           pkgs = nixpkgsFor.${system};
@@ -29,6 +27,8 @@
         {
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
+              go
+              goreleaser
             ];
           };
         });
