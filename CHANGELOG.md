@@ -1,6 +1,6 @@
 # BMC Changelog
 
-## NEXT VERSION
+## [0.2.13] - 06 May 2026
 
 ### Added
 - **Release automation**: `release.sh` handles version bump (semver, dropping legacy 4th component), CHANGELOG finalization, Nix vendorHash auto-update, local build verification, git tag creation, and optional push
