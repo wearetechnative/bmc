@@ -19,7 +19,7 @@ bold "==> Pre-flight checks"
 
 [[ -f VERSION-bmc ]] || die "VERSION-bmc not found"
 
-if [[ -n "$(git status --porcelain)" ]]; then
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
   die "Uncommitted changes detected. Commit or stash them first."
 fi
 
