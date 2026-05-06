@@ -1,5 +1,33 @@
 # BMC Changelog
 
+## NEXT VERSION
+
+### Fixed
+- **TUI list sizing**: List height is now clamped to the actual terminal height and updates on resize; spurious pagination dots no longer appear on short lists; eval-context and sub-group lists render correctly via `/dev/tty`
+- **TUI blank rows**: Short lists (≤ 4 items, e.g. connection method and SSH user pickers) no longer show blank rows between the last item and the bottom of the list
+- **profsel wrapper hint**: Running `bmc profsel` directly in a terminal now prints a tip on stderr pointing to `bmc install-shell-integration` when the shell wrapper is not in use
+- **install-shell-integration on managed dotfiles**: When `~/.zshrc` or `~/.bashrc` is not writable (e.g. home-manager on NixOS), the command now prints actionable manual snippets for home-manager zsh/bash and Fish shell instead of a generic permission error
+
+### Added
+- **Go rewrite**: bmc is now a single self-contained Go binary — no runtime dependencies for core operations (gum, jq, awk, jsonify-aws-dotfiles, assumego, aws-mfa all eliminated)
+- **`bmc doctor`**: New system health check command — verifies AWS config, credentials, optional tools (ssh, aws CLI v2, session-manager-plugin), MFA setup, and shell integration
+- **`bmc install-shell-integration`**: Installs the profsel shell wrapper into `~/.zshrc` or `~/.bashrc`
+- **Bubbletea TUI**: All interactive prompts now use bubbletea + bubbles (filterable lists, tables, spinner, text input)
+- **MFA inlined**: STS GetSessionToken and `~/.aws/credentials` write logic built in — no external aws-mfa tool needed
+- **AWS console native**: Federation URL flow built in — no external assumego/Granted tool needed
+- **GoReleaser distribution**: Binary releases for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64
+- **Homebrew tap**: `brew install wearetechnative/tap/bmc`
+- **Nix flake**: `buildGoModule`-based flake with nix-env, nix profile, and NixOS configuration support
+
+### Changed
+- **BREAKING**: Config file moved from `~/.config/bmc/config.env` (bash) to `~/.config/bmc/config.toml` (TOML)
+- **BREAKING**: `source bmc profsel` replaced by shell wrapper + `eval "$(bmc profsel)"` — run `bmc install-shell-integration` once to set up
+- Shell completions now via cobra built-in: `bmc completion bash/zsh` (replaces `bmc gencompletions`)
+- `ec2find` now queries profiles concurrently using goroutines
+
+### Removed
+- Bash scripts removed: `_bmclib.sh`, `ec2connect.sh`, `ec2scheduler.sh`, `ecsconnect.sh`, `profsel.sh`, `aws-profile-select.sh`, `find-profile.awk`, `wouter.sh`
+
 ## 0.2.12.0 - 30 Mar 2026
 - Fix: `bmc ec2ls` Name column now displays complete names when Name tag contains spaces
 - Fix: `bmc profsel -p <profile>` now correctly recognizes source profiles (credentials-based profiles without role_arn)
