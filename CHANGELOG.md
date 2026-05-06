@@ -1,6 +1,6 @@
 # BMC Changelog
 
-## NEXT VERSION
+## [0.2.14] - 06 May 2026
 
 ### Fixed
 - **Homebrew formula directory**: Formula now published to `Formula/bmc.rb` (was root `bmc.rb`)
