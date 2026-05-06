@@ -1,6 +1,6 @@
 # BMC Changelog
 
-## NEXT VERSION
+## [0.2.15] - 06 May 2026
 
 ### Fixed
 - **Homebrew Formula**: switch back to `brews` for proper Formula syntax (`brew install bmc` without `--cask`)
