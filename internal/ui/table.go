@@ -114,6 +114,7 @@ func runTable(columns []string, rows [][]string, selectMode bool, out *[]string)
 
 	var p *tea.Program
 	if tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0); err == nil {
+		lipgloss.SetDefaultRenderer(lipgloss.NewRenderer(tty))
 		if _, termH, err := term.GetSize(int(tty.Fd())); err == nil && termH > 0 {
 			if max := termH - 5; max > 0 && height > max {
 				height = max

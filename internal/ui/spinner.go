@@ -58,7 +58,12 @@ func Spin(title string, fn func() error) error {
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
 	m := spinnerModel{spinner: s, title: title}
-	p := tea.NewProgram(m, tea.WithOutput(os.Stderr))
+	out := os.Stderr
+	if tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0); err == nil {
+		lipgloss.SetDefaultRenderer(lipgloss.NewRenderer(tty))
+		out = tty
+	}
+	p := tea.NewProgram(m, tea.WithOutput(out))
 
 	doneCh := make(chan error, 1)
 	go func() {

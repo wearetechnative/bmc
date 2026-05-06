@@ -143,6 +143,7 @@ func Choose(header string, items []Item) (string, error) {
 	height := wantHeight
 	var p *tea.Program
 	if tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0); err == nil {
+		lipgloss.SetDefaultRenderer(lipgloss.NewRenderer(tty))
 		if _, termH, err := term.GetSize(int(tty.Fd())); err == nil && termH > 0 {
 			if max := termH - 2; height > max {
 				height = max
