@@ -25,3 +25,10 @@
 ## 5. Documentation
 
 - [x] 5.1 Update `README.md` to document `[ec2] columns` config option and list all available column names
+
+## 6. EC2 table display improvements
+
+- [x] 6.1 Export `PrintTable` in `internal/ui/table.go` for plain stdout output
+- [x] 6.2 Update `cmd/ec2ls.go` to use `ui.PrintTable` (plain, pipeable)
+- [x] 6.3 Add footer to interactive table: row count + key hints (`↑↓ scroll  enter select  q cancel`)
+- [x] 6.4 Make interactive table terminal-height-aware: initial height via `/dev/tty` `term.GetSize`, update on `WindowSizeMsg`

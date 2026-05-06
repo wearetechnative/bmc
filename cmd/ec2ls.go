@@ -33,5 +33,6 @@ func runEC2ls(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return ui.ShowTable(cfg.EC2.Columns, awsops.InstanceRows(instances, cfg.EC2.Columns))
+	ui.PrintTable(cfg.EC2.Columns, awsops.InstanceRows(instances, cfg.EC2.Columns))
+	return nil
 }

@@ -5,7 +5,7 @@ status: in-progress
 type: task
 priority: normal
 created_at: 2026-05-06T10:21:01Z
-updated_at: 2026-05-06T16:00:00Z
+updated_at: 2026-05-06T17:00:00Z
 openspec-link: openspec/changes/configurable-ec2-columns/proposal.md
 ---
 
