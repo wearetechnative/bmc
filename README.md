@@ -1,193 +1,194 @@
 # BMC (Bill McCloud) Technative AWS/Terraform DevOps tools
 
-These scripts simplify working with aws-cli and the AWS Console.
+A single Go binary that simplifies working with AWS — profile selection, EC2/ECS operations, and console access.
 
-- [AWS Profile Switcher](./docs/aws-profile-select.md) - set Environment Vars to a profile from .aws/config
-- [AWS aws_config2browserext](./docs/aws_config2browserext) - Convert config for AWS browser Externsion (https://addons.mozilla.org/en-US/firefox/addon/aws-extend-switch-roles3/)
-- ...
+## Installation
 
-## Commands
-
-Run `bmc usage` to see all available commands. Key commands include:
-
-### EC2 Management
-- `bmc ec2ls` - List running EC2 instances
-- `bmc ec2connect` - Connect to an EC2 instance via SSH or SSM
-- `bmc ec2stopstart` - Stop or start an EC2 instance
-- `bmc ec2find` - Find EC2 instances
-- `bmc ec2scheduler` - Toggle InstanceScheduler tag to temporarily enable/disable instance scheduling
-
-The `ec2scheduler` command helps manage instances that use the `InstanceScheduler` tag for automatic start/stop scheduling. Use this to:
-- List all EC2 instances and their scheduler status (enabled/disabled/none)
-- Toggle between `InstanceScheduler` and `InstanceScheduler_DISABLED` tags for instances with existing scheduler tags
-- Get guidance and instructions to add scheduler tags to instances that don't have them
-- Open AWS Console directly to the selected instance details page using `assumego` for immediate tag addition
-- Temporarily disable scheduling for maintenance or long-running tasks
-- Re-enable scheduling when ready
-
-### AWS Profile Selection
-- `bmc profsel` - Select and set AWS profile environment variables
-
-The `profsel` command helps you interactively select AWS profiles from your `~/.aws/config` file and set the `AWS_PROFILE` environment variable.
-
-**Basic usage:**
+### Homebrew (macOS / Linux)
 ```bash
-# Interactive profile selection
-. bmc profsel
-
-# Pre-select a specific profile
-. bmc profsel -p my-profile
-
-# List available profiles
-bmc profsel -l
+brew install wearetechnative/tap/bmc
 ```
 
-**JSON output for scripting:**
-
-The `--json` flag enables machine-readable output for integration with scripts and automation tools:
-
+### Nix — nix-env
 ```bash
-# Interactive selection with JSON output (progress visible)
-PROFILE_DATA=$(bmc profsel --json 3>&1 >/dev/null)
-
-# Non-interactive with specific profile
-PROFILE_DATA=$(bmc profsel -p my-profile --json 3>&1 >/dev/null)
-
-# Extract fields from JSON
-PROFILE_NAME=$(echo "$PROFILE_DATA" | jq -r '.profile_name')
-SOURCE_PROFILE=$(echo "$PROFILE_DATA" | jq -r '.source_profile')
-PROFILE_ARN=$(echo "$PROFILE_DATA" | jq -r '.profile_arn')
+nix-env -iA bmc -f https://github.com/wearetechnative/bmc/archive/main.tar.gz
 ```
 
-**JSON output format:**
-```json
+### Nix — nix profile
+```bash
+nix profile add github:wearetechnative/bmc
+```
+
+### NixOS — configuration.nix
+```nix
 {
-  "source_profile": "my-org",
-  "profile_name": "my-dev-profile",
-  "profile_arn": "arn:aws:iam::123456789012:role/DevRole"
+  inputs.bmc.url = "github:wearetechnative/bmc";
+  # ...
+  environment.systemPackages = [ inputs.bmc.packages.${system}.bmc ];
 }
 ```
 
-**Error cases:**
-```json
-{"error": "profile not found"}
-{"error": "no profile selected"}
-```
+### Binary download (GitHub Releases)
 
-**File descriptor 3 support:**
+Download from [GitHub Releases](https://github.com/wearetechnative/bmc/releases) for your platform:
+- `linux/amd64`, `linux/arm64`
+- `darwin/amd64` (Intel Mac), `darwin/arm64` (Apple Silicon)
 
-When using `--json`, output is directed to file descriptor 3 (if available), allowing progress messages to remain visible during interactive selection. This provides the best experience for both interactive use and scripting:
+## Setup
 
-- JSON output → fd 3 (captured in variable)
-- Progress messages → stdout (visible during execution)
-- Backward compatible: falls back to stdout if fd 3 is not redirected
+### 1. Shell integration (required for profsel)
 
-### Other Commands
-- `bmc console` - Open AWS Console in browser with profile selection
-- `bmc ecsconnect` - Connect to ECS container
-- `bmc gencompletions` - Generate shell completion scripts for bash or zsh
-
-## Shell Completion
-
-BMC supports tab-completion for bash and zsh shells. This enables auto-completion of commands and improves usability.
-
-### Bash Completion
-
-Add one of the following to your `~/.bashrc`:
-
-**Option 1: Direct sourcing (recommended)**
 ```bash
-source <(bmc gencompletions bash)
+bmc install-shell-integration
 ```
 
-**Option 2: Save to file**
+This installs a shell wrapper in `~/.zshrc` or `~/.bashrc` that allows `bmc profsel` to set `AWS_PROFILE` in your current shell.
+
+#### NixOS / home-manager
+
+If `~/.zshrc` is managed by home-manager, the command will print manual snippets instead of writing to the file. Add the wrapper yourself using the method that matches your setup:
+
+**home-manager (`home.nix`)**
+```nix
+programs.zsh.initContent = ''
+  bmc() {
+    if [[ "$1" == "profsel" ]]; then
+      eval "$(command bmc profsel "$@")"
+    else
+      command bmc "$@"
+    fi
+  }
+'';
+```
+
+**Fish shell (`~/.config/fish/config.fish`)**
+```fish
+function bmc
+  if test "$argv[1]" = "profsel"
+    eval (command bmc profsel $argv)
+  else
+    command bmc $argv
+  end
+end
+```
+
+### 2. Configuration
+
+Create `~/.config/bmc/config.toml`:
+
+```toml
+[mfa]
+enabled = true
+totp_script = "/usr/bin/rbw get my-aws-mfa-entry --field totp"
+clipboard_command = "xclip -selection clipboard"
+
+[ec2]
+auto_start_stopped = "prompt"   # always | never | prompt
+columns = ["InstanceId", "Name", "PrivateIP", "PublicIP", "State", "Hibernate", "Scheduler"]
+```
+
+The `columns` field controls which columns appear in EC2 instance tables (`ec2ls`, `ec2connect`, `ec2stopstart`, `ec2scheduler`, `ec2find`) and in what order. Available column names:
+
+| Column | Description |
+|--------|-------------|
+| `InstanceId` | EC2 instance ID (e.g. `i-0abc123`) |
+| `Name` | Value of the `Name` tag |
+| `PrivateIP` | Private IPv4 address |
+| `PublicIP` | Public IPv4 address (empty if none) |
+| `State` | Instance state (`running`, `stopped`, etc.) |
+| `Hibernate` | Whether hibernation is enabled (`yes`/`no`) |
+| `Scheduler` | Whether InstanceScheduler tag is set (`yes`/`no`) |
+| `Profile` | AWS profile name (always shown in `ec2find`) |
+
+Unknown column names are silently rendered as `n/a`.
+
+
+### 3. Check prerequisites
+
 ```bash
-bmc gencompletions bash > ~/.bmc-completion.bash
-echo 'source ~/.bmc-completion.bash' >> ~/.bashrc
+bmc doctor
 ```
 
-**Option 3: System-wide installation (requires root)**
+## Commands
+
+### Profile selection
 ```bash
-bmc gencompletions bash | sudo tee /etc/bash_completion.d/bmc
+bmc profsel              # Interactive profile selection
+bmc profsel -p myprofile # Pre-select a profile
+bmc profsel -l           # List all profiles
+bmc profsel --json       # JSON output for scripting
 ```
 
-Then restart your shell or run: `source ~/.bashrc`
-
-### Zsh Completion
-
-Add one of the following to your `~/.zshrc`:
-
-**Option 1: Direct sourcing (recommended)**
+### AWS Console
 ```bash
-source <(bmc gencompletions zsh)
+bmc console              # Open console for selected/current profile
+bmc console -p myprofile # Open console for specific profile
+bmc console -s ec2       # Open console at specific service
 ```
 
-**Option 2: Save to completion directory**
+### EC2
 ```bash
-mkdir -p ~/.zsh/completions
-bmc gencompletions zsh > ~/.zsh/completions/_bmc
-
-# Add to ~/.zshrc if not already present:
-fpath=(~/.zsh/completions $fpath)
-autoload -Uz compinit
-compinit
+bmc ec2ls                # List EC2 instances
+bmc ec2connect           # Connect via SSH or SSM
+bmc ec2connect -i i-xxx  # Connect to specific instance
+bmc ec2connect -u ubuntu # SSH as specific user
+bmc ec2stopstart         # Stop or start an instance
+bmc ec2find <search>     # Find instances across profiles
+bmc ec2scheduler         # Toggle InstanceScheduler tag
 ```
 
-Then restart your shell or run: `source ~/.zshrc`
-
-## Configuration
-
-BMC can be configured via `~/.config/bmc/config.env`. Available options:
-
-### EC2 Instance Auto-Start
-- `BMC_AUTO_START_STOPPED_INSTANCES` - Controls behavior when selecting stopped instances in `bmc ec2connect`
-  - `"prompt"` (default) - Ask user before starting stopped instances
-  - `"always"` - Automatically start stopped instances without prompting
-  - `"never"` - Never start stopped instances, show error and exit
-
-Example:
+### ECS
 ```bash
-BMC_AUTO_START_STOPPED_INSTANCES="always"
+bmc ecsconnect           # Interactive shell into ECS container
 ```
 
-### MFA / TOTP Configuration
-- `totpScript` - Array containing command and arguments to generate TOTP codes for MFA authentication
-- `clipboardCopyCommand` - Array containing command and arguments to copy text to clipboard
-- `clipboardPasteCommand` - Array containing command and arguments to paste text from clipboard
-
-Examples:
+### Shell completion
 ```bash
-# Using rbw-menu.sh for TOTP generation
-totpScript=("/path/to/rbw-menu.sh" "-t" "code" "-q" "new")
+# Bash
+source <(bmc completion bash)
 
-# Using pass for TOTP generation
-totpScript=("pass" "otp" "aws/mfa")
-
-# Simple TOTP script without arguments
-totpScript=("/usr/local/bin/get-totp.sh")
-
-# Clipboard commands (Linux with xclip)
-clipboardCopyCommand=("xclip" "-selection" "clipboard")
-clipboardPasteCommand=("xclip" "-selection" "clipboard" "-o")
-
-# Clipboard commands (macOS)
-clipboardCopyCommand=("pbcopy")
-clipboardPasteCommand=("pbpaste")
-
-# Clipboard commands (custom wrapper)
-clipboardCopyCommand=("/usr/local/bin/clipcopy")
-clipboardPasteCommand=("/usr/local/bin/clippaste")
+# Zsh
+source <(bmc completion zsh)
 ```
 
-**Note**: All commands should be configured as bash arrays to properly handle arguments and paths with spaces.
+### Other
+```bash
+bmc version              # Show version
+bmc doctor               # System health check
+bmc install-shell-integration  # Install profsel wrapper
+```
 
-## TODO
+## Configuration reference
 
-- [ ] ci testing
-- [ ] central command?
-- [ ] naming conventions
-- [ ] documentation (github pages)
-- [ ] share code?
-- [ ] coding style
-- [ ] 2 versions of aws_config2browserext(2)
+`~/.config/bmc/config.toml`:
 
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `mfa.enabled` | bool | `false` | Enable MFA session management |
+| `mfa.totp_script` | string | `""` | Command to generate TOTP codes |
+| `mfa.clipboard_command` | string | `""` | Command to copy TOTP to clipboard |
+| `ec2.auto_start_stopped` | string | `"prompt"` | `always` / `never` / `prompt` |
+
+## Migration from bash version
+
+1. Install the new binary (same name: `bmc`)
+2. Run `bmc install-shell-integration` (replaces `source bmc profsel` pattern)
+3. Create `~/.config/bmc/config.toml` (replaces `~/.config/bmc/config.env`)
+4. Run `bmc doctor` to verify setup
+
+**Breaking changes:**
+- `source bmc profsel` → `eval "$(bmc profsel)"` (handled automatically by shell wrapper)
+- `~/.config/bmc/config.env` → `~/.config/bmc/config.toml`
+- Shell completions now via cobra: `bmc completion bash/zsh` (replaces `bmc gencompletions`)
+
+## Optional dependencies
+
+Some commands require additional tools (checked lazily):
+
+| Command | Requires |
+|---------|----------|
+| `ec2connect` SSH | `ssh` |
+| `ec2connect` SSM | `aws` CLI v2 + `session-manager-plugin` |
+| `ecsconnect` | `aws` CLI v2 + `session-manager-plugin` |
+
+Run `bmc doctor` to check all dependencies with install instructions.

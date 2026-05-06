@@ -4,6 +4,7 @@
 
 ### Added
 - **Back navigation in TUI menus**: Press ESC in any list to go back to the previous menu level; press Ctrl+C to cancel entirely. Works in `bmc profsel` (group → profile) and `bmc ecsconnect` (cluster → service → task → container)
+- **Configurable EC2 columns**: Set `columns` in `[ec2]` section of `~/.config/bmc/config.toml` to control which columns appear in EC2 tables and in what order. Default order now puts `Name` second. All EC2 commands (`ec2ls`, `ec2connect`, `ec2stopstart`, `ec2scheduler`, `ec2find`) use the same column list
 
 ### Fixed
 - **TUI list sizing**: List height is now clamped to the actual terminal height and updates on resize; spurious pagination dots no longer appear on short lists; eval-context and sub-group lists render correctly via `/dev/tty`
