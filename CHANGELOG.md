@@ -2,6 +2,9 @@
 
 ## NEXT VERSION
 
+### Added
+- **Back navigation in TUI menus**: Press ESC in any list to go back to the previous menu level; press Ctrl+C to cancel entirely. Works in `bmc profsel` (group → profile) and `bmc ecsconnect` (cluster → service → task → container)
+
 ### Fixed
 - **TUI list sizing**: List height is now clamped to the actual terminal height and updates on resize; spurious pagination dots no longer appear on short lists; eval-context and sub-group lists render correctly via `/dev/tty`
 - **TUI blank rows**: Short lists (≤ 4 items, e.g. connection method and SSH user pickers) no longer show blank rows between the last item and the bottom of the list

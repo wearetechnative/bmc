@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -11,6 +12,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
 )
+
+// ErrBack is returned by Choose when the user pressed ESC to go back.
+// Callers that support multi-level navigation should check errors.Is(err, ErrBack)
+// and re-present the previous menu. Ctrl+C returns ("", nil) instead.
+var ErrBack = errors.New("ui: user navigated back")
 
 // Item is a selectable list item.
 type Item struct {
@@ -60,7 +66,8 @@ type listModel struct {
 	list       list.Model
 	selected   string
 	quitting   bool
-	wantHeight int // desired height before terminal-size clamp
+	wentBack   bool // true when user pressed ESC (go back), false for Ctrl+C (cancel)
+	wantHeight int  // desired height before terminal-size clamp
 }
 
 func (m listModel) Init() tea.Cmd { return nil }
@@ -79,7 +86,11 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.quitting = true
 			return m, tea.Quit
-		case "ctrl+c", "esc":
+		case "esc":
+			m.quitting = true
+			m.wentBack = true
+			return m, tea.Quit
+		case "ctrl+c":
 			m.quitting = true
 			return m, tea.Quit
 		}
@@ -159,7 +170,11 @@ func Choose(header string, items []Item) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return result.(listModel).selected, nil
+	m := result.(listModel)
+	if m.wentBack {
+		return "", ErrBack
+	}
+	return m.selected, nil
 }
 
 // choosePlain is a fallback for non-interactive environments.
