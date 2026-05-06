@@ -1,12 +1,12 @@
 ---
 # bmc-p4wn
 title: post-rewrite-issues
-status: in-progress
+status: completed
 type: task
 priority: normal
 created_at: 2026-05-06T10:30:00Z
-updated_at: 2026-05-06T13:00:00Z
-openspec-link: openspec/changes/post-rewrite-fixes/proposal.md
+updated_at: 2026-05-06T14:00:00Z
+openspec-link: openspec/changes/archive/2026-05-06-post-rewrite-fixes/proposal.md
 ---
 
 Bugs en ontbrekende functionaliteit gevonden na de Go-rewrite.
