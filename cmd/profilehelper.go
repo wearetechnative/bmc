@@ -14,6 +14,38 @@ import (
 func ensureAWSProfile() (string, error) {
 	profile := os.Getenv("AWS_PROFILE")
 	if profile != "" {
+		profiles, err := awsconfig.LoadProfiles()
+		if err != nil {
+			return "", err
+		}
+
+		var matched *awsconfig.Profile
+		for i := range profiles {
+			if profiles[i].Name == profile {
+				matched = &profiles[i]
+				break
+			}
+		}
+
+		if matched == nil {
+			fmt.Fprintf(os.Stderr, "warning: AWS_PROFILE=%q not found in ~/.aws/config, skipping MFA check\n", profile)
+			return profile, nil
+		}
+
+		sourceProfile, err := awsconfig.ResolveSourceProfile(*matched)
+		if err != nil {
+			return "", err
+		}
+
+		cfg, err := config.Load()
+		if err != nil {
+			return "", err
+		}
+
+		if err := mfa.EnsureValid(sourceProfile, cfg, os.Stderr); err != nil {
+			return "", err
+		}
+
 		return profile, nil
 	}
 
