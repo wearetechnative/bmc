@@ -147,7 +147,7 @@ bmc profsel --json       # JSON output for scripting
 ```bash
 bmc console              # Open console for selected/current profile
 bmc console -p myprofile # Open console for specific profile
-bmc console --select     # Force interactive profile selection (ignores AWS_PROFILE)
+bmc console -p           # Force interactive profile selection (ignores AWS_PROFILE)
 bmc console -s ec2       # Open console at specific service
 ```
 

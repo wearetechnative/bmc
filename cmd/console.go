@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/wearetechnative/bmc/internal/awsconfig"
@@ -14,18 +15,18 @@ import (
 var (
 	consoleProfile string
 	consoleService string
-	consoleSelect  bool
 )
 
 var consoleCmd = &cobra.Command{
 	Use:   "console",
 	Short: "Open Firefox with AWS account in console",
+	Args:  cobra.MaximumNArgs(1),
 	RunE:  runConsole,
 }
 
 func init() {
-	consoleCmd.Flags().StringVarP(&consoleProfile, "profile", "p", "", "AWS profile to use")
-	consoleCmd.Flags().BoolVar(&consoleSelect, "select", false, "Force interactive profile selection (ignores AWS_PROFILE)")
+	consoleCmd.Flags().StringVarP(&consoleProfile, "profile", "p", "", "AWS profile (omit value to force interactive selection)")
+	consoleCmd.Flags().Lookup("profile").NoOptDefVal = " "
 	consoleCmd.Flags().StringVarP(&consoleService, "service", "s", "", "AWS service to open (e.g. ec2, s3)")
 	rootCmd.AddCommand(consoleCmd)
 }
@@ -38,16 +39,22 @@ func runConsole(cmd *cobra.Command, args []string) error {
 
 	var selectedProfile awsconfig.Profile
 
+	// When NoOptDefVal fires (-p without =value), cobra puts the next word in args.
+	profileName := strings.TrimSpace(consoleProfile)
+	if profileName == "" && len(args) > 0 {
+		profileName = args[0]
+	}
+
 	switch {
-	case consoleProfile != "":
+	case profileName != "":
 		// -p <name>: use the given profile directly
-		p, ok := awsconfig.FindProfile(profiles, consoleProfile)
+		p, ok := awsconfig.FindProfile(profiles, profileName)
 		if !ok {
-			return fmt.Errorf("profile %q not found", consoleProfile)
+			return fmt.Errorf("profile %q not found", profileName)
 		}
 		selectedProfile = p
-	case consoleSelect:
-		// --select: force interactive selection (ignore AWS_PROFILE)
+	case cmd.Flags().Changed("profile"):
+		// -p bare: force interactive selection (ignore AWS_PROFILE)
 		selectedProfile, err = selectProfileInteractive(profiles)
 		if err != nil {
 			return err
