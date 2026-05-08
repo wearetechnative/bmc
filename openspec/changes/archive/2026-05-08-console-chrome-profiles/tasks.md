@@ -21,4 +21,4 @@
 
 ## 5. Commit
 
-- [ ] 5.1 Commit all changes with a descriptive message
+- [x] 5.1 Commit all changes with a descriptive message
