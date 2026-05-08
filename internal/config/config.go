@@ -17,7 +17,9 @@ type Config struct {
 
 // ConsoleConfig holds console-related settings.
 type ConsoleConfig struct {
-	FirefoxContainers bool `json:"firefox_containers"`
+	FirefoxContainers bool   `json:"firefox_containers"`
+	ChromeProfiles    bool   `json:"chrome_profiles"`
+	ChromeBinary      string `json:"chrome_binary"`
 }
 
 // MFAConfig holds MFA-related settings.
@@ -84,6 +86,10 @@ func Load() (Config, error) {
 
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return cfg, &ParseError{Path: path, Err: err}
+	}
+
+	if cfg.Console.ChromeBinary == "" {
+		cfg.Console.ChromeBinary = "google-chrome"
 	}
 
 	return cfg, nil

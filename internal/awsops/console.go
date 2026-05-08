@@ -53,7 +53,7 @@ func OpenConsole(profile, service string, bmcCfg config.Config) error {
 	}
 
 	consoleURL := buildConsoleURL(signinToken, service)
-	return openBrowser(consoleURL, profile, bmcCfg.Console.FirefoxContainers)
+	return openBrowser(consoleURL, profile, bmcCfg.Console)
 }
 
 type federationTokenResponse struct {
@@ -110,8 +110,11 @@ func buildConsoleURL(signinToken, service string) string {
 	return "https://signin.aws.amazon.com/federation?" + params.Encode()
 }
 
-func openBrowser(u, containerName string, firefoxContainers bool) error {
-	if firefoxContainers {
+func openBrowser(u, containerName string, consoleCfg config.ConsoleConfig) error {
+	if consoleCfg.ChromeProfiles {
+		return openChromeProfile(u, containerName, consoleCfg)
+	}
+	if consoleCfg.FirefoxContainers {
 		firefoxPath, err := exec.LookPath("firefox")
 		if err != nil {
 			return fmt.Errorf("firefox not found in PATH (required for firefox_containers): install Firefox or set firefox_containers = false in config")

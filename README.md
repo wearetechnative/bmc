@@ -175,6 +175,36 @@ bmc install-shell-integration  # Install profsel wrapper
 | `mfa.clipboard_command` | string | `""` | Command to copy TOTP to clipboard |
 | `ec2.auto_start_stopped` | string | `"prompt"` | `always` / `never` / `prompt` |
 | `console.firefox_containers` | bool | `false` | Open console in Firefox container tab via [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension |
+| `console.chrome_profiles` | bool | `false` | **Experimental.** Open console in a bmc-managed isolated Chrome profile per AWS profile |
+| `console.chrome_binary` | string | `"google-chrome"` | Chrome binary to use when `chrome_profiles = true` (e.g. `"chromium"`, `"brave-browser"`) |
+
+### Experimental: Chrome profile isolation
+
+When `chrome_profiles = true`, `bmc console` opens the AWS console in a dedicated Chrome instance isolated per AWS profile. Profile data is stored at `~/.config/bmc/chrome/profiles/<profile-name>/`.
+
+On first use for a profile, bmc copies your extensions and preferences from the default Chrome profile (without copying cookies or login data), so your usual extensions are available immediately.
+
+```json
+{
+  "console": {
+    "chrome_profiles": true,
+    "chrome_binary": "google-chrome"
+  }
+}
+```
+
+For Brave or Chromium, set `chrome_binary` accordingly:
+
+```json
+{
+  "console": {
+    "chrome_profiles": true,
+    "chrome_binary": "brave-browser"
+  }
+}
+```
+
+> **Note:** Profile directories under `~/.config/bmc/chrome/profiles/` can be deleted at any time to reset a profile. They are not managed by bmc after creation.
 
 ## Migration from bash version
 
