@@ -3,7 +3,7 @@
 ## NEXT VERSION
 
 ### Added
-- **Firefox container support**: Set `[console] firefox_containers = true` in `~/.config/bmc/config.toml` to open the AWS console in a Firefox container tab via the [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension (`ext+granted-containers:` URL scheme)
+- **Firefox container support**: Set `[console] firefox_containers = true` in `~/.config/bmc/config.toml` to open the AWS console in a dedicated Firefox container tab via the [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension. The container is named after the AWS profile.
 
 ### Fixed
 - **MFA check on pre-set profile**: When `AWS_PROFILE` is already set in the environment, `bmc` now validates and refreshes the MFA session before executing any AWS operation. Previously this was skipped, causing `InvalidClientTokenId` errors when the session expired.
