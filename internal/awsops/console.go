@@ -111,6 +111,9 @@ func buildConsoleURL(signinToken, service string) string {
 }
 
 func openBrowser(u, containerName string, consoleCfg config.ConsoleConfig) error {
+	if consoleCfg.ChromeProfiles && consoleCfg.FirefoxContainers {
+		return fmt.Errorf("config conflict: chrome_profiles and firefox_containers cannot both be true — disable one in ~/.config/bmc/config.json")
+	}
 	if consoleCfg.ChromeProfiles {
 		return openChromeProfile(u, containerName, consoleCfg)
 	}
