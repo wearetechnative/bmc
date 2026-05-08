@@ -9,7 +9,9 @@ import (
 	"github.com/wearetechnative/bmc/internal/awsconfig"
 	"github.com/wearetechnative/bmc/internal/awsops"
 	"github.com/wearetechnative/bmc/internal/config"
+	"github.com/wearetechnative/bmc/internal/history"
 	"github.com/wearetechnative/bmc/internal/mfa"
+	"github.com/wearetechnative/bmc/internal/ui"
 )
 
 var (
@@ -45,6 +47,8 @@ func runConsole(cmd *cobra.Command, args []string) error {
 		profileName = args[0]
 	}
 
+	interactive := false
+
 	switch {
 	case profileName != "":
 		// -p <name>: use the given profile directly
@@ -55,13 +59,14 @@ func runConsole(cmd *cobra.Command, args []string) error {
 		selectedProfile = p
 	case cmd.Flags().Changed("profile"):
 		// -p bare: force interactive selection (ignore AWS_PROFILE)
-		selectedProfile, err = selectProfileInteractive(profiles)
+		selectedProfile, err = selectProfileForConsole(profiles)
 		if err != nil {
 			return err
 		}
 		if selectedProfile.Name == "" {
 			return nil
 		}
+		interactive = true
 	default:
 		// no -p: use AWS_PROFILE if set, otherwise interactive
 		envProfile := os.Getenv("AWS_PROFILE")
@@ -72,13 +77,14 @@ func runConsole(cmd *cobra.Command, args []string) error {
 			}
 			selectedProfile = p
 		} else {
-			selectedProfile, err = selectProfileInteractive(profiles)
+			selectedProfile, err = selectProfileForConsole(profiles)
 			if err != nil {
 				return err
 			}
 			if selectedProfile.Name == "" {
 				return nil
 			}
+			interactive = true
 		}
 	}
 
@@ -97,5 +103,46 @@ func runConsole(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "-- Opening console for profile: %s\n", selectedProfile.Name)
-	return awsops.OpenConsole(selectedProfile.Name, consoleService, cfg)
+	if err := awsops.OpenConsole(selectedProfile.Name, consoleService, cfg); err != nil {
+		return err
+	}
+
+	if interactive {
+		_ = history.Save("console", selectedProfile.Name)
+	}
+	return nil
+}
+
+// selectProfileForConsole shows a flat profile list with recent profiles at
+// the top (labelled "recent"), bypassing the group-based two-step selector.
+func selectProfileForConsole(profiles []awsconfig.Profile) (awsconfig.Profile, error) {
+	recent := history.Load("console")
+	recentSet := make(map[string]bool, len(recent))
+	for _, r := range recent {
+		recentSet[r] = true
+	}
+
+	var items []ui.Item
+	for _, name := range recent {
+		items = append(items, ui.Item{Title: name, Desc: "recent"})
+	}
+	for _, p := range profiles {
+		if !recentSet[p.Name] {
+			desc := p.AccountID
+			if p.RoleName != "" {
+				desc += " / " + p.RoleName
+			}
+			items = append(items, ui.Item{Title: p.Name, Desc: desc})
+		}
+	}
+
+	selectedName, err := ui.Choose("Select AWS profile", items)
+	if err != nil {
+		return awsconfig.Profile{}, err
+	}
+	if selectedName == "" {
+		return awsconfig.Profile{}, nil
+	}
+	p, _ := awsconfig.FindProfile(profiles, selectedName)
+	return p, nil
 }
