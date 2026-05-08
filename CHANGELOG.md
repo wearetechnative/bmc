@@ -2,8 +2,33 @@
 
 ## NEXT VERSION
 
+### Breaking Changes
+- **Config file format changed**: `~/.config/bmc/config.toml` → `~/.config/bmc/config.json`. Field names are unchanged — only the file format and filename differ. Run `bmc` once with the old `config.toml` still in place to get a migration hint with the exact JSON equivalent.
+
+  Before (`config.toml`):
+  ```toml
+  [mfa]
+  enabled = true
+  totp_script = "/usr/bin/rbw get my-aws-mfa-entry --field totp"
+
+  [console]
+  firefox_containers = true
+  ```
+  After (`config.json`):
+  ```json
+  {
+    "mfa": {
+      "enabled": true,
+      "totp_script": "/usr/bin/rbw get my-aws-mfa-entry --field totp"
+    },
+    "console": {
+      "firefox_containers": true
+    }
+  }
+  ```
+
 ### Added
-- **Firefox container support**: Set `[console] firefox_containers = true` in `~/.config/bmc/config.toml` to open the AWS console in a dedicated Firefox container tab via the [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension. The container is named after the AWS profile.
+- **Firefox container support**: Set `firefox_containers: true` in the `console` section of `~/.config/bmc/config.json` to open the AWS console in a dedicated Firefox container tab via the [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension. The container is named after the AWS profile.
 - **`bmc console -p` forces profile selection**: Running `bmc console -p` without a profile name opens the interactive profile selector, even when `AWS_PROFILE` is already set in the environment.
 
 ### Fixed
@@ -12,7 +37,6 @@
 - **MFA check on pre-set profile**: When `AWS_PROFILE` is already set in the environment, `bmc` now validates and refreshes the MFA session before executing any AWS operation. Previously this was skipped, causing `InvalidClientTokenId` errors when the session expired.
 
 ### Changed
-- **BREAKING — Config format**: Config file moved from `~/.config/bmc/config.toml` (TOML) to `~/.config/bmc/config.json` (JSON). Field names are unchanged — only the file format and filename differ. If `config.json` is absent but `config.toml` exists, bmc prints a migration hint on startup.
 - **Documentation**: Rewrote `docs/aws-profile-select.md` to reflect the current Go CLI, including shell integration via `eval "$(bmc profsel)"` and `/dev/tty` color rendering behavior
 - **OpenSpec specs**: Translated `tui-color-rendering` spec from Dutch to English
 - **Repository cleanup**: Removed obsolete bash-era files (`_bmclib.sh`, `_get_var_file.sh`, `tgselect.sh`) and untracked the accidentally committed `bmc-go` build artifact
