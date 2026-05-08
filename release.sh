@@ -184,7 +184,7 @@ fi
 # ── git commit ─────────────────────────────────────────────────────────────────
 bold "==> Creating release commit"
 
-git add VERSION-bmc CHANGELOG.md bmc
+git add VERSION-bmc CHANGELOG.md
 git diff --quiet HEAD -- package.nix 2>/dev/null || git add package.nix
 git diff --quiet HEAD -- flake.lock 2>/dev/null  || git add flake.lock
 
