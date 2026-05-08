@@ -151,6 +151,8 @@ bmc console -p           # Force interactive profile selection (ignores AWS_PROF
 bmc console -s ec2       # Open console at specific service
 ```
 
+Recently used profiles appear at the top of the interactive selector (last 10, labelled "recent"). History is stored in `~/.local/share/bmc/console-history.json`.
+
 ### EC2
 ```bash
 bmc ec2ls                # List EC2 instances
