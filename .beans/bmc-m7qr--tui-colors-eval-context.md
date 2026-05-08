@@ -7,6 +7,7 @@ priority: normal
 created_at: 2026-05-06T20:26:20Z
 updated_at: 2026-05-06T20:35:00Z
 openspec-link: openspec/changes/archive/2026-05-06-fix-tui-colors-eval-context/proposal.md
+github-issue: https://github.com/wearetechnative/bmc/issues/40
 ---
 
 Bij `eval "$(./bmc profsel)"` worden geen kleuren getoond in de TUI. De TUI schrijft correct naar `/dev/tty` via `tea.WithOutput(tty)`, maar de lipgloss default renderer kijkt naar `os.Stdout` voor kleurdetectie. Omdat stdout gepiped is in een `$()` subshell, detecteert termenv geen TTY en valt het terug op plain output.
