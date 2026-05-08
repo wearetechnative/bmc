@@ -1,6 +1,6 @@
 # BMC Changelog
 
-## NEXT VERSION
+## [0.3.0] - 08 May 2026
 
 ### Breaking Changes
 - **Config file format changed**: `~/.config/bmc/config.toml` → `~/.config/bmc/config.json`. Field names are unchanged — only the file format and filename differ. Run `bmc` once with the old `config.toml` still in place to get a migration hint with the exact JSON equivalent.

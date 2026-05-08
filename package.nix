@@ -8,7 +8,7 @@ buildGoModule rec {
 
   src = ./.;
 
-  vendorHash = "sha256-fsfVuZSDowv0CbKtxm+wVl2A0r+X0tIStdcR6QLvUbc=";
+  vendorHash = "sha256-1hHNNsJuc93f9WL/aDpBBnuz6+9b7K9fJiXwuuQIepg=";
 
   ldflags = [ "-s" "-w" "-X github.com/wearetechnative/bmc/cmd.Version=${version}" ];
 
