@@ -12,6 +12,7 @@
 - **MFA check on pre-set profile**: When `AWS_PROFILE` is already set in the environment, `bmc` now validates and refreshes the MFA session before executing any AWS operation. Previously this was skipped, causing `InvalidClientTokenId` errors when the session expired.
 
 ### Changed
+- **BREAKING — Config format**: Config file moved from `~/.config/bmc/config.toml` (TOML) to `~/.config/bmc/config.json` (JSON). Field names are unchanged — only the file format and filename differ. If `config.json` is absent but `config.toml` exists, bmc prints a migration hint on startup.
 - **Documentation**: Rewrote `docs/aws-profile-select.md` to reflect the current Go CLI, including shell integration via `eval "$(bmc profsel)"` and `/dev/tty` color rendering behavior
 - **OpenSpec specs**: Translated `tui-color-rendering` spec from Dutch to English
 - **Repository cleanup**: Removed obsolete bash-era files (`_bmclib.sh`, `_get_var_file.sh`, `tgselect.sh`) and untracked the accidentally committed `bmc-go` build artifact

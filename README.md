@@ -74,20 +74,23 @@ end
 
 ### 2. Configuration
 
-Create `~/.config/bmc/config.toml`:
+Create `~/.config/bmc/config.json`:
 
-```toml
-[mfa]
-enabled = true
-totp_script = "/usr/bin/rbw get my-aws-mfa-entry --field totp"
-clipboard_command = "xclip -selection clipboard"
-
-[ec2]
-auto_start_stopped = "prompt"   # always | never | prompt
-columns = ["InstanceId", "Name", "PrivateIP", "PublicIP", "State", "Hibernate", "Scheduler"]
-
-[console]
-firefox_containers = true   # open in Firefox container tab via Granted extension
+```json
+{
+  "mfa": {
+    "enabled": true,
+    "totp_script": "/usr/bin/rbw get my-aws-mfa-entry --field totp",
+    "clipboard_command": "xclip -selection clipboard"
+  },
+  "ec2": {
+    "auto_start_stopped": "prompt",
+    "columns": ["InstanceId", "Name", "PrivateIP", "PublicIP", "State", "Hibernate", "Scheduler"]
+  },
+  "console": {
+    "firefox_containers": true
+  }
+}
 ```
 
 The `columns` field controls which columns appear in EC2 instance tables (`ec2ls`, `ec2connect`, `ec2stopstart`, `ec2scheduler`, `ec2find`) and in what order. Available column names:
@@ -163,7 +166,7 @@ bmc install-shell-integration  # Install profsel wrapper
 
 ## Configuration reference
 
-`~/.config/bmc/config.toml`:
+`~/.config/bmc/config.json`:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -177,12 +180,12 @@ bmc install-shell-integration  # Install profsel wrapper
 
 1. Install the new binary (same name: `bmc`)
 2. Run `bmc install-shell-integration` (replaces `source bmc profsel` pattern)
-3. Create `~/.config/bmc/config.toml` (replaces `~/.config/bmc/config.env`)
+3. Create `~/.config/bmc/config.json` (replaces `~/.config/bmc/config.env`)
 4. Run `bmc doctor` to verify setup
 
 **Breaking changes:**
 - `source bmc profsel` → `eval "$(bmc profsel)"` (handled automatically by shell wrapper)
-- `~/.config/bmc/config.env` → `~/.config/bmc/config.toml`
+- `~/.config/bmc/config.env` → `~/.config/bmc/config.json`
 - Shell completions now via cobra: `bmc completion bash/zsh` (replaces `bmc gencompletions`)
 
 ## Optional dependencies

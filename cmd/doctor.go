@@ -30,7 +30,7 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 	fmt.Println("Core (always required)")
 	allOK = doctorCheck("~/.aws/config", checkAWSConfig()) && allOK
 	allOK = doctorCheck("~/.aws/credentials", checkAWSCredentials()) && allOK
-	allOK = doctorCheck("~/.config/bmc/config.toml", checkBMCConfig()) && allOK
+	allOK = doctorCheck("~/.config/bmc/config.json", checkBMCConfig()) && allOK
 
 	fmt.Println()
 
@@ -68,7 +68,7 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 		fmt.Println()
 		fmt.Println("⚠  Legacy config.env found:")
 		fmt.Printf("   %s\n", config.LegacyConfigPath())
-		fmt.Println("   Please migrate to ~/.config/bmc/config.toml")
+		fmt.Println("   Please migrate to ~/.config/bmc/config.json")
 		fmt.Println("   See: https://github.com/wearetechnative/bmc#configuration")
 		allOK = false
 	}
@@ -118,7 +118,7 @@ func checkAWSCredentials() string {
 func checkBMCConfig() string {
 	path := config.ConfigPath()
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return "~/.config/bmc/config.toml not found — defaults will be used\n" +
+		return "~/.config/bmc/config.json not found — defaults will be used\n" +
 			"Create it to configure MFA and EC2 behaviour."
 	}
 	_, err := config.Load()
