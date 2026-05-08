@@ -1,5 +1,7 @@
 # BMC Changelog
 
+## NEXT VERSION
+
 ## [0.3.0] - 08 May 2026
 
 ### Breaking Changes
