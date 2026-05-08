@@ -85,6 +85,9 @@ clipboard_command = "xclip -selection clipboard"
 [ec2]
 auto_start_stopped = "prompt"   # always | never | prompt
 columns = ["InstanceId", "Name", "PrivateIP", "PublicIP", "State", "Hibernate", "Scheduler"]
+
+[console]
+firefox_containers = true   # open in Firefox container tab via Granted extension
 ```
 
 The `columns` field controls which columns appear in EC2 instance tables (`ec2ls`, `ec2connect`, `ec2stopstart`, `ec2scheduler`, `ec2find`) and in what order. Available column names:
@@ -168,6 +171,7 @@ bmc install-shell-integration  # Install profsel wrapper
 | `mfa.totp_script` | string | `""` | Command to generate TOTP codes |
 | `mfa.clipboard_command` | string | `""` | Command to copy TOTP to clipboard |
 | `ec2.auto_start_stopped` | string | `"prompt"` | `always` / `never` / `prompt` |
+| `console.firefox_containers` | bool | `false` | Open console in Firefox container tab via [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension |
 
 ## Migration from bash version
 

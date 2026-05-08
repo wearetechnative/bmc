@@ -14,14 +14,16 @@ import (
 
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/wearetechnative/bmc/internal/config"
 )
 
 // OpenConsole opens the AWS Management Console for the given profile in the default browser.
 // If service is non-empty (e.g. "ec2"), the console will open at that service page.
-func OpenConsole(profile, service string) error {
+// If cfg.Console.FirefoxContainers is true, the URL is opened via the Granted Firefox extension.
+func OpenConsole(profile, service string, bmcCfg config.Config) error {
 	ctx := context.Background()
 
-	cfg, err := awscfg.LoadDefaultConfig(ctx,
+	awsCfg, err := awscfg.LoadDefaultConfig(ctx,
 		awscfg.WithSharedConfigProfile(profile),
 		awscfg.WithRegion(getRegionOrDefault(ctx, profile)),
 	)
@@ -30,14 +32,14 @@ func OpenConsole(profile, service string) error {
 	}
 
 	// Assume the role to get temporary credentials
-	stsClient := sts.NewFromConfig(cfg)
+	stsClient := sts.NewFromConfig(awsCfg)
 	callerID, err := stsClient.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get caller identity: %w", err)
 	}
 
 	// Get the credentials from the config
-	creds, err := cfg.Credentials.Retrieve(ctx)
+	creds, err := awsCfg.Credentials.Retrieve(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve credentials: %w", err)
 	}
@@ -51,7 +53,7 @@ func OpenConsole(profile, service string) error {
 	}
 
 	consoleURL := buildConsoleURL(signinToken, service)
-	return openBrowser(consoleURL)
+	return openBrowser(consoleURL, bmcCfg.Console.FirefoxContainers)
 }
 
 type federationTokenResponse struct {
@@ -108,7 +110,17 @@ func buildConsoleURL(signinToken, service string) string {
 	return "https://signin.aws.amazon.com/federation?" + params.Encode()
 }
 
-func openBrowser(u string) error {
+func openBrowser(u string, firefoxContainers bool) error {
+	if firefoxContainers {
+		firefoxPath, err := exec.LookPath("firefox")
+		if err != nil {
+			return fmt.Errorf("firefox not found in PATH (required for firefox_containers): install Firefox or set firefox_containers = false in config")
+		}
+		cmd := exec.Command(firefoxPath, "ext+granted-containers:"+u)
+		cmd.Stderr = nil
+		return cmd.Start()
+	}
+
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "linux":

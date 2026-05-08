@@ -77,5 +77,5 @@ func runConsole(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "-- Opening console for profile: %s\n", selectedProfile.Name)
-	return awsops.OpenConsole(selectedProfile.Name, consoleService)
+	return awsops.OpenConsole(selectedProfile.Name, consoleService, cfg)
 }

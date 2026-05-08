@@ -10,8 +10,14 @@ import (
 
 // Config holds all bmc runtime configuration.
 type Config struct {
-	MFA MFAConfig `toml:"mfa"`
-	EC2 EC2Config `toml:"ec2"`
+	MFA     MFAConfig     `toml:"mfa"`
+	EC2     EC2Config     `toml:"ec2"`
+	Console ConsoleConfig `toml:"console"`
+}
+
+// ConsoleConfig holds console-related settings.
+type ConsoleConfig struct {
+	FirefoxContainers bool `toml:"firefox_containers"`
 }
 
 // MFAConfig holds MFA-related settings.
