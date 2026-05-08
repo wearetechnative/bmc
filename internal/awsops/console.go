@@ -117,7 +117,7 @@ func openBrowser(u, containerName string, firefoxContainers bool) error {
 			return fmt.Errorf("firefox not found in PATH (required for firefox_containers): install Firefox or set firefox_containers = false in config")
 		}
 		grantedURL := fmt.Sprintf("ext+granted-containers:name=%s&url=%s&color=blue&icon=circle",
-			url.QueryEscape(containerName), url.QueryEscape(url.QueryEscape(u)))
+			url.QueryEscape(containerName), url.QueryEscape(u))
 		cmd := exec.Command(firefoxPath, grantedURL)
 		cmd.Stderr = nil
 		return cmd.Start()
