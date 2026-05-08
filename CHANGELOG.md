@@ -30,7 +30,7 @@
 ### Added
 - **Firefox container support**: Set `firefox_containers: true` in the `console` section of `~/.config/bmc/config.json` to open the AWS console in a dedicated Firefox container tab via the [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension. The container is named after the AWS profile.
 - **Chrome profile isolation (experimental)**: Set `chrome_profiles: true` in the `console` section of `~/.config/bmc/config.json` to open the AWS console in a bmc-managed isolated Chrome profile per AWS profile. On first use, extensions and preferences are seeded from your default Chrome profile. Works with Chrome, Brave, Chromium, and Edge via the optional `chrome_binary` setting.
-- **`bmc console -p` forces profile selection**: Running `bmc console -p` without a profile name opens the interactive profile selector, even when `AWS_PROFILE` is already set in the environment.
+- **`bmc console --select` forces profile selection**: Running `bmc console --select` opens the interactive profile selector, even when `AWS_PROFILE` is already set in the environment.
 
 ### Fixed
 - **MFA credentials write**: `aws_security_token` (legacy alias used by aws-mfa and older AWS SDKs) is now kept in sync with `aws_session_token` when refreshing a session. Previously the stale alias caused authentication failures for tools reading the old key name.
