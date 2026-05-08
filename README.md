@@ -115,6 +115,24 @@ Unknown column names are silently rendered as `n/a`.
 bmc doctor
 ```
 
+## MFA
+
+bmc handles MFA automatically — there is no separate `bmc mfa` command. When you run `bmc profsel` or `bmc console`, bmc checks whether your session credentials are still valid and refreshes them if needed.
+
+**Requirements:**
+
+1. Set `mfa.enabled = true` in `~/.config/bmc/config.json`
+2. Add a `[profile-long-term]` section to `~/.aws/credentials` for the source profile that has MFA:
+
+```ini
+[technative-long-term]
+aws_access_key_id     = AKIA...
+aws_secret_access_key = ...
+aws_mfa_device        = arn:aws:iam::123456789012:mfa/your-username
+```
+
+When the session expires, bmc prompts for a 6-digit TOTP code. If `totp_script` is configured, bmc runs that command to fetch the code automatically (e.g. from a password manager) and copies it to the clipboard via `clipboard_command`.
+
 ## Commands
 
 ### Profile selection
@@ -129,6 +147,7 @@ bmc profsel --json       # JSON output for scripting
 ```bash
 bmc console              # Open console for selected/current profile
 bmc console -p myprofile # Open console for specific profile
+bmc console -p           # Force interactive profile selection (ignores AWS_PROFILE)
 bmc console -s ec2       # Open console at specific service
 ```
 
