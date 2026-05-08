@@ -12,6 +12,7 @@
 ### Changed
 - **Documentation**: Rewrote `docs/aws-profile-select.md` to reflect the current Go CLI, including shell integration via `eval "$(bmc profsel)"` and `/dev/tty` color rendering behavior
 - **OpenSpec specs**: Translated `tui-color-rendering` spec from Dutch to English
+- **Repository cleanup**: Removed obsolete bash-era files (`_bmclib.sh`, `_get_var_file.sh`, `tgselect.sh`) and untracked the accidentally committed `bmc-go` build artifact
 
 ## [0.2.15] - 06 May 2026
 
