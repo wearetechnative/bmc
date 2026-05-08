@@ -1,11 +1,11 @@
 ---
 # bmc-7yo4
 title: fix-readme
-status: scrapped
+status: completed
 type: task
 priority: normal
 created_at: 2026-05-06T21:29:38Z
-updated_at: 2026-05-08T17:52:39Z
+updated_at: 2026-05-08T19:30:00Z
 ---
 
 The readme contains options that were available with shell version of bmc, like shellcompletion:
