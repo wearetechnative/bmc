@@ -40,9 +40,11 @@ func lockAndLoad(path string) (*lockedFile, error) {
 	if len(bytes.TrimSpace(content)) == 0 {
 		cfg = ini.Empty()
 	} else {
-		cfg, err = ini.Load(content)
+		cfg, err = ini.LoadSources(ini.LoadOptions{IgnoreInlineComment: true}, content)
 		if err != nil {
-			cfg = ini.Empty()
+			syscall.Flock(int(f.Fd()), syscall.LOCK_UN)
+			f.Close()
+			return nil, fmt.Errorf("failed to parse %s: %w", path, err)
 		}
 	}
 

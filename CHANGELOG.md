@@ -7,6 +7,8 @@
 - **`bmc console -p` forces profile selection**: Running `bmc console -p` without a profile name opens the interactive profile selector, even when `AWS_PROFILE` is already set in the environment.
 
 ### Fixed
+- **MFA credentials write**: `aws_security_token` (legacy alias used by aws-mfa and older AWS SDKs) is now kept in sync with `aws_session_token` when refreshing a session. Previously the stale alias caused authentication failures for tools reading the old key name.
+- **MFA credentials file safety**: Credentials file parser now uses consistent options (`IgnoreInlineComment`) in both read and write paths, and returns an error instead of silently discarding all credentials when the file cannot be parsed.
 - **MFA check on pre-set profile**: When `AWS_PROFILE` is already set in the environment, `bmc` now validates and refreshes the MFA session before executing any AWS operation. Previously this was skipped, causing `InvalidClientTokenId` errors when the session expired.
 
 ### Changed

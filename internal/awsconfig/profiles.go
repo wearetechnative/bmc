@@ -186,6 +186,7 @@ func WriteSessionCredentials(profileName, accessKeyID, secretKey, sessionToken, 
 	mustSet(sec, "aws_access_key_id", accessKeyID)
 	mustSet(sec, "aws_secret_access_key", secretKey)
 	mustSet(sec, "aws_session_token", sessionToken)
+	mustSet(sec, "aws_security_token", sessionToken) // legacy alias used by aws-mfa and older SDKs
 	mustSet(sec, "expiration", expiration)
 
 	return f.save(credPath)
