@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.4.0] - 13 May 2026
+
 ### Breaking Changes
 - **`mfa.clipboard_command` renamed to `mfa.copy_command`**: Update your `~/.config/bmc/config.json` — the old field name is silently ignored
 
