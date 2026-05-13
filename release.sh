@@ -81,7 +81,7 @@ grep -q "^## NEXT VERSION" CHANGELOG.md \
   || die "CHANGELOG.md has no '## NEXT VERSION' section — add your entries first"
 
 RELEASE_DATE="$(date '+%d %b %Y')"
-sed -i "0,/^## NEXT VERSION/s/^## NEXT VERSION/## [$NEW_VERSION] - $RELEASE_DATE/" CHANGELOG.md
+sed -i "0,/^## NEXT VERSION/s/^## NEXT VERSION/## NEXT VERSION\n\n## [$NEW_VERSION] - $RELEASE_DATE/" CHANGELOG.md
 green "  CHANGELOG.md: ## [$NEW_VERSION] - $RELEASE_DATE"
 
 # ── update VERSION-bmc ─────────────────────────────────────────────────────────
