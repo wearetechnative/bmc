@@ -1,11 +1,12 @@
 ---
 # bmc-n5k1
 title: ec2ls-context-menu
-status: todo
+status: completed
+openspec-link: openspec/changes/archive/2026-05-13-ec2-unified-command/proposal.md
 type: task
 priority: normal
 created_at: 2026-05-08T20:00:00Z
-updated_at: 2026-05-13T08:11:54Z
+updated_at: 2026-05-13T12:30:00Z
 ---
 
 Add an action context menu to `bmc ec2ls` so users can act on a selected EC2 instance directly from the list.

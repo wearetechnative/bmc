@@ -2,6 +2,12 @@
 
 ## NEXT VERSION
 
+### Added
+- **`bmc ec2` unified command**: Select an EC2 instance and immediately act on it — no need to repeat instance selection across separate commands
+  - Optional positional search argument: `bmc ec2 nginx` filters by name, ID, private IP, or public IP (case-insensitive); single match skips the picker entirely
+  - Action menu after selection: **Connect SSH**, **Connect SSM**, **Start instance** / **Stop instance** (label adapts to current state), **Toggle scheduler**
+  - All actions reuse the same logic as `ec2connect`, `ec2stopstart`, and `ec2scheduler` — existing commands are unchanged
+
 ## [0.4.0] - 13 May 2026
 
 ### Breaking Changes
