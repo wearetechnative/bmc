@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.5.1] - 13 May 2026
+
 ### Added
 - **Documentation site**: Full documentation available at [bmc.technative.cloud](https://bmc.technative.cloud) — Hugo site with TechNative branding, multi-page navigation covering installation, setup, commands, and advanced topics
   - Automatically deployed via GitHub Actions on every push to `main`
