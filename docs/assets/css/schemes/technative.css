@@ -1,5 +1,5 @@
 /* TechNative color scheme for Congo */
-/* Primary: #D4921A (gold) — links, buttons, accents */
+/* Primary: #ebb55e (orange-gold) — links, buttons, accents */
 /* Secondary: #1C3D52 (navy) — neutral-800 is main dark background */
 
 :root {
@@ -22,18 +22,18 @@
   --color-neutral-900:  19,  42,  57;   /* darker navy — deep backgrounds */
   --color-neutral-950:  10,  24,  33;   /* darkest navy */
 
-  /* Primary: gold (#D4921A) — links, buttons, accents */
-  --color-primary-50:  254, 248, 235;
-  --color-primary-100: 252, 236, 195;
-  --color-primary-200: 248, 215, 140;
-  --color-primary-300: 242, 188,  80;
-  --color-primary-400: 234, 163,  40;
-  --color-primary-500: 212, 146,  26;   /* #D4921A */
-  --color-primary-600: 179, 120,  15;
-  --color-primary-700: 143,  94,  10;
-  --color-primary-800: 107,  69,   8;
-  --color-primary-900:  72,  46,   5;
-  --color-primary-950:  36,  23,   3;
+  /* Primary: orange-gold (#ebb55e) — links, buttons, accents */
+  --color-primary-50:  254, 250, 240;
+  --color-primary-100: 253, 243, 218;
+  --color-primary-200: 250, 229, 179;
+  --color-primary-300: 245, 210, 135;
+  --color-primary-400: 235, 181,  94;   /* #ebb55e */
+  --color-primary-500: 214, 155,  62;
+  --color-primary-600: 179, 124,  38;
+  --color-primary-700: 141,  94,  22;
+  --color-primary-800: 104,  68,  12;
+  --color-primary-900:  68,  44,   5;
+  --color-primary-950:  35,  22,   2;
 
   /* Secondary: navy (#1C3D52) */
   --color-secondary-50:  235, 242, 246;
