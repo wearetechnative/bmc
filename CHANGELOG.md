@@ -2,6 +2,12 @@
 
 ## NEXT VERSION
 
+### Added
+- **Documentation site**: Full documentation available at [bmc.technative.cloud](https://bmc.technative.cloud) — Hugo site with TechNative branding, multi-page navigation covering installation, setup, commands, and advanced topics
+  - Automatically deployed via GitHub Actions on every push to `main`
+  - Hosted on GitHub Pages at `bmc.technative.cloud`
+- **Shortened README**: README now links to the docs site as the primary reference
+
 ## [0.5.0] - 13 May 2026
 
 ### Added

@@ -1,0 +1,28 @@
+/* TechNative color scheme for Congo */
+/* Primary: #1C3D52 (dark navy), Accent: #D4921A (gold) */
+
+:root {
+  --color-primary-50:  #e8eef2;
+  --color-primary-100: #c5d6e1;
+  --color-primary-200: #9ebccd;
+  --color-primary-300: #77a1b8;
+  --color-primary-400: #578daa;
+  --color-primary-500: #37799c;
+  --color-primary-600: #2d6180;
+  --color-primary-700: #1c3d52;
+  --color-primary-800: #152e3e;
+  --color-primary-900: #0d1e29;
+}
+
+.dark {
+  --color-primary-50:  #0d1e29;
+  --color-primary-100: #152e3e;
+  --color-primary-200: #1c3d52;
+  --color-primary-300: #2d6180;
+  --color-primary-400: #37799c;
+  --color-primary-500: #578daa;
+  --color-primary-600: #77a1b8;
+  --color-primary-700: #9ebccd;
+  --color-primary-800: #c5d6e1;
+  --color-primary-900: #e8eef2;
+}

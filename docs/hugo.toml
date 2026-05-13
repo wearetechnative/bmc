@@ -1,0 +1,80 @@
+baseURL = "https://bmc.technative.cloud/"
+languageCode = "en"
+title = "BMC"
+theme = "github.com/jpanther/congo/v2"
+
+[module]
+  [[module.imports]]
+    path = "github.com/jpanther/congo/v2"
+
+[params]
+  colorScheme = "technative"
+  description = "BMC (Bill McCloud) — TechNative AWS/Terraform DevOps tools"
+  defaultAppearance = "dark"
+  autoSwitchAppearance = true
+  enableSearch = true
+  enableCodeCopy = true
+  showScrollToTop = true
+  showReadingTime = false
+
+[params.author]
+  name = "TechNative"
+
+[params.header]
+  layout = "basic"
+  logo = "logo.png"
+  logoDark = "logo.png"
+  showTitle = true
+
+[params.footer]
+  showCopyright = true
+  showThemeAttribution = false
+  showAppearanceSwitcher = true
+  showScrollToTop = true
+
+[params.homepage]
+  layout = "page"
+  showRecent = false
+
+[params.article]
+  showDate = false
+  showAuthor = false
+  showReadingTime = false
+  showEdit = false
+  showHeadingAnchors = true
+  showTableOfContents = true
+  showBreadcrumbs = true
+
+[params.list]
+  showBreadcrumbs = true
+  showSummary = true
+  groupByYear = false
+
+[taxonomies]
+  tag = "tags"
+
+[menu]
+  [[menu.main]]
+    name = "Installation"
+    pageRef = "installation"
+    weight = 10
+  [[menu.main]]
+    name = "Setup"
+    pageRef = "setup"
+    weight = 20
+  [[menu.main]]
+    name = "Commands"
+    pageRef = "commands"
+    weight = 30
+  [[menu.main]]
+    name = "Advanced"
+    pageRef = "advanced"
+    weight = 40
+  [[menu.main]]
+    name = "GitHub"
+    url = "https://github.com/wearetechnative/bmc"
+    weight = 50
+    [menu.main.params]
+      icon = "github"
+      showName = false
+      target = "_blank"
