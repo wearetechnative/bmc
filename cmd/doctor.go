@@ -54,7 +54,7 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 	allOK = doctorCheck("MFA enabled", checkMFAEnabled(cfg)) && allOK
 	if cfg.MFA.Enabled {
 		allOK = doctorCheck("totp_script configured", checkTOTPScript(cfg)) && allOK
-		allOK = doctorCheck("clipboard_command", checkClipboard(cfg)) && allOK
+		allOK = doctorCheck("copy_command", checkClipboard(cfg)) && allOK
 	}
 
 	fmt.Println()
@@ -163,12 +163,12 @@ func checkTOTPScript(cfg config.Config) string {
 }
 
 func checkClipboard(cfg config.Config) string {
-	if cfg.MFA.ClipboardCommand == "" {
-		return "clipboard_command not configured (optional)"
+	if cfg.MFA.CopyCommand == "" {
+		return "copy_command not configured (optional)"
 	}
-	path := prereqs.FindPath(strings.Fields(cfg.MFA.ClipboardCommand)[0])
+	path := prereqs.FindPath(strings.Fields(cfg.MFA.CopyCommand)[0])
 	if path == "" {
-		return "clipboard_command binary not found: " + cfg.MFA.ClipboardCommand + "\n" +
+		return "copy_command binary not found: " + cfg.MFA.CopyCommand + "\n" +
 			"Install: sudo apt install xclip  (clipboard copy will be skipped)"
 	}
 	return ""

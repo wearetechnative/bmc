@@ -1,12 +1,11 @@
 ---
 # bmc-q3f7
 title: filter-select-lists
-status: todo
+status: scrapped
 type: task
 priority: normal
 created_at: 2026-05-08T20:00:00Z
-updated_at: 2026-05-08T20:00:00Z
-github-issue: https://github.com/wearetechnative/bmc/issues/42
+updated_at: 2026-05-13T07:17:36Z
 ---
 
 Add filtering/search to all interactive TUI select lists in bmc.
