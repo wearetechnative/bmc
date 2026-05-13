@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.5.0] - 13 May 2026
+
 ### Added
 - **JSON output for `ec2ls` and `ec2find`**: Pass `--json` to get a machine-readable JSON array instead of a table — useful for scripting and piping into `jq`
   - `bmc ec2ls --json` outputs all instances; all fields always included regardless of `ec2.columns` config
