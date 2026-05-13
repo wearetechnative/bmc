@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>BMC</title><link>https://bmc.technative.cloud/</link><description>Recent content on BMC</description><generator>Hugo</generator><language>en</language><atom:link href="https://bmc.technative.cloud/index.xml" rel="self" type="application/rss+xml"/><item><title>Chrome Profiles</title><link>https://bmc.technative.cloud/advanced/chrome-profiles/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/advanced/chrome-profiles/</guid><description>&lt;p>BMC can open the AWS console in a dedicated, isolated Chrome profile per AWS account. Each profile has its own cookies and session — no cross-account contamination.&lt;/p>
+&lt;h2 id="enable" class="relative group">Enable &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#enable" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;console&amp;#34;&lt;/span>: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_profiles&amp;#34;&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_binary&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;google-chrome&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>For Brave or Chromium:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;console&amp;#34;&lt;/span>: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_profiles&amp;#34;&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_binary&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;brave-browser&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="how-it-works" class="relative group">How it works &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#how-it-works" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>On first use for a profile, BMC:&lt;/p></description></item><item><title>profsel</title><link>https://bmc.technative.cloud/commands/profsel/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/profsel/</guid><description>&lt;p>&lt;code>bmc profsel&lt;/code> interactively selects an AWS profile and exports it as &lt;code>AWS_PROFILE&lt;/code> in your current shell.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc profsel &lt;span style="color:#75715e"># Interactive profile selection&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc profsel -p myprofile &lt;span style="color:#75715e"># Pre-select a profile by name&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc profsel -l &lt;span style="color:#75715e"># List all profiles in tabular format&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc profsel --json &lt;span style="color:#75715e"># Output selected profile as JSON&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="shell-integration-required" class="relative group">Shell integration required &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#shell-integration-required" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>&lt;code>bmc profsel&lt;/code> must be invoked through the shell wrapper for &lt;code>AWS_PROFILE&lt;/code> to be set in your current shell. Install it once with:&lt;/p></description></item><item><title>Shell Integration</title><link>https://bmc.technative.cloud/setup/shell-integration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/setup/shell-integration/</guid><description>&lt;p>Shell integration is required for &lt;code>bmc profsel&lt;/code> to set &lt;code>AWS_PROFILE&lt;/code> in your current shell session.&lt;/p>
+&lt;h2 id="install" class="relative group">Install &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#install" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc install-shell-integration
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This installs a shell wrapper function:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>zsh / bash&lt;/strong>: appends to &lt;code>~/.zshrc&lt;/code> or &lt;code>~/.bashrc&lt;/code>&lt;/li>
+&lt;li>&lt;strong>Fish&lt;/strong>: writes &lt;code>~/.config/fish/functions/bmc.fish&lt;/code> (auto-loaded, no restart needed)&lt;/li>
+&lt;li>&lt;strong>NixOS + Fish&lt;/strong>: prints a &lt;code>programs.fish.functions&lt;/code> snippet instead of writing files&lt;/li>
+&lt;/ul>
+&lt;p>After installation, restart your shell or source the config file.&lt;/p></description></item><item><title>Configuration</title><link>https://bmc.technative.cloud/setup/configuration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/setup/configuration/</guid><description>&lt;p>BMC is configured via &lt;code>~/.config/bmc/config.json&lt;/code>.&lt;/p>
+&lt;h2 id="example" class="relative group">Example &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#example" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;mfa&amp;#34;&lt;/span>: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;enabled&amp;#34;&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;totp_script&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;/usr/bin/rbw get my-aws-mfa-entry --field totp&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;copy_command&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;wl-copy&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;paste_command&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;wl-paste | wtype -&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> },
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;ec2&amp;#34;&lt;/span>: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;auto_start_stopped&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;prompt&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;columns&amp;#34;&lt;/span>: [&lt;span style="color:#e6db74">&amp;#34;InstanceId&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;Name&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;PrivateIP&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;PublicIP&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;State&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;Hibernate&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;Scheduler&amp;#34;&lt;/span>]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> },
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;console&amp;#34;&lt;/span>: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;firefox_containers&amp;#34;&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="reference" class="relative group">Reference &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#reference" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>Key&lt;/th>
+ &lt;th>Type&lt;/th>
+ &lt;th>Default&lt;/th>
+ &lt;th>Description&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>mfa.enabled&lt;/code>&lt;/td>
+ &lt;td>bool&lt;/td>
+ &lt;td>&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Enable MFA session management&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>mfa.totp_script&lt;/code>&lt;/td>
+ &lt;td>string&lt;/td>
+ &lt;td>&lt;code>&amp;quot;&amp;quot;&lt;/code>&lt;/td>
+ &lt;td>Shell command to generate a 6-digit TOTP code&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>mfa.copy_command&lt;/code>&lt;/td>
+ &lt;td>string&lt;/td>
+ &lt;td>&lt;code>&amp;quot;&amp;quot;&lt;/code>&lt;/td>
+ &lt;td>Command to copy TOTP to clipboard (receives code via stdin)&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>mfa.paste_command&lt;/code>&lt;/td>
+ &lt;td>string&lt;/td>
+ &lt;td>&lt;code>&amp;quot;&amp;quot;&lt;/code>&lt;/td>
+ &lt;td>Command to simulate paste keystroke 300ms after copy&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ec2.auto_start_stopped&lt;/code>&lt;/td>
+ &lt;td>string&lt;/td>
+ &lt;td>&lt;code>&amp;quot;prompt&amp;quot;&lt;/code>&lt;/td>
+ &lt;td>&lt;code>always&lt;/code> / &lt;code>never&lt;/code> / &lt;code>prompt&lt;/code> — what to do when connecting to a stopped instance&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>ec2.columns&lt;/code>&lt;/td>
+ &lt;td>[]string&lt;/td>
+ &lt;td>all columns&lt;/td>
+ &lt;td>Columns to show in EC2 tables, in order&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>console.firefox_containers&lt;/code>&lt;/td>
+ &lt;td>bool&lt;/td>
+ &lt;td>&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Open AWS console in Firefox container tabs via the &lt;a href="https://addons.mozilla.org/en-US/firefox/addon/granted/" target="_blank" rel="noreferrer">Granted&lt;/a> extension&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>console.chrome_profiles&lt;/code>&lt;/td>
+ &lt;td>bool&lt;/td>
+ &lt;td>&lt;code>false&lt;/code>&lt;/td>
+ &lt;td>Open AWS console in isolated Chrome profiles per AWS account&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>console.chrome_binary&lt;/code>&lt;/td>
+ &lt;td>string&lt;/td>
+ &lt;td>&lt;code>&amp;quot;google-chrome&amp;quot;&lt;/code>&lt;/td>
+ &lt;td>Chrome binary to use (&lt;code>&amp;quot;chromium&amp;quot;&lt;/code>, &lt;code>&amp;quot;brave-browser&amp;quot;&lt;/code>, etc.)&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="ec2-columns" class="relative group">EC2 columns &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#ec2-columns" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>The &lt;code>ec2.columns&lt;/code> field controls which columns appear in EC2 instance tables and in what order. Available values:&lt;/p></description></item><item><title>console</title><link>https://bmc.technative.cloud/commands/console/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/console/</guid><description>&lt;p>&lt;code>bmc console&lt;/code> opens the AWS Management Console in your browser for the current or selected AWS profile.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc console &lt;span style="color:#75715e"># Open console for current profile (AWS_PROFILE)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc console -p myprofile &lt;span style="color:#75715e"># Open console for a specific profile&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc console -p &lt;span style="color:#75715e"># Force interactive profile selection&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc console -s ec2 &lt;span style="color:#75715e"># Open console at a specific service URL&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="browser-options" class="relative group">Browser options &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#browser-options" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;h3 id="firefox-containers-with-granted-recommended" class="relative group">Firefox containers with Granted (recommended) &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#firefox-containers-with-granted-recommended" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h3>&lt;p>The &lt;a href="https://addons.mozilla.org/en-US/firefox/addon/granted/" target="_blank" rel="noreferrer">Granted&lt;/a> Firefox extension enables container tabs — each AWS profile opens in its own isolated container with separate cookies and sessions.&lt;/p></description></item><item><title>NixOS / home-manager</title><link>https://bmc.technative.cloud/advanced/nixos-home-manager/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/advanced/nixos-home-manager/</guid><description>&lt;h2 id="installing-bmc" class="relative group">Installing BMC &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#installing-bmc" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;h3 id="nixos-configurationnix" class="relative group">NixOS (configuration.nix) &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#nixos-configurationnix" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-nix" data-lang="nix">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> inputs&lt;span style="color:#f92672">.&lt;/span>bmc&lt;span style="color:#f92672">.&lt;/span>url &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;github:wearetechnative/bmc&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> outputs &lt;span style="color:#f92672">=&lt;/span> { nixpkgs&lt;span style="color:#f92672">,&lt;/span> bmc&lt;span style="color:#f92672">,&lt;/span> &lt;span style="color:#f92672">...&lt;/span> }: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> nixosConfigurations&lt;span style="color:#f92672">.&lt;/span>myhost &lt;span style="color:#f92672">=&lt;/span> nixpkgs&lt;span style="color:#f92672">.&lt;/span>lib&lt;span style="color:#f92672">.&lt;/span>nixosSystem {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> modules &lt;span style="color:#f92672">=&lt;/span> [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> environment&lt;span style="color:#f92672">.&lt;/span>systemPackages &lt;span style="color:#f92672">=&lt;/span> [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> bmc&lt;span style="color:#f92672">.&lt;/span>packages&lt;span style="color:#f92672">.&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>system&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#f92672">.&lt;/span>bmc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> };
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> };
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="home-manager" class="relative group">home-manager &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#home-manager" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-nix" data-lang="nix">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> inputs&lt;span style="color:#f92672">.&lt;/span>bmc&lt;span style="color:#f92672">.&lt;/span>url &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;github:wearetechnative/bmc&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> home&lt;span style="color:#f92672">.&lt;/span>packages &lt;span style="color:#f92672">=&lt;/span> [ inputs&lt;span style="color:#f92672">.&lt;/span>bmc&lt;span style="color:#f92672">.&lt;/span>packages&lt;span style="color:#f92672">.&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>system&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#f92672">.&lt;/span>bmc ];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="shell-integration-with-home-manager" class="relative group">Shell integration with home-manager &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#shell-integration-with-home-manager" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>&lt;code>bmc install-shell-integration&lt;/code> prints snippets instead of writing files when it detects a managed shell config. Add them manually:&lt;/p></description></item><item><title>ec2</title><link>https://bmc.technative.cloud/commands/ec2/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/ec2/</guid><description>&lt;p>&lt;code>bmc ec2&lt;/code> is the unified entry point for EC2 operations. Pick an instance once and choose an action from a menu — no need to repeat instance selection across separate commands.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc ec2 &lt;span style="color:#75715e"># Interactive instance picker → action menu&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc ec2 nginx &lt;span style="color:#75715e"># Filter instances by name/ID/IP first&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc ec2 i-0abc123 &lt;span style="color:#75715e"># Single match skips the picker&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The optional search argument filters instances by a case-insensitive substring match on instance name, ID, private IP, or public IP.&lt;/p></description></item><item><title>MFA</title><link>https://bmc.technative.cloud/setup/mfa/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/setup/mfa/</guid><description>&lt;p>BMC handles MFA automatically. When you run &lt;code>bmc profsel&lt;/code> or &lt;code>bmc console&lt;/code>, BMC checks if your session credentials are still valid and refreshes them if needed — no separate command required.&lt;/p>
+&lt;h2 id="requirements" class="relative group">Requirements &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#requirements" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;ol>
+&lt;li>Set &lt;code>mfa.enabled = true&lt;/code> in &lt;code>~/.config/bmc/config.json&lt;/code>&lt;/li>
+&lt;li>Add a &lt;code>[profile-long-term]&lt;/code> section to &lt;code>~/.aws/credentials&lt;/code>:&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ini" data-lang="ini">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">[technative-long-term]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">aws_access_key_id&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">AKIA...&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">aws_secret_access_key&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">aws_mfa_device&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">arn:aws:iam::123456789012:mfa/your-username&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>When the session expires, BMC prompts for a 6-digit TOTP code. If &lt;code>totp_script&lt;/code> is configured, BMC runs it automatically to fetch the code.&lt;/p></description></item><item><title>Migration from bash version</title><link>https://bmc.technative.cloud/advanced/migration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/advanced/migration/</guid><description>&lt;p>If you were using the previous bash-based version of BMC, here is what changed and how to migrate.&lt;/p>
+&lt;h2 id="steps" class="relative group">Steps &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#steps" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;ol>
+&lt;li>Install the new binary (same name: &lt;code>bmc&lt;/code>)&lt;/li>
+&lt;li>Run &lt;code>bmc install-shell-integration&lt;/code> — replaces the &lt;code>source bmc profsel&lt;/code> pattern&lt;/li>
+&lt;li>Create &lt;code>~/.config/bmc/config.json&lt;/code> — replaces &lt;code>~/.config/bmc/config.env&lt;/code>&lt;/li>
+&lt;li>Run &lt;code>bmc doctor&lt;/code> to verify setup&lt;/li>
+&lt;/ol>
+&lt;h2 id="breaking-changes" class="relative group">Breaking changes &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#breaking-changes" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>Old&lt;/th>
+ &lt;th>New&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>source bmc profsel&lt;/code>&lt;/td>
+ &lt;td>&lt;code>eval &amp;quot;$(bmc profsel)&amp;quot;&lt;/code> — handled automatically by the shell wrapper&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>~/.config/bmc/config.env&lt;/code>&lt;/td>
+ &lt;td>&lt;code>~/.config/bmc/config.json&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>bmc gencompletions&lt;/code>&lt;/td>
+ &lt;td>&lt;code>bmc completion bash|zsh&lt;/code> (Cobra built-in)&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="config-migration" class="relative group">Config migration &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#config-migration" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>Old &lt;code>config.env&lt;/code>:&lt;/p></description></item><item><title>ec2ls</title><link>https://bmc.technative.cloud/commands/ec2ls/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/ec2ls/</guid><description>&lt;p>&lt;code>bmc ec2ls&lt;/code> lists all EC2 instances in the current AWS profile.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc ec2ls &lt;span style="color:#75715e"># Display as interactive table&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc ec2ls --json &lt;span style="color:#75715e"># Output as JSON array&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="table-output" class="relative group">Table output &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#table-output" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>The table columns are configurable via &lt;code>ec2.columns&lt;/code> in &lt;code>~/.config/bmc/config.json&lt;/code>. See 
+ 
+ &lt;a href="https://bmc.technative.cloud/setup/configuration/#ec2-columns">Configuration&lt;/a>.&lt;/p>
+&lt;h2 id="json-output" class="relative group">JSON output &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#json-output" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>&lt;code>--json&lt;/code> outputs all instances as a JSON array with AWS PascalCase keys, ignoring the &lt;code>columns&lt;/code> config:&lt;/p></description></item><item><title>ec2connect</title><link>https://bmc.technative.cloud/commands/ec2connect/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/ec2connect/</guid><description>&lt;p>&lt;code>bmc ec2connect&lt;/code> connects to a running EC2 instance via SSH or AWS SSM Session Manager.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc ec2connect &lt;span style="color:#75715e"># Interactive instance picker&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc ec2connect nginx &lt;span style="color:#75715e"># Filter instances by name/ID/IP first&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc ec2connect -i i-0abc123 &lt;span style="color:#75715e"># Connect to a specific instance ID&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc ec2connect -u ubuntu &lt;span style="color:#75715e"># SSH as a specific user (skips method picker)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="connection-methods" class="relative group">Connection methods &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#connection-methods" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;h3 id="ssh" class="relative group">SSH &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#ssh" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h3>&lt;p>Requires &lt;code>ssh&lt;/code> on your PATH. BMC prompts for the SSH user (root, ubuntu, ec2-user, or custom) unless &lt;code>-u&lt;/code> is specified.&lt;/p></description></item><item><title>ec2find</title><link>https://bmc.technative.cloud/commands/ec2find/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/ec2find/</guid><description>&lt;p>&lt;code>bmc ec2find&lt;/code> searches for EC2 instances across all AWS profiles in an account group simultaneously.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc ec2find nginx &lt;span style="color:#75715e"># Search across profiles (select group interactively)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>bmc ec2find nginx --json &lt;span style="color:#75715e"># Same search, output as JSON array&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="how-it-works" class="relative group">How it works &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#how-it-works" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;ol>
+&lt;li>You select an AWS account group from an interactive picker&lt;/li>
+&lt;li>BMC queries all profiles in that group in parallel&lt;/li>
+&lt;li>Results matching your search string are shown&lt;/li>
+&lt;/ol>
+&lt;p>The search is a case-insensitive substring match on: instance ID, name, private IP, public IP, and profile name.&lt;/p></description></item><item><title>ec2stopstart</title><link>https://bmc.technative.cloud/commands/ec2stopstart/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/ec2stopstart/</guid><description>&lt;p>&lt;code>bmc ec2stopstart&lt;/code> stops or starts an EC2 instance interactively.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc ec2stopstart &lt;span style="color:#75715e"># Pick instance → stop or start&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>BMC shows the current state of the selected instance and offers the appropriate action (Stop or Start). For hibernate-enabled instances, Stop also offers a hibernate option.&lt;/p>
+&lt;h2 id="stopping-with-hibernate" class="relative group">Stopping with hibernate &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#stopping-with-hibernate" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>If an instance has hibernation configured (&lt;code>Hibernate: yes&lt;/code> in &lt;code>ec2ls&lt;/code>), BMC will ask whether to hibernate instead of a cold stop. Hibernation saves RAM to disk and resumes faster.&lt;/p></description></item><item><title>ec2scheduler</title><link>https://bmc.technative.cloud/commands/ec2scheduler/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/ec2scheduler/</guid><description>&lt;p>&lt;code>bmc ec2scheduler&lt;/code> enables or disables the AWS Instance Scheduler tag on an EC2 instance.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc ec2scheduler &lt;span style="color:#75715e"># Pick instance → enable or disable scheduler&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="what-it-does" class="relative group">What it does &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#what-it-does" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>The command adds or removes the &lt;code>InstanceScheduler&lt;/code> tag on the selected instance. AWS Instance Scheduler uses this tag to automatically start and stop instances on a configured schedule — useful for saving costs on non-production environments.&lt;/p></description></item><item><title>ecsconnect</title><link>https://bmc.technative.cloud/commands/ecsconnect/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/commands/ecsconnect/</guid><description>&lt;p>&lt;code>bmc ecsconnect&lt;/code> opens an interactive shell into a running ECS container.&lt;/p>
+&lt;h2 id="usage" class="relative group">Usage &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#usage" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bmc ecsconnect &lt;span style="color:#75715e"># Interactive: pick cluster → service → task → container&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The command walks you through selecting:&lt;/p>
+&lt;ol>
+&lt;li>ECS cluster&lt;/li>
+&lt;li>Service&lt;/li>
+&lt;li>Task&lt;/li>
+&lt;li>Container&lt;/li>
+&lt;/ol>
+&lt;p>Then launches an interactive shell via AWS SSM.&lt;/p>
+&lt;h2 id="prerequisites" class="relative group">Prerequisites &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#prerequisites" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;ul>
+&lt;li>&lt;code>aws&lt;/code> CLI v2&lt;/li>
+&lt;li>&lt;code>session-manager-plugin&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Check with:&lt;/p></description></item></channel></rss>

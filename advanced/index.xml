@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Advanced on BMC</title><link>https://bmc.technative.cloud/advanced/</link><description>Recent content in Advanced on BMC</description><generator>Hugo</generator><language>en</language><atom:link href="https://bmc.technative.cloud/advanced/index.xml" rel="self" type="application/rss+xml"/><item><title>Chrome Profiles</title><link>https://bmc.technative.cloud/advanced/chrome-profiles/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/advanced/chrome-profiles/</guid><description>&lt;p>BMC can open the AWS console in a dedicated, isolated Chrome profile per AWS account. Each profile has its own cookies and session — no cross-account contamination.&lt;/p>
+&lt;h2 id="enable" class="relative group">Enable &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#enable" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;console&amp;#34;&lt;/span>: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_profiles&amp;#34;&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_binary&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;google-chrome&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>For Brave or Chromium:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;console&amp;#34;&lt;/span>: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_profiles&amp;#34;&lt;/span>: &lt;span style="color:#66d9ef">true&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">&amp;#34;chrome_binary&amp;#34;&lt;/span>: &lt;span style="color:#e6db74">&amp;#34;brave-browser&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="how-it-works" class="relative group">How it works &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#how-it-works" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>On first use for a profile, BMC:&lt;/p></description></item><item><title>NixOS / home-manager</title><link>https://bmc.technative.cloud/advanced/nixos-home-manager/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/advanced/nixos-home-manager/</guid><description>&lt;h2 id="installing-bmc" class="relative group">Installing BMC &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#installing-bmc" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;h3 id="nixos-configurationnix" class="relative group">NixOS (configuration.nix) &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#nixos-configurationnix" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-nix" data-lang="nix">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> inputs&lt;span style="color:#f92672">.&lt;/span>bmc&lt;span style="color:#f92672">.&lt;/span>url &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;github:wearetechnative/bmc&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> outputs &lt;span style="color:#f92672">=&lt;/span> { nixpkgs&lt;span style="color:#f92672">,&lt;/span> bmc&lt;span style="color:#f92672">,&lt;/span> &lt;span style="color:#f92672">...&lt;/span> }: {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> nixosConfigurations&lt;span style="color:#f92672">.&lt;/span>myhost &lt;span style="color:#f92672">=&lt;/span> nixpkgs&lt;span style="color:#f92672">.&lt;/span>lib&lt;span style="color:#f92672">.&lt;/span>nixosSystem {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> modules &lt;span style="color:#f92672">=&lt;/span> [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> environment&lt;span style="color:#f92672">.&lt;/span>systemPackages &lt;span style="color:#f92672">=&lt;/span> [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> bmc&lt;span style="color:#f92672">.&lt;/span>packages&lt;span style="color:#f92672">.&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>system&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#f92672">.&lt;/span>bmc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> };
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> };
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="home-manager" class="relative group">home-manager &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#home-manager" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-nix" data-lang="nix">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> inputs&lt;span style="color:#f92672">.&lt;/span>bmc&lt;span style="color:#f92672">.&lt;/span>url &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;github:wearetechnative/bmc&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> home&lt;span style="color:#f92672">.&lt;/span>packages &lt;span style="color:#f92672">=&lt;/span> [ inputs&lt;span style="color:#f92672">.&lt;/span>bmc&lt;span style="color:#f92672">.&lt;/span>packages&lt;span style="color:#f92672">.&lt;/span>&lt;span style="color:#e6db74">${&lt;/span>system&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#f92672">.&lt;/span>bmc ];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="shell-integration-with-home-manager" class="relative group">Shell integration with home-manager &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#shell-integration-with-home-manager" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>&lt;code>bmc install-shell-integration&lt;/code> prints snippets instead of writing files when it detects a managed shell config. Add them manually:&lt;/p></description></item><item><title>Migration from bash version</title><link>https://bmc.technative.cloud/advanced/migration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://bmc.technative.cloud/advanced/migration/</guid><description>&lt;p>If you were using the previous bash-based version of BMC, here is what changed and how to migrate.&lt;/p>
+&lt;h2 id="steps" class="relative group">Steps &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#steps" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;ol>
+&lt;li>Install the new binary (same name: &lt;code>bmc&lt;/code>)&lt;/li>
+&lt;li>Run &lt;code>bmc install-shell-integration&lt;/code> — replaces the &lt;code>source bmc profsel&lt;/code> pattern&lt;/li>
+&lt;li>Create &lt;code>~/.config/bmc/config.json&lt;/code> — replaces &lt;code>~/.config/bmc/config.env&lt;/code>&lt;/li>
+&lt;li>Run &lt;code>bmc doctor&lt;/code> to verify setup&lt;/li>
+&lt;/ol>
+&lt;h2 id="breaking-changes" class="relative group">Breaking changes &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#breaking-changes" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;table>
+ &lt;thead>
+ &lt;tr>
+ &lt;th>Old&lt;/th>
+ &lt;th>New&lt;/th>
+ &lt;/tr>
+ &lt;/thead>
+ &lt;tbody>
+ &lt;tr>
+ &lt;td>&lt;code>source bmc profsel&lt;/code>&lt;/td>
+ &lt;td>&lt;code>eval &amp;quot;$(bmc profsel)&amp;quot;&lt;/code> — handled automatically by the shell wrapper&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>~/.config/bmc/config.env&lt;/code>&lt;/td>
+ &lt;td>&lt;code>~/.config/bmc/config.json&lt;/code>&lt;/td>
+ &lt;/tr>
+ &lt;tr>
+ &lt;td>&lt;code>bmc gencompletions&lt;/code>&lt;/td>
+ &lt;td>&lt;code>bmc completion bash|zsh&lt;/code> (Cobra built-in)&lt;/td>
+ &lt;/tr>
+ &lt;/tbody>
+&lt;/table>
+&lt;h2 id="config-migration" class="relative group">Config migration &lt;span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100">&lt;a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#config-migration" aria-label="Anchor">#&lt;/a>&lt;/span>&lt;/h2>&lt;p>Old &lt;code>config.env&lt;/code>:&lt;/p></description></item></channel></rss>
