@@ -1,12 +1,13 @@
 ---
 # bmc-d4m6
 title: project-documentation
-status: in-progress
+status: completed
 type: task
 priority: normal
 created_at: 2026-05-08T20:00:00Z
-updated_at: 2026-05-13T13:00:00Z
+updated_at: 2026-05-13T14:30:00Z
 github-issue: https://github.com/wearetechnative/bmc/issues/9
+openspec-link: openspec/changes/archive/2026-05-13-docs-site/proposal.md
 ---
 
 Create a proper documentation website for bmc with subtle TN (TechNative) branding.
