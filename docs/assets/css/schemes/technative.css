@@ -1,28 +1,43 @@
 /* TechNative color scheme for Congo */
-/* Primary: #1C3D52 (dark navy), Accent: #D4921A (gold) */
+/* Primary: #1C3D52 (dark navy), Secondary: #D4921A (gold) */
 
 :root {
-  --color-primary-50:  #e8eef2;
-  --color-primary-100: #c5d6e1;
-  --color-primary-200: #9ebccd;
-  --color-primary-300: #77a1b8;
-  --color-primary-400: #578daa;
-  --color-primary-500: #37799c;
-  --color-primary-600: #2d6180;
-  --color-primary-700: #1c3d52;
-  --color-primary-800: #152e3e;
-  --color-primary-900: #0d1e29;
-}
+  --color-neutral: 255, 255, 255;
+  --color-neutral-50:  250, 250, 249;
+  --color-neutral-100: 245, 245, 244;
+  --color-neutral-200: 231, 229, 228;
+  --color-neutral-300: 214, 211, 209;
+  --color-neutral-400: 168, 162, 158;
+  --color-neutral-500: 120, 113, 108;
+  --color-neutral-600: 87,  83,  78;
+  --color-neutral-700: 68,  64,  60;
+  --color-neutral-800: 41,  37,  36;
+  --color-neutral-900: 28,  25,  23;
+  --color-neutral-950: 12,  10,   9;
 
-.dark {
-  --color-primary-50:  #0d1e29;
-  --color-primary-100: #152e3e;
-  --color-primary-200: #1c3d52;
-  --color-primary-300: #2d6180;
-  --color-primary-400: #37799c;
-  --color-primary-500: #578daa;
-  --color-primary-600: #77a1b8;
-  --color-primary-700: #9ebccd;
-  --color-primary-800: #c5d6e1;
-  --color-primary-900: #e8eef2;
+  /* Navy (#1C3D52) as primary */
+  --color-primary-50:  235, 242, 246;
+  --color-primary-100: 207, 224, 234;
+  --color-primary-200: 163, 196, 213;
+  --color-primary-300: 111, 160, 185;
+  --color-primary-400:  67, 126, 158;
+  --color-primary-500:  35,  94, 127;
+  --color-primary-600:  25,  72,  99;
+  --color-primary-700:  28,  61,  82;
+  --color-primary-800:  19,  42,  57;
+  --color-primary-900:  10,  24,  33;
+  --color-primary-950:   5,  12,  17;
+
+  /* Gold (#D4921A) as secondary */
+  --color-secondary-50:  254, 248, 235;
+  --color-secondary-100: 252, 236, 195;
+  --color-secondary-200: 248, 215, 140;
+  --color-secondary-300: 242, 188,  80;
+  --color-secondary-400: 234, 163,  40;
+  --color-secondary-500: 212, 146,  26;
+  --color-secondary-600: 179, 120,  15;
+  --color-secondary-700: 143,  94,  10;
+  --color-secondary-800: 107,  69,   8;
+  --color-secondary-900:  72,  46,   5;
+  --color-secondary-950:  36,  23,   3;
 }
