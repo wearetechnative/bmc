@@ -67,6 +67,34 @@ Add the wrapper manually using one of these methods:
   end
 `
 
+const fishWrapper = `# bmc shell integration — added by bmc install-shell-integration
+function bmc
+  if test "$argv[1]" = "profsel"
+    eval (command bmc profsel $argv)
+  else
+    command bmc $argv
+  end
+end
+`
+
+const fishManualNixOS = `NixOS detected: bmc cannot write to Fish configuration files directly.
+
+Add the wrapper using home-manager in your home.nix:
+
+── home-manager fish (home.nix) ─────────────────────────────
+  programs.fish.functions = {
+    bmc = {
+      body = ''
+        if test "$argv[1]" = "profsel"
+          eval (command bmc profsel $argv)
+        else
+          command bmc $argv
+        end
+      '';
+    };
+  };
+`
+
 var installShellCmd = &cobra.Command{
 	Use:   "install-shell-integration",
 	Short: "Install the profsel shell wrapper into your shell rc file",
@@ -75,6 +103,11 @@ var installShellCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(installShellCmd)
+}
+
+func isNixOS() bool {
+	_, err := os.Stat("/etc/nixos")
+	return err == nil
 }
 
 func runInstallShell(cmd *cobra.Command, args []string) error {
@@ -86,6 +119,25 @@ func runInstallShell(cmd *cobra.Command, args []string) error {
 		rcFile = filepath.Join(os.Getenv("HOME"), ".zshrc")
 	case strings.HasSuffix(shell, "bash"):
 		rcFile = filepath.Join(os.Getenv("HOME"), ".bashrc")
+	case strings.HasSuffix(shell, "fish"):
+		if isNixOS() {
+			fmt.Print(fishManualNixOS)
+			return nil
+		}
+		fishFuncDir := filepath.Join(os.Getenv("HOME"), ".config", "fish", "functions")
+		fishFuncFile := filepath.Join(fishFuncDir, "bmc.fish")
+		if _, err := os.Stat(fishFuncFile); err == nil {
+			fmt.Printf("Shell integration already installed in %s\n", fishFuncFile)
+			return nil
+		}
+		if err := os.MkdirAll(fishFuncDir, 0755); err != nil {
+			return fmt.Errorf("failed to create Fish functions directory: %w", err)
+		}
+		if err := os.WriteFile(fishFuncFile, []byte(fishWrapper), 0644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", fishFuncFile, err)
+		}
+		fmt.Printf("Shell integration installed in %s\n", fishFuncFile)
+		return nil
 	default:
 		fmt.Printf("Unsupported shell: %s\n", shell)
 		fmt.Printf("Add the following to your shell rc file manually:\n%s", shellWrapper)

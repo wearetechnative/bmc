@@ -1,11 +1,12 @@
 ---
 # bmc-p8w2
 title: fish-support
-status: todo
+status: completed
+openspec-link: openspec/changes/archive/2026-05-13-fish-shell-support/proposal.md
 type: task
 priority: normal
 created_at: 2026-05-08T20:00:00Z
-updated_at: 2026-05-08T20:00:00Z
+updated_at: 2026-05-13T10:00:00Z
 github-issue: https://github.com/wearetechnative/bmc/issues/41
 ---
 

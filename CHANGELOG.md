@@ -1,5 +1,18 @@
 # BMC Changelog
 
+## NEXT VERSION
+
+### Added
+- **Fish shell support**: `bmc install-shell-integration` now supports Fish shell
+  - Writes a wrapper function to `~/.config/fish/functions/bmc.fish` (auto-loaded, no restart needed)
+  - On NixOS: skips auto-install and prints a `programs.fish.functions` home-manager snippet instead
+  - Already-installed check via file existence
+- **ec2connect filter by name**: `bmc ec2connect <search>` filters instances before selection using a case-insensitive substring match on instance name, ID, private IP, and public IP
+  - Single match: connects immediately without showing a picker
+  - Multiple matches: shows the interactive picker with only the matching instances
+  - No matches: returns a clear error
+  - `-i <id>` flag still takes precedence (with a warning if a search arg is also given)
+
 ## [0.3.0] - 08 May 2026
 
 ### Breaking Changes

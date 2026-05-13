@@ -42,7 +42,11 @@ Download from [GitHub Releases](https://github.com/wearetechnative/bmc/releases)
 bmc install-shell-integration
 ```
 
-This installs a shell wrapper in `~/.zshrc` or `~/.bashrc` that allows `bmc profsel` to set `AWS_PROFILE` in your current shell.
+This installs a shell wrapper that allows `bmc profsel` to set `AWS_PROFILE` in your current shell.
+
+- **zsh / bash**: appends to `~/.zshrc` or `~/.bashrc`
+- **Fish**: writes `~/.config/fish/functions/bmc.fish` (auto-loaded, no restart needed)
+- **NixOS + Fish**: prints a `programs.fish.functions` home-manager snippet instead of writing files
 
 #### NixOS / home-manager
 
@@ -61,7 +65,7 @@ programs.zsh.initContent = ''
 '';
 ```
 
-**Fish shell (`~/.config/fish/config.fish`)**
+**Fish shell (`~/.config/fish/functions/bmc.fish`)**
 ```fish
 function bmc
   if test "$argv[1]" = "profsel"

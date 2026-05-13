@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -18,8 +19,9 @@ var (
 )
 
 var ec2connectCmd = &cobra.Command{
-	Use:   "ec2connect",
+	Use:   "ec2connect [search]",
 	Short: "Connect to a running EC2 instance",
+	Args:  cobra.MaximumNArgs(1),
 	RunE:  runEC2Connect,
 }
 
@@ -47,13 +49,41 @@ func runEC2Connect(cmd *cobra.Command, args []string) error {
 
 	// Select instance
 	instanceID := ec2connectInstanceID
+	if instanceID != "" && len(args) > 0 {
+		fmt.Fprintf(os.Stderr, "Warning: positional argument %q ignored because -i flag is set\n", args[0])
+	}
 	if instanceID == "" {
-		instanceID, err = selectInstanceID(instances, cfg.EC2.Columns)
-		if err != nil {
-			return err
-		}
-		if instanceID == "" {
-			return nil
+		if len(args) > 0 {
+			fragment := strings.ToLower(args[0])
+			var filtered []awsops.Instance
+			for _, inst := range instances {
+				combined := strings.ToLower(inst.InstanceID + inst.Name + inst.PrivateIP + inst.PublicIP)
+				if strings.Contains(combined, fragment) {
+					filtered = append(filtered, inst)
+				}
+			}
+			switch len(filtered) {
+			case 0:
+				return fmt.Errorf("no instances found matching %q", args[0])
+			case 1:
+				instanceID = filtered[0].InstanceID
+			default:
+				instanceID, err = selectInstanceID(filtered, cfg.EC2.Columns)
+				if err != nil {
+					return err
+				}
+				if instanceID == "" {
+					return nil
+				}
+			}
+		} else {
+			instanceID, err = selectInstanceID(instances, cfg.EC2.Columns)
+			if err != nil {
+				return err
+			}
+			if instanceID == "" {
+				return nil
+			}
 		}
 	}
 

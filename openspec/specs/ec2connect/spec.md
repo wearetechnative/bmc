@@ -122,3 +122,10 @@ The ec2connect command SHALL maintain backward compatibility with existing workf
 - **THEN** the system SHALL connect via AWS Systems Manager Session Manager
 - **AND** the system SHALL function exactly as it did before this change
 
+### Requirement: Optional positional argument for instance pre-selection
+The `ec2connect` command SHALL accept an optional positional argument. When no positional argument and no `-i` flag is given, the command SHALL display the full interactive instance picker as before.
+
+#### Scenario: No arguments shows full picker
+- **WHEN** the user runs `bmc ec2connect` with no positional argument and no `-i` flag
+- **THEN** the system SHALL show the full interactive instance picker with all instances
+- **AND** behaviour SHALL be identical to pre-change functionality
