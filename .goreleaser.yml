@@ -32,6 +32,8 @@ archives:
 nfpms:
   - id: bmc
     package_name: bmc
+    builds:
+      - bmc
     vendor: TechNative
     homepage: https://bmc.technative.cloud
     maintainer: TechNative <info@technative.eu>
@@ -40,9 +42,6 @@ nfpms:
     formats:
       - deb
       - rpm
-    contents:
-      - src: ./bmc
-        dst: /usr/bin/bmc
 
 checksum:
   name_template: "checksums.txt"
