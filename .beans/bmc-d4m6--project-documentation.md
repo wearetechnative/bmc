@@ -1,11 +1,11 @@
 ---
 # bmc-d4m6
 title: project-documentation
-status: todo
+status: in-progress
 type: task
 priority: normal
 created_at: 2026-05-08T20:00:00Z
-updated_at: 2026-05-08T20:00:00Z
+updated_at: 2026-05-13T13:00:00Z
 github-issue: https://github.com/wearetechnative/bmc/issues/9
 ---
 
