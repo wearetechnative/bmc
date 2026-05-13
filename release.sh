@@ -194,7 +194,7 @@ green "  Commit created"
 # ── annotated tag ──────────────────────────────────────────────────────────────
 bold "==> Creating tag v$NEW_VERSION"
 
-TAG_MSG="$(awk "/^\#\# \[$NEW_VERSION\]/{found=1; next} found && /^\#\# /{exit} found{print}" CHANGELOG.md)"
+TAG_MSG="$(awk "/^## \[$NEW_VERSION\]/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)"
 
 git tag -a "v$NEW_VERSION" -m "$(printf 'Release v%s\n\n%s' "$NEW_VERSION" "$TAG_MSG")"
 green "  Tag v$NEW_VERSION created"
