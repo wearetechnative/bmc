@@ -85,7 +85,8 @@ Create `~/.config/bmc/config.json`:
   "mfa": {
     "enabled": true,
     "totp_script": "/usr/bin/rbw get my-aws-mfa-entry --field totp",
-    "clipboard_command": "xclip -selection clipboard"
+    "copy_command": "wl-copy",
+    "paste_command": "wl-paste | wtype -"
   },
   "ec2": {
     "auto_start_stopped": "prompt",
@@ -135,7 +136,43 @@ aws_secret_access_key = ...
 aws_mfa_device        = arn:aws:iam::123456789012:mfa/your-username
 ```
 
-When the session expires, bmc prompts for a 6-digit TOTP code. If `totp_script` is configured, bmc runs that command to fetch the code automatically (e.g. from a password manager) and copies it to the clipboard via `clipboard_command`.
+When the session expires, bmc prompts for a 6-digit TOTP code. If `totp_script` is configured, bmc runs that command via `sh -c` to fetch the code automatically and optionally copies it to the clipboard and pastes it into the focused window.
+
+`totp_script` is executed via `sh -c`, so quoted arguments with spaces work correctly and interactive TUI selection tools (e.g. `gum filter`) render on the terminal and accept keyboard input.
+
+### Clipboard integration
+
+`copy_command` receives the TOTP code via **stdin** and copies it to the clipboard. `paste_command` runs 300ms later and simulates a paste keystroke in whatever window is currently focused — useful for automatically filling an MFA field in a browser.
+
+**Wayland (wl-clipboard)**
+
+```json
+{
+  "mfa": {
+    "copy_command": "wl-copy",
+    "paste_command": "wl-paste"
+  }
+}
+```
+
+- `wl-copy` reads stdin and writes it to the Wayland clipboard
+- `wl-paste` outputs the clipboard content — combine with a type tool if you want to simulate keystrokes instead: `"paste_command": "wl-paste | wtype -"`
+
+**X11 (xclip)**
+
+```json
+{
+  "mfa": {
+    "copy_command": "xclip -selection clipboard",
+    "paste_command": "xdotool key ctrl+v"
+  }
+}
+```
+
+- `xclip -selection clipboard` reads stdin into the clipboard
+- `xdotool key ctrl+v` simulates Ctrl+V in the focused window
+
+Both fields are optional. If only `copy_command` is set, the code is copied but not auto-pasted. If `copy_command` is not set, no clipboard interaction occurs.
 
 ## Commands
 
@@ -197,7 +234,8 @@ bmc install-shell-integration  # Install profsel wrapper
 |-----|------|---------|-------------|
 | `mfa.enabled` | bool | `false` | Enable MFA session management |
 | `mfa.totp_script` | string | `""` | Command to generate TOTP codes |
-| `mfa.clipboard_command` | string | `""` | Command to copy TOTP to clipboard |
+| `mfa.copy_command` | string | `""` | Command to copy TOTP to clipboard (receives code via stdin) |
+| `mfa.paste_command` | string | `""` | Command to simulate paste keystroke after copy (e.g. `xdotool key ctrl+v`); runs 300ms after copy |
 | `ec2.auto_start_stopped` | string | `"prompt"` | `always` / `never` / `prompt` |
 | `console.firefox_containers` | bool | `false` | Open console in Firefox container tab via [Granted](https://addons.mozilla.org/en-US/firefox/addon/granted/) extension |
 | `console.chrome_profiles` | bool | `false` | **Experimental.** Open console in a bmc-managed isolated Chrome profile per AWS profile |

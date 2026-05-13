@@ -118,8 +118,8 @@ func acquireTOTP(cfg config.Config, outfd *os.File) (string, error) {
 		code = strings.TrimSpace(code)
 		fmt.Fprintln(outfd, code)
 
-		if cfg.MFA.ClipboardCommand != "" {
-			copyToClipboard(cfg.MFA.ClipboardCommand, code, outfd)
+		if cfg.MFA.CopyCommand != "" {
+			copyAndPaste(cfg.MFA.CopyCommand, cfg.MFA.PasteCommand, code, outfd)
 		}
 		return code, nil
 	}
@@ -133,19 +133,21 @@ func acquireTOTP(cfg config.Config, outfd *os.File) (string, error) {
 }
 
 func runTOTPScript(script string) (string, error) {
-	parts := strings.Fields(script)
-	if len(parts) == 0 {
+	if script == "" {
 		return "", fmt.Errorf("totp_script is empty")
 	}
-	out, err := exec.Command(parts[0], parts[1:]...).Output()
+	cmd := exec.Command("sh", "-c", script)
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	out, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("totp_script failed: %w", err)
 	}
 	return string(out), nil
 }
 
-func copyToClipboard(cmd, text string, outfd *os.File) {
-	parts := strings.Fields(cmd)
+func copyAndPaste(copyCmd, pasteCmd, text string, outfd *os.File) {
+	parts := strings.Fields(copyCmd)
 	if len(parts) == 0 {
 		return
 	}
@@ -153,8 +155,19 @@ func copyToClipboard(cmd, text string, outfd *os.File) {
 	c.Stdin = strings.NewReader(text)
 	if err := c.Run(); err != nil {
 		fmt.Fprintf(outfd, "-- Note: Clipboard copy failed (%v)\n", err)
+		return
+	}
+	fmt.Fprintln(outfd, "-- Copied to clipboard")
+
+	if pasteCmd == "" {
+		return
+	}
+	time.Sleep(300 * time.Millisecond)
+	pasteParts := strings.Fields(pasteCmd)
+	if err := exec.Command(pasteParts[0], pasteParts[1:]...).Run(); err != nil {
+		fmt.Fprintf(outfd, "-- Note: Paste failed (%v)\n", err)
 	} else {
-		fmt.Fprintln(outfd, "-- Copied to clipboard")
+		fmt.Fprintln(outfd, "-- Pasted to active window")
 	}
 }
 

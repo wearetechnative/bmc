@@ -2,7 +2,12 @@
 
 ## NEXT VERSION
 
+### Breaking Changes
+- **`mfa.clipboard_command` renamed to `mfa.copy_command`**: Update your `~/.config/bmc/config.json` — the old field name is silently ignored
+
 ### Added
+- **MFA paste command**: New `mfa.paste_command` config field for keystroke simulation after clipboard copy (e.g. `xdotool key ctrl+v`, `wtype -k ctrl+v`). Runs 300ms after a successful copy, no action if copy fails.
+- **totp_script via sh -c**: Quoted arguments with spaces now work correctly (e.g. `rbw code "My Entry (new)"`). Interactive TUI selection tools (e.g. `gum filter`) render on the terminal and accept keyboard input.
 - **Fish shell support**: `bmc install-shell-integration` now supports Fish shell
   - Writes a wrapper function to `~/.config/fish/functions/bmc.fish` (auto-loaded, no restart needed)
   - On NixOS: skips auto-install and prints a `programs.fish.functions` home-manager snippet instead
