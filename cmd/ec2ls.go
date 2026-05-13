@@ -1,11 +1,16 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/wearetechnative/bmc/internal/awsops"
 	"github.com/wearetechnative/bmc/internal/config"
 	"github.com/wearetechnative/bmc/internal/ui"
 )
+
+var ec2lsJSON bool
 
 var ec2lsCmd = &cobra.Command{
 	Use:   "ec2ls",
@@ -14,6 +19,7 @@ var ec2lsCmd = &cobra.Command{
 }
 
 func init() {
+	ec2lsCmd.Flags().BoolVar(&ec2lsJSON, "json", false, "Output instances as JSON array")
 	rootCmd.AddCommand(ec2lsCmd)
 }
 
@@ -23,12 +29,21 @@ func runEC2ls(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	cfg, err := config.Load()
+	instances, err := awsops.ListInstances(profile)
 	if err != nil {
 		return err
 	}
 
-	instances, err := awsops.ListInstances(profile)
+	if ec2lsJSON {
+		data, err := json.Marshal(instances)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(data))
+		return nil
+	}
+
+	cfg, err := config.Load()
 	if err != nil {
 		return err
 	}

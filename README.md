@@ -198,13 +198,15 @@ Recently used profiles appear at the top of the interactive selector (last 10, l
 ```bash
 bmc ec2                  # Select instance → action menu (connect, start/stop, scheduler)
 bmc ec2 nginx            # Filter instances by name/ID/IP, then show action menu
-bmc ec2ls                # List EC2 instances (display-only)
-bmc ec2connect           # Connect via SSH or SSM
-bmc ec2connect -i i-xxx  # Connect to specific instance
-bmc ec2connect -u ubuntu # SSH as specific user
-bmc ec2stopstart         # Stop or start an instance
-bmc ec2find <search>     # Find instances across profiles
-bmc ec2scheduler         # Toggle InstanceScheduler tag
+bmc ec2ls                    # List EC2 instances (display-only)
+bmc ec2ls --json             # Output instances as JSON array
+bmc ec2connect               # Connect via SSH or SSM
+bmc ec2connect -i i-xxx      # Connect to specific instance
+bmc ec2connect -u ubuntu     # SSH as specific user
+bmc ec2stopstart             # Stop or start an instance
+bmc ec2find <search>         # Find instances across profiles
+bmc ec2find <search> --json  # Output matching instances as JSON array
+bmc ec2scheduler             # Toggle InstanceScheduler tag
 ```
 
 `bmc ec2 [search]` is the unified entry point: pick an instance once, then choose an action from the menu. The optional search argument filters by name, instance ID, private IP, or public IP (case-insensitive substring). A single match skips the picker and goes directly to the action menu.

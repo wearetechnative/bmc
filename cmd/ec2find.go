@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -12,6 +13,8 @@ import (
 	"github.com/wearetechnative/bmc/internal/ui"
 )
 
+var ec2findJSON bool
+
 var ec2findCmd = &cobra.Command{
 	Use:   "ec2find <search-string>",
 	Short: "Find EC2 instances across all profiles in a group",
@@ -20,6 +23,7 @@ var ec2findCmd = &cobra.Command{
 }
 
 func init() {
+	ec2findCmd.Flags().BoolVar(&ec2findJSON, "json", false, "Output instances as JSON array")
 	rootCmd.AddCommand(ec2findCmd)
 }
 
@@ -72,6 +76,18 @@ func runEC2Find(cmd *cobra.Command, args []string) error {
 
 	if len(matches) == 0 {
 		fmt.Fprintf(os.Stderr, "No instances found matching %q in group %q\n", args[0], selectedGroup)
+		if ec2findJSON {
+			fmt.Println("[]")
+		}
+		return nil
+	}
+
+	if ec2findJSON {
+		data, err := json.Marshal(matches)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(data))
 		return nil
 	}
 

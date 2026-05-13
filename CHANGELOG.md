@@ -3,6 +3,10 @@
 ## NEXT VERSION
 
 ### Added
+- **JSON output for `ec2ls` and `ec2find`**: Pass `--json` to get a machine-readable JSON array instead of a table — useful for scripting and piping into `jq`
+  - `bmc ec2ls --json` outputs all instances; all fields always included regardless of `ec2.columns` config
+  - `bmc ec2find <search> --json` outputs matching instances including the `Profile` field; interactive group selection still works via the terminal
+  - JSON keys follow AWS CLI PascalCase convention (`InstanceId`, `PrivateIpAddress`, etc.)
 - **`bmc ec2` unified command**: Select an EC2 instance and immediately act on it — no need to repeat instance selection across separate commands
   - Optional positional search argument: `bmc ec2 nginx` filters by name, ID, private IP, or public IP (case-insensitive); single match skips the picker entirely
   - Action menu after selection: **Connect SSH**, **Connect SSM**, **Start instance** / **Stop instance** (label adapts to current state), **Toggle scheduler**

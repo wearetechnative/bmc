@@ -13,14 +13,14 @@ import (
 
 // Instance holds normalised EC2 instance data for display.
 type Instance struct {
-	InstanceID  string
-	PrivateIP   string
-	PublicIP    string
-	State       string
-	Hibernate   string // yes / no
-	Name        string
-	Scheduler   string // yes / no
-	Profile     string // set when searching across profiles
+	InstanceID  string `json:"InstanceId"`
+	PrivateIP   string `json:"PrivateIpAddress"`
+	PublicIP    string `json:"PublicIpAddress"`
+	State       string `json:"State"`
+	Hibernate   string `json:"Hibernate"` // yes / no
+	Name        string `json:"Name"`
+	Scheduler   string `json:"Scheduler"` // yes / no
+	Profile     string `json:"Profile"`   // set when searching across profiles
 }
 
 // InstanceFieldValue returns the value of the named column for inst.
@@ -202,7 +202,10 @@ func GetInstanceState(profile, instanceID string) (string, error) {
 }
 
 func ec2Client(ctx context.Context, profile string) (*ec2.Client, error) {
-	cfg, err := awscfg.LoadDefaultConfig(ctx, awscfg.WithSharedConfigProfile(profile))
+	cfg, err := awscfg.LoadDefaultConfig(ctx,
+		awscfg.WithSharedConfigProfile(profile),
+		awscfg.WithRegion(getRegionOrDefault(ctx, profile)),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load AWS config for profile %q: %w", profile, err)
 	}
