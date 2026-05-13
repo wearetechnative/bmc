@@ -29,6 +29,21 @@ archives:
       - LICENSE
       - CHANGELOG.md
 
+nfpms:
+  - id: bmc
+    package_name: bmc
+    vendor: TechNative
+    homepage: https://bmc.technative.cloud
+    maintainer: TechNative <info@technative.eu>
+    description: Bill McCloud's AWS toolbox — profile selection, EC2/ECS operations, console access
+    license: Apache-2.0
+    formats:
+      - deb
+      - rpm
+    contents:
+      - src: ./bmc
+        dst: /usr/bin/bmc
+
 checksum:
   name_template: "checksums.txt"
 
