@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.5.2] - 18 May 2026
+
 ### Added
 - **`-p`/`--profile` flag on AWS commands**: Pass `-p <profile>` directly to `ec2connect`, `ec2ls`, `ec2`, `ec2scheduler`, `ec2stopstart`, and `ecsconnect` to specify an AWS profile without setting `AWS_PROFILE` in the environment
   - Flag takes priority over `AWS_PROFILE` env var; MFA check still runs
