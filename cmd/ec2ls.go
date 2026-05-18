@@ -20,6 +20,8 @@ var ec2lsCmd = &cobra.Command{
 
 func init() {
 	ec2lsCmd.Flags().BoolVar(&ec2lsJSON, "json", false, "Output instances as JSON array")
+	ec2lsCmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
+	ec2lsCmd.Flags().Lookup("profile").NoOptDefVal = " "
 	rootCmd.AddCommand(ec2lsCmd)
 }
 

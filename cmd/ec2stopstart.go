@@ -18,6 +18,8 @@ var ec2stopstartCmd = &cobra.Command{
 }
 
 func init() {
+	ec2stopstartCmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
+	ec2stopstartCmd.Flags().Lookup("profile").NoOptDefVal = " "
 	rootCmd.AddCommand(ec2stopstartCmd)
 }
 

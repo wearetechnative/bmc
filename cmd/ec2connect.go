@@ -28,6 +28,8 @@ var ec2connectCmd = &cobra.Command{
 func init() {
 	ec2connectCmd.Flags().StringVarP(&ec2connectInstanceID, "instance", "i", "", "Instance ID to connect to")
 	ec2connectCmd.Flags().StringVarP(&ec2connectUser, "user", "u", "", "SSH user")
+	ec2connectCmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
+	ec2connectCmd.Flags().Lookup("profile").NoOptDefVal = " "
 	rootCmd.AddCommand(ec2connectCmd)
 }
 
