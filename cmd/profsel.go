@@ -42,16 +42,15 @@ func init() {
 }
 
 func runProfsel(cmd *cobra.Command, args []string) error {
-	if profselList && profselJSON {
-		return fmt.Errorf("flags -l and --json are incompatible")
-	}
-
 	profiles, err := awsconfig.LoadProfiles()
 	if err != nil {
 		return err
 	}
 
 	if profselList {
+		if profselJSON {
+			return printProfilesJSON(profiles)
+		}
 		return printProfiles(profiles)
 	}
 
@@ -154,6 +153,30 @@ func selectProfileInteractive(profiles []awsconfig.Profile) (awsconfig.Profile, 
 		p, _ := awsconfig.FindProfile(profiles, selectedName)
 		return p, nil
 	}
+}
+
+func printProfilesJSON(profiles []awsconfig.Profile) error {
+	type jsonProfile struct {
+		Group     string `json:"group"`
+		Name      string `json:"name"`
+		AccountID string `json:"account_id"`
+		RoleARN   string `json:"role_arn,omitempty"`
+	}
+	out := make([]jsonProfile, len(profiles))
+	for i, p := range profiles {
+		out[i] = jsonProfile{
+			Group:     p.Group,
+			Name:      p.Name,
+			AccountID: p.AccountID,
+			RoleARN:   p.RoleARN,
+		}
+	}
+	data, err := json.Marshal(out)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(data))
+	return nil
 }
 
 func printProfiles(profiles []awsconfig.Profile) error {

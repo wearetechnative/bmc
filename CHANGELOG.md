@@ -2,6 +2,9 @@
 
 ## NEXT VERSION
 
+### Added
+- **`profsel -l --json`**: Output the full profile list as JSON (`[{group, name, account_id, role_arn}]`)
+
 ### Fixed
 - **`profsel -l` inside eval wrapper**: Profile list output now goes to stderr, preventing shell errors when `bmc profsel` is wrapped in `eval`
 
