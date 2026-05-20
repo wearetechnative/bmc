@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.5.3] - 20 May 2026
+
 ### Fixed
 - **`profsel -l` inside eval wrapper**: Profile list output now goes to stderr, preventing shell errors when `bmc profsel` is wrapped in `eval`
 - **Shell integration wrapper**: Fixed two bugs — `profsel` arg was doubled in the underlying command, and `-l`/`--list` output was incorrectly eval'd. Wrapper now skips eval for list mode and uses `${@:2}` (bash/zsh) / `$argv[2..]` (fish) to avoid arg duplication
