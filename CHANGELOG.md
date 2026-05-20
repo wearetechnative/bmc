@@ -2,6 +2,12 @@
 
 ## NEXT VERSION
 
+### Added
+- **`-k`/`--key` flag for `ec2connect`**: Specify an SSH identity file (`.pem` key pair) when connecting via SSH
+  - Path is passed directly to `ssh -i` — no validation performed by bmc
+  - Providing `-k` automatically selects SSH as the connection method (no method picker shown)
+  - Restores functionality from the original bash-era `ec2connect.sh`
+
 ## [0.5.2] - 18 May 2026
 
 ### Added

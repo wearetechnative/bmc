@@ -106,7 +106,7 @@ func runEC2(cmd *cobra.Command, args []string) error {
 
 	switch action {
 	case "Connect SSH":
-		return connectSSH(instanceID)
+		return connectSSH(instanceID, "")
 	case "Connect SSM":
 		return connectSSM(instanceID)
 	case "Start instance":

@@ -16,6 +16,7 @@ import (
 var (
 	ec2connectInstanceID string
 	ec2connectUser       string
+	ec2connectKey        string
 )
 
 var ec2connectCmd = &cobra.Command{
@@ -28,6 +29,7 @@ var ec2connectCmd = &cobra.Command{
 func init() {
 	ec2connectCmd.Flags().StringVarP(&ec2connectInstanceID, "instance", "i", "", "Instance ID to connect to")
 	ec2connectCmd.Flags().StringVarP(&ec2connectUser, "user", "u", "", "SSH user")
+	ec2connectCmd.Flags().StringVarP(&ec2connectKey, "key", "k", "", "SSH identity file (passed to ssh -i)")
 	ec2connectCmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
 	ec2connectCmd.Flags().Lookup("profile").NoOptDefVal = " "
 	rootCmd.AddCommand(ec2connectCmd)
@@ -124,7 +126,7 @@ func runEC2Connect(cmd *cobra.Command, args []string) error {
 
 	// Choose connection method (skip if -u or known SSH intent)
 	connectionMethod := ""
-	if ec2connectUser != "" {
+	if ec2connectUser != "" || ec2connectKey != "" {
 		connectionMethod = "ssh"
 	} else {
 		method, err := ui.Choose("Connection method", []ui.Item{{Title: "ssh"}, {Title: "ssm"}})
@@ -136,14 +138,14 @@ func runEC2Connect(cmd *cobra.Command, args []string) error {
 
 	switch connectionMethod {
 	case "ssh":
-		return connectSSH(instanceID)
+		return connectSSH(instanceID, ec2connectKey)
 	case "ssm":
 		return connectSSM(instanceID)
 	}
 	return nil
 }
 
-func connectSSH(instanceID string) error {
+func connectSSH(instanceID, key string) error {
 	if err := prereqs.Check(prereqs.SSH); err != nil {
 		return err
 	}
@@ -176,9 +178,14 @@ func connectSSH(instanceID string) error {
 	}
 
 	target := user + "@" + instanceID
-	fmt.Fprintf(os.Stderr, "-- Executing: ssh %s\n", target)
+	sshArgs := []string{"ssh"}
+	if key != "" {
+		sshArgs = append(sshArgs, "-i", key)
+	}
+	sshArgs = append(sshArgs, target)
+	fmt.Fprintf(os.Stderr, "-- Executing: ssh %s\n", strings.Join(sshArgs[1:], " "))
 
-	return syscall.Exec(sshBin, []string{"ssh", target}, os.Environ())
+	return syscall.Exec(sshBin, sshArgs, os.Environ())
 }
 
 func connectSSM(instanceID string) error {
