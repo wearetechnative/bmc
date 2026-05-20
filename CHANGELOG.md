@@ -2,6 +2,9 @@
 
 ## NEXT VERSION
 
+### Fixed
+- **`profsel -l` inside eval wrapper**: Profile list output now goes to stderr, preventing shell errors when `bmc profsel` is wrapped in `eval`
+
 ### Added
 - **`-k`/`--key` flag for `ec2connect`**: Specify an SSH identity file (`.pem` key pair) when connecting via SSH
   - Path is passed directly to `ssh -i` — no validation performed by bmc

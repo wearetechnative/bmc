@@ -157,7 +157,7 @@ func selectProfileInteractive(profiles []awsconfig.Profile) (awsconfig.Profile, 
 }
 
 func printProfiles(profiles []awsconfig.Profile) error {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	w := tabwriter.NewWriter(os.Stderr, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "Group\tName\tARN Number")
 	for _, p := range profiles {
 		fmt.Fprintf(w, "%s\t%s\t%s\n", p.Group, p.Name, p.AccountID)
