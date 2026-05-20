@@ -14,7 +14,12 @@ const shellWrapper = `
 # bmc shell integration — added by bmc install-shell-integration
 bmc() {
   if [[ "$1" == "profsel" ]]; then
-    eval "$(command bmc profsel "$@")"
+    local _bmc_args=("${@:2}")
+    if [[ " ${_bmc_args[*]} " == *" -l "* || " ${_bmc_args[*]} " == *" --list "* ]]; then
+      command bmc profsel "${_bmc_args[@]}"
+    else
+      eval "$(command bmc profsel "${_bmc_args[@]}")"
+    fi
   else
     command bmc "$@"
   fi
@@ -30,7 +35,12 @@ Add the wrapper manually using one of these methods:
   programs.zsh.initContent = ''
     bmc() {
       if [[ "$1" == "profsel" ]]; then
-        eval "$(command bmc profsel "$@")"
+        local _bmc_args=("${@:2}")
+        if [[ " ${_bmc_args[*]} " == *" -l "* || " ${_bmc_args[*]} " == *" --list "* ]]; then
+          command bmc profsel "${_bmc_args[@]}"
+        else
+          eval "$(command bmc profsel "${_bmc_args[@]}")"
+        fi
       else
         command bmc "$@"
       fi
@@ -41,7 +51,12 @@ Add the wrapper manually using one of these methods:
   programs.bash.initContent = ''
     bmc() {
       if [[ "$1" == "profsel" ]]; then
-        eval "$(command bmc profsel "$@")"
+        local _bmc_args=("${@:2}")
+        if [[ " ${_bmc_args[*]} " == *" -l "* || " ${_bmc_args[*]} " == *" --list "* ]]; then
+          command bmc profsel "${_bmc_args[@]}"
+        else
+          eval "$(command bmc profsel "${_bmc_args[@]}")"
+        fi
       else
         command bmc "$@"
       fi
@@ -51,7 +66,12 @@ Add the wrapper manually using one of these methods:
 ── manual ~/.zshrc or ~/.bashrc ─────────────────────────────
   bmc() {
     if [[ "$1" == "profsel" ]]; then
-      eval "$(command bmc profsel "$@")"
+      local _bmc_args=("${@:2}")
+      if [[ " ${_bmc_args[*]} " == *" -l "* || " ${_bmc_args[*]} " == *" --list "* ]]; then
+        command bmc profsel "${_bmc_args[@]}"
+      else
+        eval "$(command bmc profsel "${_bmc_args[@]}")"
+      fi
     else
       command bmc "$@"
     fi
@@ -60,7 +80,12 @@ Add the wrapper manually using one of these methods:
 ── fish (~/.config/fish/config.fish) ────────────────────────
   function bmc
     if test "$argv[1]" = "profsel"
-      eval (command bmc profsel $argv)
+      set _bmc_args $argv[2..]
+      if contains -- -l $_bmc_args; or contains -- --list $_bmc_args
+        command bmc profsel $_bmc_args
+      else
+        eval (command bmc profsel $_bmc_args)
+      end
     else
       command bmc $argv
     end
@@ -70,7 +95,12 @@ Add the wrapper manually using one of these methods:
 const fishWrapper = `# bmc shell integration — added by bmc install-shell-integration
 function bmc
   if test "$argv[1]" = "profsel"
-    eval (command bmc profsel $argv)
+    set _bmc_args $argv[2..]
+    if contains -- -l $_bmc_args; or contains -- --list $_bmc_args
+      command bmc profsel $_bmc_args
+    else
+      eval (command bmc profsel $_bmc_args)
+    end
   else
     command bmc $argv
   end
@@ -86,7 +116,12 @@ Add the wrapper using home-manager in your home.nix:
     bmc = {
       body = ''
         if test "$argv[1]" = "profsel"
-          eval (command bmc profsel $argv)
+          set _bmc_args $argv[2..]
+          if contains -- -l $_bmc_args; or contains -- --list $_bmc_args
+            command bmc profsel $_bmc_args
+          else
+            eval (command bmc profsel $_bmc_args)
+          end
         else
           command bmc $argv
         end
