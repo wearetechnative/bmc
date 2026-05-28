@@ -12,8 +12,22 @@ description: "Open the AWS Management Console for the current or selected profil
 bmc console              # Open console for current profile (AWS_PROFILE)
 bmc console -p myprofile # Open console for a specific profile
 bmc console -p           # Force interactive profile selection
-bmc console -s ec2       # Open console at a specific service URL
+bmc console -s ec2       # Open console at a specific service page
+bmc console -s systems-manager/parameters  # Deep link to a sub-page
 ```
+
+## Service shortcuts
+
+Use `-s` to open a specific AWS service or console page directly. The value is a console path — use a slash to deep link to a sub-page:
+
+```bash
+bmc console -s rds                          # RDS dashboard
+bmc console -s ec2                          # EC2 dashboard
+bmc console -s systems-manager/parameters   # Parameter Store
+bmc console -s iam/roles                    # IAM Roles
+```
+
+The region from your selected AWS profile is used automatically.
 
 ## Browser options
 
