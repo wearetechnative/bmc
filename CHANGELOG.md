@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.5.5] - 28 May 2026
+
 ### Fixed
 - **`console -s <service>` 400 Bad Request**: URL generation now uses region-aware path-based console URLs (`https://<region>.console.aws.amazon.com/<service>/home`) instead of the broken subdomain format (`https://<service>.console.aws.amazon.com/`) that caused 400 errors for most services
   - Region is resolved from the selected AWS profile
