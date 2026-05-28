@@ -52,7 +52,7 @@ func OpenConsole(profile, service string, bmcCfg config.Config) error {
 		return fmt.Errorf("failed to get federation token: %w", err)
 	}
 
-	consoleURL := buildConsoleURL(signinToken, service)
+	consoleURL := buildConsoleURL(signinToken, service, awsCfg.Region)
 	return openBrowser(consoleURL, profile, bmcCfg.Console)
 }
 
@@ -95,10 +95,14 @@ func getFederationToken(accessKey, secretKey, sessionToken string) (string, erro
 	return tokenResp.SigninToken, nil
 }
 
-func buildConsoleURL(signinToken, service string) string {
-	destination := "https://console.aws.amazon.com/"
+func buildConsoleURL(signinToken, service, region string) string {
+	destination := "https://" + region + ".console.aws.amazon.com/"
 	if service != "" {
-		destination = "https://" + service + ".console.aws.amazon.com/"
+		if strings.Contains(service, "/") {
+			destination = "https://" + region + ".console.aws.amazon.com/" + service
+		} else {
+			destination = "https://" + region + ".console.aws.amazon.com/" + service + "/home"
+		}
 	}
 
 	params := url.Values{}

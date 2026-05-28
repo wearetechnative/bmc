@@ -2,6 +2,11 @@
 
 ## NEXT VERSION
 
+### Fixed
+- **`console -s <service>` 400 Bad Request**: URL generation now uses region-aware path-based console URLs (`https://<region>.console.aws.amazon.com/<service>/home`) instead of the broken subdomain format (`https://<service>.console.aws.amazon.com/`) that caused 400 errors for most services
+  - Region is resolved from the selected AWS profile
+  - The `-s` flag now accepts console sub-paths (e.g., `systems-manager/parameters`) for deep linking directly to a specific page
+
 ## [0.5.4] - 21 May 2026
 
 ## [0.5.3] - 20 May 2026
