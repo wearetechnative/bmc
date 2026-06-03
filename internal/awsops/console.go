@@ -13,14 +13,14 @@ import (
 	"time"
 
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/wearetechnative/bmc/internal/config"
 )
 
-// OpenConsole opens the AWS Management Console for the given profile in the default browser.
-// If service is non-empty (e.g. "ec2"), the console will open at that service page.
-// If cfg.Console.FirefoxContainers is true, the URL is opened via the Granted Firefox extension.
-func OpenConsole(profile, service string, bmcCfg config.Config) error {
+// BuildFederationURL loads credentials for the given profile, calls the AWS
+// federation endpoint, and returns a ready-to-use signin URL along with the
+// credential expiry time. The expiry reflects the underlying STS session
+// duration (typically 1 hour for role-assumed credentials).
+func BuildFederationURL(profile, service string, bmcCfg config.Config) (string, time.Time, error) {
 	ctx := context.Background()
 
 	awsCfg, err := awscfg.LoadDefaultConfig(ctx,
@@ -28,32 +28,39 @@ func OpenConsole(profile, service string, bmcCfg config.Config) error {
 		awscfg.WithRegion(getRegionOrDefault(ctx, profile)),
 	)
 	if err != nil {
-		return fmt.Errorf("failed to load AWS config for profile %q: %w", profile, err)
+		return "", time.Time{}, fmt.Errorf("failed to load AWS config for profile %q: %w", profile, err)
 	}
 
-	// Assume the role to get temporary credentials
-	stsClient := sts.NewFromConfig(awsCfg)
-	callerID, err := stsClient.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
-	if err != nil {
-		return fmt.Errorf("failed to get caller identity: %w", err)
-	}
-
-	// Get the credentials from the config
 	creds, err := awsCfg.Credentials.Retrieve(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve credentials: %w", err)
+		return "", time.Time{}, fmt.Errorf("failed to retrieve credentials: %w", err)
 	}
 
-	_ = callerID
-
-	// Build sign-in token via federation endpoint
 	signinToken, err := getFederationToken(creds.AccessKeyID, creds.SecretAccessKey, creds.SessionToken)
 	if err != nil {
-		return fmt.Errorf("failed to get federation token: %w", err)
+		return "", time.Time{}, fmt.Errorf("failed to get federation token: %w", err)
 	}
 
 	consoleURL := buildConsoleURL(signinToken, service, awsCfg.Region)
+	return consoleURL, creds.Expires, nil
+}
+
+// OpenConsole opens the AWS Management Console for the given profile in the default browser.
+// If service is non-empty (e.g. "ec2"), the console will open at that service page.
+// If cfg.Console.FirefoxContainers is true, the URL is opened via the Granted Firefox extension.
+func OpenConsole(profile, service string, bmcCfg config.Config) error {
+	consoleURL, _, err := BuildFederationURL(profile, service, bmcCfg)
+	if err != nil {
+		return err
+	}
 	return openBrowser(consoleURL, profile, bmcCfg.Console)
+}
+
+// OpenURLInBrowser opens any URL in the appropriate browser based on the
+// console config (Firefox container, Chrome profile, or system default).
+// containerName is used as the container/profile name for browser isolation.
+func OpenURLInBrowser(u, containerName string, consoleCfg config.ConsoleConfig) error {
+	return openBrowser(u, containerName, consoleCfg)
 }
 
 type federationTokenResponse struct {
