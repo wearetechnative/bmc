@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.6.0] - 23 Jun 2026
+
 ### Added
 - **`bmc watcher`**: Background daemon that automatically refreshes AWS console federation sessions before they expire, keeping your browser logged in without manual re-authentication
   - `bmc console --watch` / `-w`: registers the session with the watcher after opening the console
