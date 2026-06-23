@@ -55,7 +55,7 @@ func EnsureValid(sourceProfile string, cfg config.Config, outfd *os.File) error 
 
 	fmt.Fprintf(outfd, "-- Refreshing MFA session for %s...\n", sourceProfile)
 
-	totpCode, err := acquireTOTP(cfg, outfd)
+	totpCode, err := acquireTOTP(cfg, sourceProfile, outfd)
 	if err != nil {
 		return fmt.Errorf("failed to get TOTP code: %w", err)
 	}
@@ -108,10 +108,14 @@ func isValid(expiration string) bool {
 }
 
 // acquireTOTP gets the TOTP code via totp_script or interactive prompt.
-func acquireTOTP(cfg config.Config, outfd *os.File) (string, error) {
-	if cfg.MFA.TOTPScript != "" {
+func acquireTOTP(cfg config.Config, sourceProfile string, outfd *os.File) (string, error) {
+	script := cfg.MFA.ProfileScripts[sourceProfile]
+	if script == "" {
+		script = cfg.MFA.TOTPScript
+	}
+	if script != "" {
 		fmt.Fprintln(outfd, "-- Executing TOTP script...")
-		code, err := runTOTPScript(cfg.MFA.TOTPScript)
+		code, err := runTOTPScript(script)
 		if err != nil {
 			return "", err
 		}

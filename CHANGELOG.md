@@ -13,6 +13,7 @@
   - Falls back to local refresh page (fetch + auto-close) if CDP is unavailable or no console tab is found
   - Falls back to opening the federation URL directly if the local page fails
 - **`watcher.firefox_debug_port` config option**: controls the CDP port (default `9222`); set to `0` to disable CDP entirely
+- **`mfa.profile_scripts` config option**: per-source-profile TOTP script overrides — map each AWS source profile name to a different TOTP script command; `totp_script` remains the global fallback for profiles not listed
 
 ## [0.5.5] - 28 May 2026
 

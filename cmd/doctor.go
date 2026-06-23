@@ -54,6 +54,12 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 	allOK = doctorCheck("MFA enabled", checkMFAEnabled(cfg)) && allOK
 	if cfg.MFA.Enabled {
 		allOK = doctorCheck("totp_script configured", checkTOTPScript(cfg)) && allOK
+		if len(cfg.MFA.ProfileScripts) > 0 {
+			fmt.Printf("  ✓ profile_scripts: %d override(s) configured\n", len(cfg.MFA.ProfileScripts))
+			for profile := range cfg.MFA.ProfileScripts {
+				fmt.Printf("      %s\n", profile)
+			}
+		}
 		allOK = doctorCheck("copy_command", checkClipboard(cfg)) && allOK
 	}
 

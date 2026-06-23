@@ -32,10 +32,11 @@ type ConsoleConfig struct {
 
 // MFAConfig holds MFA-related settings.
 type MFAConfig struct {
-	Enabled      bool   `json:"enabled"`
-	TOTPScript   string `json:"totp_script"`
-	CopyCommand  string `json:"copy_command"`
-	PasteCommand string `json:"paste_command"`
+	Enabled        bool              `json:"enabled"`
+	TOTPScript     string            `json:"totp_script"`
+	ProfileScripts map[string]string `json:"profile_scripts,omitempty"`
+	CopyCommand    string            `json:"copy_command"`
+	PasteCommand   string            `json:"paste_command"`
 }
 
 // EC2Config holds EC2-related settings.

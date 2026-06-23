@@ -34,6 +34,24 @@ Example with [rbw](https://github.com/doy/rbw) (Bitwarden CLI):
 
 Interactive TUI tools (e.g. `gum filter`) work because the script runs with the terminal attached.
 
+## Per-profile TOTP scripts
+
+If you manage multiple AWS accounts with different TOTP credentials, use `profile_scripts` to map each source profile to its own script. The global `totp_script` acts as a fallback for profiles not listed.
+
+```json
+{
+  "mfa": {
+    "enabled": true,
+    "totp_script": "rbw code \"Technative AWS (new)\"",
+    "profile_scripts": {
+      "wvandrtoorren": "rbw code \"Personal AWS\""
+    }
+  }
+}
+```
+
+When `bmc profsel` resolves the source profile (e.g. `wvandrtoorren`), it uses the matching script from `profile_scripts`. Profiles not listed fall back to `totp_script`. If neither is configured, BMC prompts for manual input.
+
 ## Clipboard integration
 
 After fetching the TOTP code, BMC can copy it to the clipboard and simulate a paste keystroke.
