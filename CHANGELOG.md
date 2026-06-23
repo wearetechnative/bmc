@@ -2,6 +2,18 @@
 
 ## NEXT VERSION
 
+### Added
+- **`bmc watcher`**: Background daemon that automatically refreshes AWS console federation sessions before they expire, keeping your browser logged in without manual re-authentication
+  - `bmc console --watch` / `-w`: registers the session with the watcher after opening the console
+  - `bmc watcher start`: starts the keep-alive daemon (auto-started by `--watch`)
+  - `bmc watcher stop`: stops the daemon
+  - `bmc watcher status`: shows active sessions with next-refresh countdown, indicates whether CDP or tab-fallback is used
+  - `bmc watcher setup`: configures Firefox for CDP-based invisible refresh (writes `user.js` in the default Firefox profile)
+- **CDP-based invisible session refresh**: when Firefox Remote Debugging Protocol is available (port 9222 by default), session refresh executes a `fetch()` call inside an existing AWS console tab — no new tab opened, no focus change
+  - Falls back to local refresh page (fetch + auto-close) if CDP is unavailable or no console tab is found
+  - Falls back to opening the federation URL directly if the local page fails
+- **`watcher.firefox_debug_port` config option**: controls the CDP port (default `9222`); set to `0` to disable CDP entirely
+
 ## [0.5.5] - 28 May 2026
 
 ### Fixed

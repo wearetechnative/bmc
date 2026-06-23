@@ -13,6 +13,14 @@ type Config struct {
 	MFA     MFAConfig     `json:"mfa"`
 	EC2     EC2Config     `json:"ec2"`
 	Console ConsoleConfig `json:"console"`
+	Watcher WatcherConfig `json:"watcher"`
+}
+
+// WatcherConfig holds settings for the bmc watcher daemon.
+type WatcherConfig struct {
+	// FirefoxDebugPort is the CDP remote debugging port Firefox listens on.
+	// Set to 0 to disable CDP and always use the tab-based fallback.
+	FirefoxDebugPort int `json:"firefox_debug_port"`
 }
 
 // ConsoleConfig holds console-related settings.
@@ -45,6 +53,9 @@ func Defaults() Config {
 		EC2: EC2Config{
 			AutoStartStopped: "prompt",
 			Columns:          []string{"InstanceId", "Name", "PrivateIP", "PublicIP", "State", "Hibernate", "Scheduler"},
+		},
+		Watcher: WatcherConfig{
+			FirefoxDebugPort: 9222,
 		},
 	}
 }

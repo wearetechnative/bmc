@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -20,6 +21,12 @@ const (
 	// keep the daemon alive while the user opens a console with --watch.
 	startupGrace = 60 * time.Second
 )
+
+// logFilePath returns the path to the watcher log file.
+func logFilePath() string {
+	home, _ := os.UserHomeDir()
+	return filepath.Join(home, ".config", "bmc", "watcher.log")
+}
 
 // RunDaemon is the daemon entry point, invoked when BMC_WATCHER_DAEMON=1.
 // It starts the HTTP server, registers itself in the state file, and runs
@@ -37,6 +44,12 @@ func RunDaemon() {
 		os.Exit(1)
 	}
 
+	// Initialise CDP client if a non-zero port is configured.
+	var cdp *CDPClient
+	if bmcCfg.Watcher.FirefoxDebugPort != 0 {
+		cdp = NewCDPClient("127.0.0.1", bmcCfg.Watcher.FirefoxDebugPort)
+	}
+
 	// Read sessions written by the parent before forking, then update PID/port.
 	state, err := ReadState()
 	if err != nil {
@@ -45,6 +58,7 @@ func RunDaemon() {
 	state.PID = os.Getpid()
 	state.StartedAt = time.Now().UTC()
 	state.Port = srv.Port()
+	state.CDPActive = cdp != nil && cdp.IsReachable()
 	if err := WriteState(state); err != nil {
 		fmt.Fprintf(os.Stderr, "watcher: failed to write state: %v\n", err)
 	}
@@ -62,7 +76,7 @@ func RunDaemon() {
 	hadSessions := false
 
 	for {
-		runPollLoop(srv, bmcCfg)
+		runPollLoop(srv, cdp, bmcCfg)
 
 		st, err := ReadState()
 		if err == nil && len(st.Sessions) > 0 {
@@ -107,16 +121,21 @@ func Fork() (int, error) {
 	cmd := exec.Command(exe, "watcher", "start")
 	cmd.Env = append(os.Environ(), "BMC_WATCHER_DAEMON=1")
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	logPath := logFilePath()
+	logFile, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		logFile = nil
+	}
 	cmd.Stdin = nil
-	cmd.Stdout = nil
-	cmd.Stderr = nil
+	cmd.Stdout = logFile
+	cmd.Stderr = logFile
 	if err := cmd.Start(); err != nil {
 		return 0, fmt.Errorf("failed to fork daemon: %w", err)
 	}
 	return cmd.Process.Pid, nil
 }
 
-func runPollLoop(srv *Server, bmcCfg config.Config) {
+func runPollLoop(srv *Server, cdp *CDPClient, bmcCfg config.Config) {
 	state, err := ReadState()
 	if err != nil || len(state.Sessions) == 0 {
 		return
@@ -132,7 +151,7 @@ func runPollLoop(srv *Server, bmcCfg config.Config) {
 		if s.RefreshAt.After(now) {
 			continue // not yet time to refresh
 		}
-		newSession, err := refreshSession(*s, srv, bmcCfg)
+		newSession, err := refreshSession(*s, srv, cdp, bmcCfg)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "watcher: refresh failed for %s: %v\n", s.Profile, err)
 			continue
@@ -145,15 +164,27 @@ func runPollLoop(srv *Server, bmcCfg config.Config) {
 	}
 }
 
-func refreshSession(s Session, srv *Server, bmcCfg config.Config) (Session, error) {
+func refreshSession(s Session, srv *Server, cdp *CDPClient, bmcCfg config.Config) (Session, error) {
 	signinURL, credExpiry, err := awsops.BuildFederationURL(s.Profile, s.Service, bmcCfg)
 	if err != nil {
 		return s, fmt.Errorf("failed to build federation URL: %w", err)
 	}
 
+	// Try CDP first (invisible — no new tab, no focus change).
+	if cdp != nil {
+		if err := cdp.RefreshSession(signinURL); err == nil {
+			s.Expiry = credExpiry
+			s.RefreshAt = credExpiry.Add(-refreshWindow)
+			return s, nil
+		} else {
+			fmt.Fprintf(os.Stderr, "watcher: CDP refresh failed for %s, falling back: %v\n", s.Profile, err)
+		}
+	}
+
+	// Fall back to opening the local refresh page (fetch + window.close).
 	localURL := srv.RefreshURL(signinURL)
 	if err := awsops.OpenURLInBrowser(localURL, s.ContainerName, bmcCfg.Console); err != nil {
-		// Fallback: open the federation URL directly in the container.
+		// Last resort: open the federation URL directly in the container.
 		fmt.Fprintf(os.Stderr, "watcher: local refresh page failed for %s, falling back to direct URL\n", s.Profile)
 		if err2 := awsops.OpenURLInBrowser(signinURL, s.ContainerName, bmcCfg.Console); err2 != nil {
 			return s, fmt.Errorf("fallback refresh also failed: %w", err2)

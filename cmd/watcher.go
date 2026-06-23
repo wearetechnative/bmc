@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/wearetechnative/bmc/internal/config"
 	"github.com/wearetechnative/bmc/internal/watcher"
 )
 
@@ -33,10 +34,17 @@ var watcherStatusCmd = &cobra.Command{
 	RunE:  runWatcherStatus,
 }
 
+var watcherSetupCmd = &cobra.Command{
+	Use:   "setup",
+	Short: "Configure Firefox for CDP-based invisible session refresh",
+	RunE:  runWatcherSetup,
+}
+
 func init() {
 	watcherCmd.AddCommand(watcherStartCmd)
 	watcherCmd.AddCommand(watcherStopCmd)
 	watcherCmd.AddCommand(watcherStatusCmd)
+	watcherCmd.AddCommand(watcherSetupCmd)
 	rootCmd.AddCommand(watcherCmd)
 }
 
@@ -99,7 +107,11 @@ func runWatcherStatus(_ *cobra.Command, _ []string) error {
 		fmt.Fprintln(os.Stderr, "watcher is not running")
 		return nil
 	}
-	fmt.Fprintf(os.Stderr, "-- watcher running (PID %d)\n", state.PID)
+	cdpMode := "tab fallback"
+	if state.CDPActive {
+		cdpMode = "CDP active"
+	}
+	fmt.Fprintf(os.Stderr, "-- watcher running (PID %d, %s)\n", state.PID, cdpMode)
 	if len(state.Sessions) == 0 {
 		fmt.Fprintln(os.Stderr, "   no active sessions")
 		return nil
@@ -116,6 +128,61 @@ func runWatcherStatus(_ *cobra.Command, _ []string) error {
 		}
 		fmt.Fprintf(os.Stderr, "   %-30s  %-20s  refreshes in %s\n",
 			s.Profile, s.ContainerName+"/"+service, formatWatcherDuration(until))
+	}
+	return nil
+}
+
+func runWatcherSetup(_ *cobra.Command, _ []string) error {
+	bmcCfg, err := config.Load()
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+	port := bmcCfg.Watcher.FirefoxDebugPort
+	if port == 0 {
+		fmt.Fprintln(os.Stderr, "CDP is disabled (firefox_debug_port is 0 in config). Set a non-zero port to enable.")
+		return nil
+	}
+
+	profileDir, err := watcher.FindDefaultProfile()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Could not find Firefox profile: %v\n", err)
+		fmt.Fprintln(os.Stderr, "")
+		fmt.Fprintln(os.Stderr, "Manual setup: add these lines to user.js in your Firefox profile directory:")
+		fmt.Fprintf(os.Stderr, "  user_pref(\"remote.enabled\", true);\n")
+		fmt.Fprintf(os.Stderr, "  user_pref(\"remote.force-local\", true);\n")
+		fmt.Fprintln(os.Stderr, "")
+		fmt.Fprintln(os.Stderr, "Then start Firefox with:")
+		fmt.Fprintf(os.Stderr, "  firefox --remote-debugging-port=%d\n", port)
+		return nil
+	}
+
+	// Detect conflicting prefs written by older bmc versions.
+	if watcher.HasConflictingPrefs(profileDir) {
+		fmt.Fprintf(os.Stderr, "WARNING: %s/user.js contains prefs that block Firefox BiDi.\n", profileDir)
+		fmt.Fprintln(os.Stderr, "Remove these lines from user.js:")
+		fmt.Fprintln(os.Stderr, "  remote.enabled, remote.force-local")
+		fmt.Fprintln(os.Stderr, "  devtools.debugger.remote-*")
+		fmt.Fprintln(os.Stderr, "")
+	}
+
+	if watcher.IsDebugPortConfigured(profileDir) {
+		fmt.Fprintln(os.Stderr, "Firefox BiDi setup is already complete.")
+	} else {
+		if err := watcher.WriteDebugPortConfig(profileDir, port); err != nil {
+			return fmt.Errorf("failed to write Firefox preferences: %w", err)
+		}
+		fmt.Fprintf(os.Stderr, "Setup marker written to %s/user.js\n", profileDir)
+	}
+
+	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "Firefox BiDi needs no preferences — activate it by starting Firefox with:")
+	fmt.Fprintf(os.Stderr, "  firefox --remote-debugging-port=%d\n", port)
+	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "To make this permanent, add to your shell config (~/.zshrc / ~/.bashrc):")
+	fmt.Fprintf(os.Stderr, "  alias firefox='firefox --remote-debugging-port=%d'\n", port)
+	fmt.Fprintln(os.Stderr, "")
+	if watcher.FirefoxIsRunning() {
+		fmt.Fprintln(os.Stderr, "Firefox is running. Restart it with the flag above for BiDi to activate.")
 	}
 	return nil
 }

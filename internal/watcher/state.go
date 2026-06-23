@@ -14,6 +14,7 @@ type WatcherState struct {
 	PID       int       `json:"pid"`
 	StartedAt time.Time `json:"started_at,omitempty"`
 	Port      int       `json:"port,omitempty"`
+	CDPActive bool      `json:"cdp_active,omitempty"`
 	Sessions  []Session `json:"sessions,omitempty"`
 }
 
