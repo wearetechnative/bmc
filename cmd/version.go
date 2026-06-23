@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -20,9 +21,9 @@ var versionCmd = &cobra.Command{
     http://github.com/wearetechnative/bmc
 
     by Wouter, Pim, et al.
-    © Technative 2024
+    © Technative 2024-%d
 
-`, Version)
+`, Version, time.Now().Year())
 	},
 }
 
