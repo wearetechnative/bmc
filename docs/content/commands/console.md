@@ -72,6 +72,10 @@ Opens the console in a dedicated Chrome profile per AWS account. See [Chrome Pro
 
 Without either option, BMC opens the AWS console URL in your system default browser.
 
+## Recent profiles
+
+The interactive picker shows recently used profiles at the top (last 10, labelled "recent"). History is shared with `bmc profsel` and all other commands that trigger interactive profile selection — stored in `~/.local/share/bmc/profile-history.json`.
+
 ## MFA
 
 If MFA is enabled and the session has expired, `bmc console` automatically refreshes it before opening the browser. See [MFA setup](/setup/mfa/).

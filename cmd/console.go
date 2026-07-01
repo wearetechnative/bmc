@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -13,7 +12,6 @@ import (
 	"github.com/wearetechnative/bmc/internal/config"
 	"github.com/wearetechnative/bmc/internal/history"
 	"github.com/wearetechnative/bmc/internal/mfa"
-	"github.com/wearetechnative/bmc/internal/ui"
 	"github.com/wearetechnative/bmc/internal/watcher"
 )
 
@@ -64,14 +62,13 @@ func runConsole(cmd *cobra.Command, args []string) error {
 		selectedProfile = p
 	case cmd.Flags().Changed("profile"):
 		// -p bare: force interactive selection (ignore AWS_PROFILE)
-		selectedProfile, err = selectProfileForConsoleInteractive(profiles)
+		selectedProfile, interactive, err = selectProfileWithHistory(profiles)
 		if err != nil {
 			return err
 		}
 		if selectedProfile.Name == "" {
 			return nil
 		}
-		interactive = true
 	default:
 		// no -p: use AWS_PROFILE if set, otherwise interactive
 		envProfile := os.Getenv("AWS_PROFILE")
@@ -82,14 +79,13 @@ func runConsole(cmd *cobra.Command, args []string) error {
 			}
 			selectedProfile = p
 		} else {
-			selectedProfile, err = selectProfileForConsoleInteractive(profiles)
+			selectedProfile, interactive, err = selectProfileWithHistory(profiles)
 			if err != nil {
 				return err
 			}
 			if selectedProfile.Name == "" {
 				return nil
 			}
-			interactive = true
 		}
 	}
 
@@ -113,7 +109,7 @@ func runConsole(cmd *cobra.Command, args []string) error {
 	}
 
 	if interactive {
-		_ = history.Save("console", selectedProfile.Name)
+		_ = history.Save("profile", selectedProfile.Name)
 	}
 
 	if consoleWatch {
@@ -121,100 +117,6 @@ func runConsole(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-// recentGroups returns the groups of recently-used profiles, in order of most
-// recent use, with duplicates removed. Groups whose profiles no longer exist in
-// the config are silently skipped.
-func recentGroups(profiles []awsconfig.Profile, recentProfiles []string) []string {
-	profileGroup := make(map[string]string, len(profiles))
-	for _, p := range profiles {
-		profileGroup[p.Name] = p.Group
-	}
-	seen := make(map[string]bool)
-	var groups []string
-	for _, name := range recentProfiles {
-		g := profileGroup[name]
-		if g != "" && !seen[g] {
-			seen[g] = true
-			groups = append(groups, g)
-		}
-	}
-	return groups
-}
-
-// selectProfileForConsoleInteractive shows a two-step group-aware selector.
-// Step 1: account groups, with recently-used groups surfaced at the top.
-// Step 2: profiles within the selected group, with recently-used profiles at the top.
-// Pressing back in step 2 returns to step 1.
-func selectProfileForConsoleInteractive(profiles []awsconfig.Profile) (awsconfig.Profile, error) {
-	recent := history.Load("console")
-	recentSet := make(map[string]bool, len(recent))
-	for _, r := range recent {
-		recentSet[r] = true
-	}
-
-	recentGroupList := recentGroups(profiles, recent)
-	recentGroupSet := make(map[string]bool, len(recentGroupList))
-	for _, g := range recentGroupList {
-		recentGroupSet[g] = true
-	}
-
-	allGroups := awsconfig.Groups(profiles)
-	if len(allGroups) == 0 {
-		return awsconfig.Profile{}, fmt.Errorf("no profile groups found in ~/.aws/config")
-	}
-
-	var groupItems []ui.Item
-	for _, g := range recentGroupList {
-		groupItems = append(groupItems, ui.Item{Title: g, Desc: "recent"})
-	}
-	for _, g := range allGroups {
-		if !recentGroupSet[g] {
-			groupItems = append(groupItems, ui.Item{Title: g})
-		}
-	}
-
-	for {
-		selectedGroup, err := ui.Choose("Select AWS account group", groupItems)
-		if err != nil {
-			return awsconfig.Profile{}, err
-		}
-		if selectedGroup == "" {
-			return awsconfig.Profile{}, nil
-		}
-
-		groupProfiles := awsconfig.ByGroup(profiles, selectedGroup)
-		var profileItems []ui.Item
-		for _, p := range groupProfiles {
-			if recentSet[p.Name] {
-				profileItems = append(profileItems, ui.Item{Title: p.Name, Desc: "recent"})
-			}
-		}
-		for _, p := range groupProfiles {
-			if !recentSet[p.Name] {
-				desc := p.AccountID
-				if p.RoleName != "" {
-					desc += " / " + p.RoleName
-				}
-				profileItems = append(profileItems, ui.Item{Title: p.Name, Desc: desc})
-			}
-		}
-
-		selectedName, err := ui.Choose("Select profile  (group: "+selectedGroup+")", profileItems)
-		if errors.Is(err, ui.ErrBack) {
-			continue
-		}
-		if err != nil {
-			return awsconfig.Profile{}, err
-		}
-		if selectedName == "" {
-			return awsconfig.Profile{}, nil
-		}
-
-		p, _ := awsconfig.FindProfile(profiles, selectedName)
-		return p, nil
-	}
 }
 
 // registerConsoleSession registers the opened session with the watcher daemon,

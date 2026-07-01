@@ -40,4 +40,4 @@ Useful for scripting — pipe into `jq` or other tools.
 
 ## Recent profiles
 
-The interactive picker shows recently used profiles at the top (last 10, labelled "recent"). History is stored in `~/.local/share/bmc/console-history.json`.
+The interactive picker shows recently used profiles at the top (last 10, labelled "recent"). History is shared across all commands that trigger interactive profile selection — a profile selected in `bmc console` or `bmc ec2connect` also appears recent in `bmc profsel`. History is stored in `~/.local/share/bmc/profile-history.json`.
