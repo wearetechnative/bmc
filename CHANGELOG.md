@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.7.0] - 01 Jul 2026
+
 ### Changed
 - **Shared profile history for all interactive selectors**: recently used AWS profiles now surface at the top of the picker (marked "recent") in `bmc profsel`, `bmc console`, and all commands that trigger interactive profile selection (`ec2connect`, `ec2ls`, etc.)
   - History is stored in `~/.local/share/bmc/profile-history.json` and shared across all commands — a profile selected in `console` appears recent in `profsel` and vice versa
