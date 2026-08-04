@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.6.1] - 04 Aug 2026
+
 ### Fixed
 - **Console sessions expiring after ~15 minutes**: `bmc console` resolved credentials without specifying an AssumeRole duration, so the AWS SDK for Go applied its own 15-minute default. The bash-era implementation shelled out to the AWS CLI, which defaults to one hour — hence the regression after the Go rewrite. A console session lives exactly as long as the credentials behind it, so sessions now last one hour again
   - Verified against a live role-based profile: 14m59s before, 59m59s after
