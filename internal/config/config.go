@@ -28,6 +28,13 @@ type ConsoleConfig struct {
 	FirefoxContainers bool   `json:"firefox_containers"`
 	ChromeProfiles    bool   `json:"chrome_profiles"`
 	ChromeBinary      string `json:"chrome_binary"`
+
+	// SessionDurationSeconds is the STS AssumeRole duration requested when
+	// opening a console. A console session lasts exactly as long as the
+	// credentials behind it, so this is what controls session lifetime.
+	// Defaults to 3600. Accepted range is 900–43200; values above a role's
+	// MaxSessionDuration automatically fall back to 3600.
+	SessionDurationSeconds int `json:"session_duration_seconds"`
 }
 
 // MFAConfig holds MFA-related settings.
@@ -54,6 +61,9 @@ func Defaults() Config {
 		EC2: EC2Config{
 			AutoStartStopped: "prompt",
 			Columns:          []string{"InstanceId", "Name", "PrivateIP", "PublicIP", "State", "Hibernate", "Scheduler"},
+		},
+		Console: ConsoleConfig{
+			SessionDurationSeconds: 3600,
 		},
 		Watcher: WatcherConfig{
 			FirefoxDebugPort: 9222,

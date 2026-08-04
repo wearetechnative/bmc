@@ -174,7 +174,7 @@ func refreshSession(s Session, srv *Server, cdp *CDPClient, bmcCfg config.Config
 	if cdp != nil {
 		if err := cdp.RefreshSession(signinURL); err == nil {
 			s.Expiry = credExpiry
-			s.RefreshAt = credExpiry.Add(-refreshWindow)
+			s.RefreshAt = RefreshTime(credExpiry)
 			return s, nil
 		} else {
 			fmt.Fprintf(os.Stderr, "watcher: CDP refresh failed for %s, falling back: %v\n", s.Profile, err)
@@ -192,6 +192,6 @@ func refreshSession(s Session, srv *Server, cdp *CDPClient, bmcCfg config.Config
 	}
 
 	s.Expiry = credExpiry
-	s.RefreshAt = credExpiry.Add(-refreshWindow)
+	s.RefreshAt = RefreshTime(credExpiry)
 	return s, nil
 }

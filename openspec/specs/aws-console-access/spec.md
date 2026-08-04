@@ -24,6 +24,18 @@ The `bmc console` command SHALL check for the `AWS_PROFILE` environment variable
 ### Requirement: Interactive profile selection shows recent profiles
 When `AWS_PROFILE` is not set and no `-p` flag is given, the `bmc console` command SHALL present the interactive profile selector with recently used profiles shown at the top of the list.
 
+#### Scenario: Recent profiles exist
+
+- **WHEN** a user runs `bmc console` without `AWS_PROFILE` set and without `-p`
+- **AND** the console history contains previously used profiles
+- **THEN** the interactive profile selector SHALL list those profiles at the top of the list
+
+#### Scenario: No recent profiles
+
+- **WHEN** a user runs `bmc console` without `AWS_PROFILE` set and without `-p`
+- **AND** the console history is empty
+- **THEN** the interactive profile selector SHALL list profiles without a recent section
+
 ### Requirement: Force Profile Selection with -p Flag
 The `bmc console` command SHALL support a `-p` flag without arguments to force profile selection even when `AWS_PROFILE` is set.
 
@@ -60,4 +72,20 @@ The `bmc console` command SHALL support a `-l` flag to list available AWS profil
 #### Scenario: List available profiles
 - **WHEN** user runs `bmc console -l`
 - **THEN** the command SHALL print the list of available AWS profiles and exit without opening the console
+
+### Requirement: Console sessions last a requested duration
+
+The `bmc console` command SHALL open sessions whose lifetime is determined by an explicitly requested AssumeRole duration, and SHALL report that session's expiry to the user. The duration, its configuration, and its bounds are defined by the `console-session-duration` capability.
+
+#### Scenario: Console opened for a role-based profile
+
+- **WHEN** a user opens the console for a profile that assumes a role
+- **THEN** the session SHALL last the requested duration, one hour by default
+- **AND** the command SHALL print the expiry time to stderr
+
+#### Scenario: Console opened with --watch
+
+- **WHEN** a user runs `bmc console --watch`
+- **THEN** the session registered with the watcher SHALL carry the real credential expiry
+- **AND** the watcher SHALL refresh the session before that expiry
 

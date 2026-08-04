@@ -108,8 +108,12 @@ func runConsole(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "-- Opening console for profile: %s\n", selectedProfile.Name)
-	if err := awsops.OpenConsole(selectedProfile.Name, consoleService, cfg); err != nil {
+	expiry, err := awsops.OpenConsole(selectedProfile.Name, consoleService, cfg)
+	if err != nil {
 		return err
+	}
+	if !expiry.IsZero() {
+		fmt.Fprintf(os.Stderr, "-- Console session valid until: %s\n", expiry.Local().Format("15:04:05"))
 	}
 
 	if interactive {
@@ -117,7 +121,7 @@ func runConsole(cmd *cobra.Command, args []string) error {
 	}
 
 	if consoleWatch {
-		registerConsoleSession(selectedProfile.Name, consoleService)
+		registerConsoleSession(selectedProfile.Name, consoleService, expiry)
 	}
 
 	return nil
@@ -218,16 +222,21 @@ func selectProfileForConsoleInteractive(profiles []awsconfig.Profile) (awsconfig
 }
 
 // registerConsoleSession registers the opened session with the watcher daemon,
-// starting the daemon first if it is not already running.
-func registerConsoleSession(profile, service string) {
-	// AWS federation sessions are capped at 1 hour for role-assumed credentials.
-	expiry := time.Now().Add(time.Hour)
+// starting the daemon first if it is not already running. expiry is the real
+// credential expiry reported by OpenConsole; guessing it here would make the
+// watcher refresh long after the session had already died.
+func registerConsoleSession(profile, service string, expiry time.Time) {
+	if expiry.IsZero() {
+		// Static credentials never expire; assume the shortest session AWS
+		// would hand out so the watcher keeps checking.
+		expiry = time.Now().Add(awsops.FallbackSessionDuration)
+	}
 	s := watcher.Session{
 		Profile:       profile,
 		Service:       service,
 		ContainerName: profile,
 		Expiry:        expiry,
-		RefreshAt:     expiry.Add(-5 * time.Minute),
+		RefreshAt:     watcher.RefreshTime(expiry),
 	}
 
 	alreadyRunning, err := watcher.EnsureWatcher()

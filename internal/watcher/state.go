@@ -27,6 +27,22 @@ type Session struct {
 	RefreshAt     time.Time `json:"refresh_at"`
 }
 
+// RefreshTime returns when a session expiring at expiry should be refreshed:
+// refreshWindow before expiry, but never past the session's midpoint, so short
+// sessions still get refreshed while they are alive.
+func RefreshTime(expiry time.Time) time.Time {
+	now := time.Now()
+	lifetime := expiry.Sub(now)
+	if lifetime <= 0 {
+		return now
+	}
+	window := refreshWindow
+	if window > lifetime/2 {
+		window = lifetime / 2
+	}
+	return expiry.Add(-window)
+}
+
 // StatePath returns the path to ~/.config/bmc/watcher.json.
 func StatePath() string {
 	home, _ := os.UserHomeDir()

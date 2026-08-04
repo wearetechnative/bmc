@@ -198,3 +198,42 @@ func TestPollLoop_RefreshesExpiredSession(t *testing.T) {
 		}
 	}
 }
+
+func TestRefreshTime(t *testing.T) {
+	now := time.Now()
+
+	tests := []struct {
+		name       string
+		expiry     time.Time
+		wantWindow time.Duration // expected gap between RefreshAt and expiry
+	}{
+		{"one hour session uses full window", now.Add(time.Hour), refreshWindow},
+		{"twelve hour session uses full window", now.Add(12 * time.Hour), refreshWindow},
+		{"ten minute session uses full window", now.Add(10 * time.Minute), refreshWindow},
+		{"six minute session is halved", now.Add(6 * time.Minute), 3 * time.Minute},
+		{"two minute session is halved", now.Add(2 * time.Minute), time.Minute},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := RefreshTime(tt.expiry)
+			window := tt.expiry.Sub(got)
+			if diff := window - tt.wantWindow; diff > time.Second || diff < -time.Second {
+				t.Errorf("RefreshTime window = %v, want %v", window, tt.wantWindow)
+			}
+			if !got.After(now.Add(-time.Second)) {
+				t.Errorf("RefreshTime = %v is not in the future; watcher would never refresh", got)
+			}
+			if !got.Before(tt.expiry) {
+				t.Errorf("RefreshTime = %v is not before expiry %v", got, tt.expiry)
+			}
+		})
+	}
+}
+
+func TestRefreshTimeAlreadyExpired(t *testing.T) {
+	got := RefreshTime(time.Now().Add(-time.Minute))
+	if got.After(time.Now()) {
+		t.Errorf("RefreshTime for an expired session = %v, want now or earlier", got)
+	}
+}

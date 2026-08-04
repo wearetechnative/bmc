@@ -29,6 +29,24 @@ bmc console -s iam/roles                    # IAM Roles
 
 The region from your selected AWS profile is used automatically.
 
+## Session lifetime
+
+A console session lasts exactly as long as the temporary credentials it was created from, so the AssumeRole duration BMC requests is what determines when you get logged out. The default is one hour, which every IAM role supports.
+
+To request longer sessions, set `session_duration_seconds` in `~/.config/bmc/config.json`:
+
+```json
+{
+  "console": {
+    "session_duration_seconds": 14400
+  }
+}
+```
+
+Accepted values range from 900 (15 minutes) to 43200 (12 hours). A role only grants up to its own `MaxSessionDuration` — when the configured value exceeds it, BMC falls back to one hour rather than failing. Roles reached by role chaining are always capped at one hour by AWS.
+
+On open, `bmc console` prints when the session expires. Use `bmc console --watch` to have the watcher daemon refresh it in the background shortly before it lapses.
+
 ## Browser options
 
 ### Firefox containers with Granted (recommended)

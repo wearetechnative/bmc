@@ -2,6 +2,18 @@
 
 ## NEXT VERSION
 
+### Fixed
+- **Console sessions expiring after ~15 minutes**: `bmc console` resolved credentials without specifying an AssumeRole duration, so the AWS SDK for Go applied its own 15-minute default. The bash-era implementation shelled out to the AWS CLI, which defaults to one hour — hence the regression after the Go rewrite. A console session lives exactly as long as the credentials behind it, so sessions now last one hour again
+  - Verified against a live role-based profile: 14m59s before, 59m59s after
+  - A profile's own `duration_seconds` is still honoured when it is shorter than the configured value
+  - When the requested duration exceeds a role's `MaxSessionDuration`, credential resolution retries at one hour instead of failing
+- **`bmc console --watch` refreshing too late**: the watcher was registered with a hardcoded one-hour expiry instead of the real credential expiry, so it scheduled its refresh roughly 40 minutes after a 15-minute session had already died. The real expiry is now used, and the refresh is never scheduled later than the session's midpoint
+- **Useless `DurationSeconds` on the federation request**: AWS honours that parameter only for long-term IAM user credentials and ignores it for temporary ones, so it no longer gets sent when a session token is present
+
+### Added
+- **`console.session_duration_seconds` config option**: sets the AssumeRole duration requested for console sessions (default `3600`, accepted range `900`–`43200`). Roles only grant up to their own `MaxSessionDuration`, and roles reached by role chaining are capped at one hour by AWS
+- **Session expiry is printed** when `bmc console` opens a session
+
 ## [0.6.0] - 23 Jun 2026
 
 ### Added
