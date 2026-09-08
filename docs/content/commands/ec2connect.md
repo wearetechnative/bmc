@@ -9,7 +9,7 @@ description: "Connect to an EC2 instance via SSH or SSM"
 ## Usage
 
 ```bash
-bmc ec2connect                              # Interactive instance picker
+bmc ec2connect                              # Interactive instance picker (type to filter)
 bmc ec2connect nginx                        # Filter instances by name/ID/IP first
 bmc ec2connect -p TN-Production nginx       # Use a specific profile, then filter
 bmc ec2connect -P nginx                     # Force interactive profile picker, then filter
@@ -30,6 +30,10 @@ Every command that talks to AWS shares the same profile flags:
 | _(neither)_              | Use `AWS_PROFILE` if set, otherwise show the picker |
 
 A bare `-p` with no value is an error (`flag needs an argument`) — use `-P`/`--pick` to force interactive selection.
+
+## Instance picker
+
+When no instance is preselected (via a `[search]` fragment or `-i`), BMC shows the interactive instance table. Start typing to filter the list in real time — matching is case-insensitive across the instance ID, name, and private/public IPs, so it works even when those columns are hidden by `ec2.columns`. Arrow keys move the selection, Enter connects to the highlighted instance, and Esc/Ctrl+C cancel. The same picker (and filter) is used by `bmc ec2`, `bmc ec2stopstart`, and `bmc ec2scheduler`.
 
 ## Connection methods
 

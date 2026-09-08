@@ -16,6 +16,8 @@ bmc ec2 i-0abc123    # Single match skips the picker
 
 The optional search argument filters instances by a case-insensitive substring match on instance name, ID, private IP, or public IP.
 
+In the interactive instance picker you can also start typing to filter the list in real time — matching covers the instance ID, name, and IPs, even when those columns are hidden by `ec2.columns`. Arrow keys move the selection, Enter confirms, and Esc/Ctrl+C cancel.
+
 ## Action menu
 
 After selecting an instance, a menu appears:

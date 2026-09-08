@@ -2,6 +2,11 @@
 
 ## NEXT VERSION
 
+### Added
+- **Type-to-filter in the interactive instance picker**: the EC2 instance selector now filters as you type, instead of requiring you to scroll to find an instance. Shared by `ec2connect`, `ec2`, `ec2stopstart`, and `ec2scheduler`
+  - Matching is case-insensitive and covers the instance ID, name, and private/public IPs — the same fields as the positional `[search]` fragment — so filtering works even when those columns are hidden by `ec2.columns`
+  - Arrow keys still navigate, Enter selects the highlighted row, and Esc/Ctrl+C cancel
+
 ### Changed
 - **Profile flag no longer swallows positional arguments**: `-p`/`--profile` is now a plain value flag, so `bmc ec2connect -p TN-Production compute2` works again. Previously the flag reserved a bare form for interactive selection (via pflag's `NoOptDefVal`), which made it silently refuse the space-separated value and misparse the command as too many positional arguments
   - Both `-p NAME` (space) and `-p=NAME` (equals) forms now work
