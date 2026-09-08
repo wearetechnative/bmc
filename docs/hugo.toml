@@ -3,6 +3,10 @@ languageCode = "en"
 title = "BMC"
 theme = "github.com/jpanther/congo/v2"
 
+# Derive each page's .Lastmod from its last git commit date (used by the
+# "Last updated" stamp in the footer). CI checks out with full history.
+enableGitInfo = true
+
 [module]
   [[module.imports]]
     path = "github.com/jpanther/congo/v2"
