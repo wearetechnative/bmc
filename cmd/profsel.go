@@ -9,14 +9,15 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wearetechnative/bmc/internal/awsconfig"
-	"golang.org/x/term"
 	"github.com/wearetechnative/bmc/internal/config"
 	"github.com/wearetechnative/bmc/internal/mfa"
 	"github.com/wearetechnative/bmc/internal/ui"
+	"golang.org/x/term"
 )
 
 var (
 	profselPreferred string
+	profselPick      bool
 	profselList      bool
 	profselJSON      bool
 )
@@ -36,6 +37,7 @@ Or install the wrapper permanently:
 
 func init() {
 	profselCmd.Flags().StringVarP(&profselPreferred, "profile", "p", "", "Pre-select a profile by name")
+	profselCmd.Flags().BoolVarP(&profselPick, "pick", "P", false, "Force interactive profile selection (ignores --profile)")
 	profselCmd.Flags().BoolVarP(&profselList, "list", "l", false, "List all profiles in tabular format")
 	profselCmd.Flags().BoolVar(&profselJSON, "json", false, "Output JSON {source_profile, profile_name, profile_arn}")
 	rootCmd.AddCommand(profselCmd)
@@ -53,7 +55,7 @@ func runProfsel(cmd *cobra.Command, args []string) error {
 
 	var selectedProfile awsconfig.Profile
 
-	if profselPreferred != "" {
+	if profselPreferred != "" && !profselPick {
 		p, ok := awsconfig.FindProfile(profiles, profselPreferred)
 		if !ok {
 			return fmt.Errorf("profile %q not found", profselPreferred)

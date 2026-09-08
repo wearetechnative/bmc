@@ -19,8 +19,7 @@ var ecsconnectCmd = &cobra.Command{
 }
 
 func init() {
-	ecsconnectCmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
-	ecsconnectCmd.Flags().Lookup("profile").NoOptDefVal = " "
+	addProfileFlags(ecsconnectCmd)
 	rootCmd.AddCommand(ecsconnectCmd)
 }
 

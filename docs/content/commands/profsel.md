@@ -10,6 +10,7 @@ weight: 10
 ```bash
 bmc profsel              # Interactive profile selection
 bmc profsel -p myprofile # Pre-select a profile by name
+bmc profsel -P           # Force interactive selection (--pick), ignoring --profile
 bmc profsel -l           # List all profiles in tabular format
 bmc profsel --json       # Output selected profile as JSON
 ```

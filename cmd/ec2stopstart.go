@@ -18,8 +18,7 @@ var ec2stopstartCmd = &cobra.Command{
 }
 
 func init() {
-	ec2stopstartCmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
-	ec2stopstartCmd.Flags().Lookup("profile").NoOptDefVal = " "
+	addProfileFlags(ec2stopstartCmd)
 	rootCmd.AddCommand(ec2stopstartCmd)
 }
 
@@ -124,4 +123,3 @@ func waitForState(profile, instanceID, desiredState string) error {
 	}
 	return fmt.Errorf("instance %s did not reach state %s within 5 minutes", instanceID, desiredState)
 }
-

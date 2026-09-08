@@ -11,11 +11,25 @@ description: "Connect to an EC2 instance via SSH or SSM"
 ```bash
 bmc ec2connect                              # Interactive instance picker
 bmc ec2connect nginx                        # Filter instances by name/ID/IP first
+bmc ec2connect -p TN-Production nginx       # Use a specific profile, then filter
+bmc ec2connect -P nginx                     # Force interactive profile picker, then filter
 bmc ec2connect -i i-0abc123                 # Connect to a specific instance ID
 bmc ec2connect -u ubuntu                    # SSH as a specific user (skips method picker)
 bmc ec2connect -k ~/.ssh/mykey.pem          # SSH with a specific identity file (skips method picker)
 bmc ec2connect -k ~/.ssh/mykey.pem -u ubuntu  # SSH with key and user (no prompts)
 ```
+
+## Profile selection
+
+Every command that talks to AWS shares the same profile flags:
+
+| Flag | Behaviour |
+|---|---|
+| `-p`, `--profile <NAME>` | Use the named profile. Both `-p NAME` and `-p=NAME` work, and a positional search term (e.g. `nginx`) is kept intact |
+| `-P`, `--pick`           | Force the interactive profile picker, ignoring `AWS_PROFILE` |
+| _(neither)_              | Use `AWS_PROFILE` if set, otherwise show the picker |
+
+A bare `-p` with no value is an error (`flag needs an argument`) — use `-P`/`--pick` to force interactive selection.
 
 ## Connection methods
 
