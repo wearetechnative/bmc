@@ -1,8 +1,15 @@
 {{/* Appends a "Last updated" stamp to the site footer.
-     .Lastmod comes from git (enableGitInfo = true in hugo.toml). The guard
-     keeps it off pages without a real modification date (e.g. generated pages). */}}
-{{ if not .Lastmod.IsZero }}
+     Dates come from git (enableGitInfo = true in hugo.toml).
+     - Home page: site-wide latest change (.Site.Lastmod), so the landing page
+       always reflects the freshest change anywhere on the site.
+     - Other pages: that page's own last change (.Lastmod).
+     The guard keeps it off pages without a real modification date. */}}
+{{ $lastmod := .Lastmod }}
+{{ if .IsHome }}
+  {{ $lastmod = .Site.Lastmod }}
+{{ end }}
+{{ if not $lastmod.IsZero }}
   <p class="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
-    Last updated: {{ .Lastmod.Format "2 January 2006" }}
+    Last updated: {{ $lastmod.Format "2 January 2006" }}
   </p>
 {{ end }}
