@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -10,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wearetechnative/bmc/internal/awsconfig"
 	"github.com/wearetechnative/bmc/internal/config"
+	"github.com/wearetechnative/bmc/internal/history"
 	"github.com/wearetechnative/bmc/internal/mfa"
-	"github.com/wearetechnative/bmc/internal/ui"
 	"golang.org/x/term"
 )
 
@@ -62,7 +61,7 @@ func runProfsel(cmd *cobra.Command, args []string) error {
 		}
 		selectedProfile = p
 	} else {
-		selectedProfile, err = selectProfileInteractive(profiles)
+		selectedProfile, _, err = selectProfileWithHistory(profiles)
 		if err != nil {
 			return err
 		}
@@ -73,6 +72,7 @@ func runProfsel(cmd *cobra.Command, args []string) error {
 			}
 			return nil
 		}
+		_ = history.Save("profile", selectedProfile.Name)
 	}
 
 	sourceProfile, err := awsconfig.ResolveSourceProfile(selectedProfile)
@@ -106,52 +106,6 @@ func runProfsel(cmd *cobra.Command, args []string) error {
 		fmt.Fprintln(os.Stderr, "Tip: run 'bmc install-shell-integration' to set AWS_PROFILE automatically")
 	}
 	return nil
-}
-
-func selectProfileInteractive(profiles []awsconfig.Profile) (awsconfig.Profile, error) {
-	groups := awsconfig.Groups(profiles)
-	if len(groups) == 0 {
-		return awsconfig.Profile{}, fmt.Errorf("no profile groups found in ~/.aws/config")
-	}
-
-	groupItems := make([]ui.Item, len(groups))
-	for i, g := range groups {
-		groupItems[i] = ui.Item{Title: g}
-	}
-
-	for {
-		selectedGroup, err := ui.Choose("Select AWS account group", groupItems)
-		if err != nil {
-			return awsconfig.Profile{}, err
-		}
-		if selectedGroup == "" {
-			return awsconfig.Profile{}, nil
-		}
-
-		groupProfiles := awsconfig.ByGroup(profiles, selectedGroup)
-		profileItems := make([]ui.Item, len(groupProfiles))
-		for i, p := range groupProfiles {
-			desc := p.AccountID
-			if p.RoleName != "" {
-				desc += " / " + p.RoleName
-			}
-			profileItems[i] = ui.Item{Title: p.Name, Desc: desc}
-		}
-
-		selectedName, err := ui.Choose("Select profile  (group: "+selectedGroup+")", profileItems)
-		if errors.Is(err, ui.ErrBack) {
-			continue
-		}
-		if err != nil {
-			return awsconfig.Profile{}, err
-		}
-		if selectedName == "" {
-			return awsconfig.Profile{}, nil
-		}
-
-		p, _ := awsconfig.FindProfile(profiles, selectedName)
-		return p, nil
-	}
 }
 
 func printProfiles(profiles []awsconfig.Profile) error {

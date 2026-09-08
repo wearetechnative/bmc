@@ -8,6 +8,10 @@
   - Arrow keys still navigate, Enter selects the highlighted row, and Esc/Ctrl+C cancel
 
 ### Changed
+- **Shared profile history for all interactive selectors**: recently used AWS profiles now surface at the top of the picker (marked "recent") in `bmc profsel`, `bmc console`, and all commands that trigger interactive profile selection (`ec2connect`, `ec2ls`, etc.)
+  - History is stored in `~/.local/share/bmc/profile-history.json` and shared across all commands — a profile selected in `console` appears recent in `profsel` and vice versa
+  - Last 10 profiles are tracked
+  - Note: existing `~/.local/share/bmc/console-history.json` is superseded by the new shared file
 - **Profile flag no longer swallows positional arguments**: `-p`/`--profile` is now a plain value flag, so `bmc ec2connect -p TN-Production compute2` works again. Previously the flag reserved a bare form for interactive selection (via pflag's `NoOptDefVal`), which made it silently refuse the space-separated value and misparse the command as too many positional arguments
   - Both `-p NAME` (space) and `-p=NAME` (equals) forms now work
   - Forcing the interactive profile picker moved to a dedicated `-P`/`--pick` flag, applied uniformly across `ec2`, `ec2connect`, `ec2ls`, `ec2scheduler`, `ec2stopstart`, `ecsconnect`, `console`, and `profsel`
