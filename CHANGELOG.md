@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.8.0] - 08 Sep 2026
+
 ### Added
 - **Type-to-filter in the interactive instance picker**: the EC2 instance selector now filters as you type, instead of requiring you to scroll to find an instance. Shared by `ec2connect`, `ec2`, `ec2stopstart`, and `ec2scheduler`
   - Matching is case-insensitive and covers the instance ID, name, and private/public IPs — the same fields as the positional `[search]` fragment — so filtering works even when those columns are hidden by `ec2.columns`
