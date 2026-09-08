@@ -12,6 +12,8 @@ description: "Toggle the InstanceScheduler tag on an EC2 instance"
 bmc ec2scheduler     # Pick instance → enable or disable scheduler
 ```
 
+In the instance picker you can start typing to filter by instance ID, name, or IP.
+
 ## What it does
 
 The command adds or removes the `InstanceScheduler` tag on the selected instance. AWS Instance Scheduler uses this tag to automatically start and stop instances on a configured schedule — useful for saving costs on non-production environments.
