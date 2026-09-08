@@ -19,8 +19,7 @@ var ec2Cmd = &cobra.Command{
 }
 
 func init() {
-	ec2Cmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
-	ec2Cmd.Flags().Lookup("profile").NoOptDefVal = " "
+	addProfileFlags(ec2Cmd)
 	rootCmd.AddCommand(ec2Cmd)
 }
 

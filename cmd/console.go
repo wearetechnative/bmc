@@ -19,6 +19,7 @@ import (
 
 var (
 	consoleProfile string
+	consolePick    bool
 	consoleService string
 	consoleWatch   bool
 )
@@ -26,13 +27,13 @@ var (
 var consoleCmd = &cobra.Command{
 	Use:   "console",
 	Short: "Open Firefox with AWS account in console",
-	Args:  cobra.MaximumNArgs(1),
+	Args:  cobra.NoArgs,
 	RunE:  runConsole,
 }
 
 func init() {
-	consoleCmd.Flags().StringVarP(&consoleProfile, "profile", "p", "", "AWS profile (omit value to force interactive selection)")
-	consoleCmd.Flags().Lookup("profile").NoOptDefVal = " "
+	consoleCmd.Flags().StringVarP(&consoleProfile, "profile", "p", "", "AWS profile name to use")
+	consoleCmd.Flags().BoolVarP(&consolePick, "pick", "P", false, "Force interactive profile selection (ignores AWS_PROFILE)")
 	consoleCmd.Flags().StringVarP(&consoleService, "service", "s", "", "AWS service to open (e.g. ec2, s3)")
 	consoleCmd.Flags().BoolVarP(&consoleWatch, "watch", "w", false, "Keep session alive via background watcher")
 	rootCmd.AddCommand(consoleCmd)
@@ -46,24 +47,13 @@ func runConsole(cmd *cobra.Command, args []string) error {
 
 	var selectedProfile awsconfig.Profile
 
-	// When NoOptDefVal fires (-p without =value), cobra puts the next word in args.
 	profileName := strings.TrimSpace(consoleProfile)
-	if profileName == "" && len(args) > 0 {
-		profileName = args[0]
-	}
 
 	interactive := false
 
 	switch {
-	case profileName != "":
-		// -p <name>: use the given profile directly
-		p, ok := awsconfig.FindProfile(profiles, profileName)
-		if !ok {
-			return fmt.Errorf("profile %q not found", profileName)
-		}
-		selectedProfile = p
-	case cmd.Flags().Changed("profile"):
-		// -p bare: force interactive selection (ignore AWS_PROFILE)
+	case consolePick:
+		// -P/--pick: force interactive selection (ignore AWS_PROFILE)
 		selectedProfile, err = selectProfileForConsoleInteractive(profiles)
 		if err != nil {
 			return err
@@ -72,6 +62,13 @@ func runConsole(cmd *cobra.Command, args []string) error {
 			return nil
 		}
 		interactive = true
+	case profileName != "":
+		// -p <name>: use the given profile directly
+		p, ok := awsconfig.FindProfile(profiles, profileName)
+		if !ok {
+			return fmt.Errorf("profile %q not found", profileName)
+		}
+		selectedProfile = p
 	default:
 		// no -p: use AWS_PROFILE if set, otherwise interactive
 		envProfile := os.Getenv("AWS_PROFILE")

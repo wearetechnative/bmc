@@ -1,6 +1,7 @@
 result
 /bmc
 /bmc-go
+/bmc-dev
 .aider*
 *.sw*
 

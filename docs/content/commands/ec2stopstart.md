@@ -12,6 +12,8 @@ description: "Stop or start an EC2 instance"
 bmc ec2stopstart     # Pick instance → stop or start
 ```
 
+In the instance picker you can start typing to filter by instance ID, name, or IP.
+
 BMC shows the current state of the selected instance and offers the appropriate action (Stop or Start). For hibernate-enabled instances, Stop also offers a hibernate option.
 
 ## Stopping with hibernate

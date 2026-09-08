@@ -11,7 +11,7 @@ description: "Open the AWS Management Console for the current or selected profil
 ```bash
 bmc console              # Open console for current profile (AWS_PROFILE)
 bmc console -p myprofile # Open console for a specific profile
-bmc console -p           # Force interactive profile selection
+bmc console -P           # Force interactive profile selection (--pick)
 bmc console -s ec2       # Open console at a specific service page
 bmc console -s systems-manager/parameters  # Deep link to a sub-page
 ```

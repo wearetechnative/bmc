@@ -2,7 +2,9 @@
 
 ## Purpose
 This specification defines the behavior of the `bmc console` command, which provides convenient access to the AWS Console in Firefox with automatic profile management. The command supports environment variable integration, flexible profile selection, service shortcuts, and profile listing functionality.
+
 ## Requirements
+
 ### Requirement: Respect AWS_PROFILE Environment Variable
 The `bmc console` command SHALL check for the `AWS_PROFILE` environment variable and use it when set, avoiding redundant profile selection prompts.
 
@@ -37,15 +39,20 @@ When `AWS_PROFILE` is not set and no `-p` flag is given, the `bmc console` comma
 - **THEN** the interactive profile selector SHALL list profiles without a recent section
 
 ### Requirement: Force Profile Selection with -p Flag
-The `bmc console` command SHALL support a `-p` flag without arguments to force profile selection even when `AWS_PROFILE` is set.
+The `bmc console` command SHALL use `-P`/`--pick` (a value-less boolean flag) to force interactive profile selection even when `AWS_PROFILE` is set. The `-p`/`--profile` flag SHALL always take a profile name as its value (both `-p NAME` and `-p=NAME` forms), and SHALL NOT be usable without a value. A bare `-p` with no value SHALL be an error (`flag needs an argument`), not a request for interactive selection.
 
 #### Scenario: Force selection when AWS_PROFILE is set
-- **WHEN** user runs `bmc console -p` and `AWS_PROFILE` environment variable is set
+- **WHEN** user runs `bmc console -P` (or `bmc console --pick`) and `AWS_PROFILE` environment variable is set
 - **THEN** the command SHALL ignore `AWS_PROFILE` and prompt for profile selection
 
 #### Scenario: Specify profile directly with -p argument
-- **WHEN** user runs `bmc console -p <profile-name>`
+- **WHEN** user runs `bmc console -p <profile-name>` (space form) or `bmc console -p=<profile-name>` (equals form)
 - **THEN** the command SHALL use the specified profile name directly without prompting
+
+#### Scenario: Bare -p is no longer a force-selection trigger
+- **WHEN** user runs `bmc console -p` with no value
+- **THEN** the command SHALL report that the flag needs an argument
+- **AND** SHALL NOT prompt for interactive selection
 
 ### Requirement: Service Selection with -s Flag
 The `bmc console` command SHALL support a `-s <path>` flag to open a specific AWS service or console sub-page. The value is treated as a console path and may include a `/` to target a sub-page (e.g., `systems-manager/parameters`). The resulting URL SHALL use the region resolved from the selected AWS profile.
@@ -88,4 +95,3 @@ The `bmc console` command SHALL open sessions whose lifetime is determined by an
 - **WHEN** a user runs `bmc console --watch`
 - **THEN** the session registered with the watcher SHALL carry the real credential expiry
 - **AND** the watcher SHALL refresh the session before that expiry
-

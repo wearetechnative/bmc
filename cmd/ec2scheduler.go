@@ -16,8 +16,7 @@ var ec2schedulerCmd = &cobra.Command{
 }
 
 func init() {
-	ec2schedulerCmd.Flags().StringVarP(&globalProfile, "profile", "p", "", "AWS profile to use (omit value to force interactive selection)")
-	ec2schedulerCmd.Flags().Lookup("profile").NoOptDefVal = " "
+	addProfileFlags(ec2schedulerCmd)
 	rootCmd.AddCommand(ec2schedulerCmd)
 }
 
