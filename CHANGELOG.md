@@ -2,6 +2,8 @@
 
 ## NEXT VERSION
 
+## [0.9.0] - 06 nov 2026
+
 ### Added
 - **`ec2ls --txt`**: outputs instances as aligned plain text without border lines, using the configured `ec2.columns` — handy for `grep`/`awk`
   - `--no-headers` (requires `--txt`) omits the header line
