@@ -19,6 +19,20 @@ aws_mfa_device        = arn:aws:iam::123456789012:mfa/your-username
 
 When the session expires, BMC prompts for a 6-digit TOTP code. If `totp_script` is configured, BMC runs it automatically to fetch the code.
 
+## Messages
+
+While the MFA session is still valid, BMC prints nothing about MFA. Messages are shown only when something happens or needs your attention: a session refresh, the TOTP script running, a manual code prompt, and the new expiry time after a refresh.
+
+To see which source profile is used, how long the current session stays valid, and the code returned by your TOTP script, add the global `--debug` flag:
+
+```bash
+bmc ec2ls --debug
+# -- Using AWS source-profile: technative
+# Current MFA Session Valid, until: 2026-11-06 19:42:17
+```
+
+All MFA messages are written to stderr, so they never end up in piped output.
+
 ## TOTP script
 
 `totp_script` is executed via `sh -c`. It should print a 6-digit code to stdout.
