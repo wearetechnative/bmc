@@ -2,7 +2,9 @@
 
 ## Purpose
 TBD - created by archiving change enhance-instance-list-scheduler-status. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: List All EC2 Instances
 The `bmc ec2ls` command SHALL list all EC2 instances in the current AWS profile with formatted instance details displayed in an interactive table, correctly parsing field values that contain spaces.
 
@@ -41,15 +43,23 @@ The `bmc ec2ls` command SHALL display whether instances are managed by the EC2 s
 - **THEN** the Scheduler column SHALL display "no"
 
 ### Requirement: Interactive Table Display
-The `bmc ec2ls` command SHALL present instance information in an interactive table for easy reading.
+The `bmc ec2ls` command SHALL present instance information in a bordered table on stdout for easy reading, using the columns from the `ec2.columns` configuration.
 
 #### Scenario: Format output as table
-- **WHEN** displaying instance information
-- **THEN** the command SHALL use `gum table` to render a formatted table
-- **AND** the command SHALL use proportional column widths for readability
+- **WHEN** displaying instance information without `--json` or `--txt`
+- **THEN** the command SHALL render a table with border lines, a bold header row and one row per instance
+- **AND** each column SHALL be as wide as its widest value
+
+#### Scenario: Cell padding
+- **WHEN** the table is rendered
+- **THEN** every cell, including header cells, SHALL have one space between the left border and its content
+- **AND** one space between its content and the right border
+
+#### Scenario: Table written to stdout
+- **WHEN** the table is rendered
+- **THEN** the table SHALL be written to stdout so it can be piped to other commands
 
 #### Scenario: Display CSV header
 - **WHEN** building the table output
-- **THEN** the command SHALL include a CSV header row with column names
-- **AND** the header SHALL be: "InstanceId,PrivateIpAddress,PublicIpAddress,State,Hibernate,Name,Scheduler"
-
+- **THEN** the command SHALL include a header row with the column names from `ec2.columns`
+- **AND** the header SHALL NOT be emitted as a comma-separated line
