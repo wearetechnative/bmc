@@ -14,7 +14,12 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show bmc version",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf(`
+		fmt.Print(versionBanner())
+	},
+}
+
+func versionBanner() string {
+	return fmt.Sprintf(`
     bmc v%s
     Bill McCloud's Toolbox
 
@@ -24,7 +29,6 @@ var versionCmd = &cobra.Command{
     © Technative 2024-%d
 
 `, Version, time.Now().Year())
-	},
 }
 
 func init() {

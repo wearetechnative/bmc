@@ -5,6 +5,7 @@
 ### Added
 - **`ec2ls --txt`**: outputs instances as aligned plain text without border lines, using the configured `ec2.columns` — handy for `grep`/`awk`
   - `--no-headers` (requires `--txt`) omits the header line
+- **`bmc --version` / `bmc -v`**: aliases for `bmc version`
 - **Global `--debug` flag**: shows diagnostic output on stderr, such as the MFA source profile, MFA session validity and the TOTP code returned by the TOTP script
 
 ### Changed
