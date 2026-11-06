@@ -37,6 +37,8 @@ When no instance is preselected (via a `[search]` fragment or `-i`), BMC shows t
 
 ## Connection methods
 
+Without `-u` or `-k`, BMC asks which connection method to use. SSM is listed first, so pressing Enter starts an SSM session.
+
 ### SSH
 
 Requires `ssh` on your PATH. BMC prompts for the SSH user (root, ubuntu, ec2-user, or custom) unless `-u` is specified.

@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts/types"
 	"github.com/wearetechnative/bmc/internal/awsconfig"
 	"github.com/wearetechnative/bmc/internal/config"
+	"github.com/wearetechnative/bmc/internal/debug"
 	"github.com/wearetechnative/bmc/internal/ui"
 )
 
@@ -30,7 +31,7 @@ func EnsureValid(sourceProfile string, cfg config.Config, outfd *os.File) error 
 		outfd = os.Stderr
 	}
 
-	fmt.Fprintf(outfd, "-- Using AWS source-profile: %s\n", sourceProfile)
+	debug.Printf(outfd, "-- Using AWS source-profile: %s\n", sourceProfile)
 
 	creds, err := awsconfig.LoadCredentials(sourceProfile)
 	if err != nil {
@@ -49,7 +50,7 @@ func EnsureValid(sourceProfile string, cfg config.Config, outfd *os.File) error 
 
 	if isValid(creds.Expiration) {
 		exp, _ := time.Parse(expirationLayout, creds.Expiration)
-		fmt.Fprintf(outfd, "Current MFA Session Valid, until: %s\n\n", exp.Format(expirationLayout))
+		debug.Printf(outfd, "Current MFA Session Valid, until: %s\n\n", exp.Format(expirationLayout))
 		return nil
 	}
 
@@ -120,7 +121,7 @@ func acquireTOTP(cfg config.Config, sourceProfile string, outfd *os.File) (strin
 			return "", err
 		}
 		code = strings.TrimSpace(code)
-		fmt.Fprintln(outfd, code)
+		debug.Printf(outfd, "%s\n", code)
 
 		if cfg.MFA.CopyCommand != "" {
 			copyAndPaste(cfg.MFA.CopyCommand, cfg.MFA.PasteCommand, code, outfd)

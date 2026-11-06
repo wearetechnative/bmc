@@ -236,14 +236,50 @@ func PrintTable(columns []string, rows [][]string) {
 		Headers(columns...).
 		StyleFunc(func(row, col int) lipgloss.Style {
 			if row == lgtable.HeaderRow {
-				return lipgloss.NewStyle().Bold(true)
+				return lipgloss.NewStyle().Bold(true).Padding(0, 1)
 			}
-			return lipgloss.NewStyle()
+			return lipgloss.NewStyle().Padding(0, 1)
 		})
 	for _, row := range rows {
 		t = t.Row(row...)
 	}
 	fmt.Fprintln(os.Stdout, t.String())
+}
+
+// PrintText prints columns and rows to stdout as aligned plain text without borders.
+// When headers is false the header line is omitted and alignment uses the rows only.
+func PrintText(columns []string, rows [][]string, headers bool) {
+	widths := make([]int, len(columns))
+	if headers {
+		for i, c := range columns {
+			widths[i] = lipgloss.Width(c)
+		}
+	}
+	for _, row := range rows {
+		for i := 0; i < len(row) && i < len(widths); i++ {
+			if w := lipgloss.Width(row[i]); w > widths[i] {
+				widths[i] = w
+			}
+		}
+	}
+	printLine := func(cells []string) {
+		var b strings.Builder
+		for i, cell := range cells {
+			if i == len(cells)-1 {
+				b.WriteString(cell)
+				break
+			}
+			b.WriteString(cell)
+			b.WriteString(strings.Repeat(" ", widths[i]-lipgloss.Width(cell)+2))
+		}
+		fmt.Fprintln(os.Stdout, b.String())
+	}
+	if headers {
+		printLine(columns)
+	}
+	for _, row := range rows {
+		printLine(row)
+	}
 }
 
 func printPlainTable(columns []string, rows [][]string) {

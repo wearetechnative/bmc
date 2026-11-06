@@ -128,7 +128,7 @@ func runEC2Connect(cmd *cobra.Command, args []string) error {
 	if ec2connectUser != "" || ec2connectKey != "" {
 		connectionMethod = "ssh"
 	} else {
-		method, err := ui.Choose("Connection method", []ui.Item{{Title: "ssh"}, {Title: "ssm"}})
+		method, err := ui.Choose("Connection method", []ui.Item{{Title: "ssm"}, {Title: "ssh"}})
 		if err != nil {
 			return err
 		}

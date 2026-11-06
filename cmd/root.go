@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/wearetechnative/bmc/internal/debug"
 )
 
 var rootCmd = &cobra.Command{
@@ -20,4 +21,5 @@ func Execute() {
 
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = false
+	rootCmd.PersistentFlags().BoolVar(&debug.Enabled, "debug", false, "Show diagnostic output (e.g. MFA session details) on stderr")
 }
