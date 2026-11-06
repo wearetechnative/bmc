@@ -2,7 +2,9 @@
 
 ## Purpose
 TBD - created by archiving change prompt-start-stopped-instances. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Prompt to Start Stopped Instances
 When a user selects a stopped EC2 instance in the ec2connect command, the system SHALL offer to start the instance before attempting connection, unless configured otherwise.
 
@@ -112,6 +114,7 @@ When SSH-specific command-line flags are provided to the ec2connect command, the
 #### Scenario: User provides no SSH-specific flags
 - **WHEN** the user runs `bmc ec2connect` without -u or -i flags
 - **THEN** the system SHALL prompt the user to choose between SSH and SSM connection methods
+- **AND** SSM SHALL be listed first and be the default selection
 - **AND** the system SHALL respect the user's manual selection
 
 ### Requirement: Backward Compatibility
