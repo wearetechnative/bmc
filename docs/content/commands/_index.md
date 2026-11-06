@@ -19,7 +19,7 @@ description: "All bmc commands with usage and examples"
 ## Other commands
 
 ```bash
-bmc version                    # Show version
+bmc version                    # Show version (alias: bmc --version, bmc -v)
 bmc doctor                     # Check dependencies and setup
 bmc install-shell-integration  # Install profsel shell wrapper
 bmc completion bash|zsh|fish   # Generate shell completions

@@ -14,6 +14,10 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	// --version is an alias for the version command. Version is only known
+	// here (set in main), so the flag is configured at execution time.
+	rootCmd.Version = Version
+	rootCmd.SetVersionTemplate(versionBanner())
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
