@@ -2,6 +2,16 @@
 
 ## NEXT VERSION
 
+### Added
+- **`ec2ls --txt`**: outputs instances as aligned plain text without border lines, using the configured `ec2.columns` — handy for `grep`/`awk`
+  - `--no-headers` (requires `--txt`) omits the header line
+- **Global `--debug` flag**: shows diagnostic output on stderr, such as the MFA source profile, MFA session validity and the TOTP code returned by the TOTP script
+
+### Changed
+- **`ec2connect` defaults to SSM**: the connection method picker now lists `ssm` first, so pressing Enter starts an SSM session instead of SSH
+- **MFA status messages hidden by default**: "-- Using AWS source-profile" and "Current MFA Session Valid" are no longer printed for every AWS command; use `--debug` to see them. Refresh messages and MFA prompts are still always shown
+- **Padded table cells**: printed tables (`ec2ls`, `ec2find`) now have a space between the border and the cell content
+
 ## [0.8.0] - 08 Sep 2026
 
 ### Added
